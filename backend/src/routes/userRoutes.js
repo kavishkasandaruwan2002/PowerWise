@@ -4,6 +4,14 @@ import { protect } from '../middleware/auth.js';
 import validate from '../middleware/validate.js';
 import { updateProfileSchema, changePasswordSchema, budgetUpdateSchema } from '../validations/userValidation.js';
 import { downloadUserProfilePDF, downloadHouseholdReportPDF } from '../controllers/pdfController.js';
+import {
+    updateBudget,
+    getBudgetHistory,
+    getBudgetComparison,
+    getBudgetForecast,
+    exportBudgetHistory
+} from '../controllers/budgetController.js';
+
 
 const router = express.Router();
 
@@ -196,5 +204,104 @@ router.get('/profile/download', downloadUserProfilePDF);
  *               format: binary
  */
 router.get('/household/download', downloadHouseholdReportPDF);
+
+/**
+ * @swagger
+ * /users/budget:
+ *   patch:
+ *     summary: Update current month's budget
+ *     tags: [Budget]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               budgetAmount:
+ *                 type: number
+ *                 minimum: 0
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Budget updated
+ */
+router.patch('/budget', validate(budgetUpdateSchema), updateBudget);
+
+/**
+ * @swagger
+ * /users/budget/history:
+ *   get:
+ *     summary: Get budget history with statistics
+ *     tags: [Budget]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Budget history
+ */
+router.get('/budget/history', getBudgetHistory);
+
+/**
+ * @swagger
+ * /users/budget/comparison:
+ *   get:
+ *     summary: Get budget comparison (MoM, YoY)
+ *     tags: [Budget]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Comparison data
+ */
+router.get('/budget/comparison', getBudgetComparison);
+
+/**
+ * @swagger
+ * /users/budget/forecast:
+ *   get:
+ *     summary: Get budget forecast
+ *     tags: [Budget]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Forecast data
+ */
+router.get('/budget/forecast', getBudgetForecast);
+
+/**
+ * @swagger
+ * /users/budget/export:
+ *   get:
+ *     summary: Export budget history as CSV
+ *     tags: [Budget]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: CSV file download
+ */
+router.get('/budget/export', exportBudgetHistory);
 
 export default router;
