@@ -3,7 +3,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const { swaggerUi, specs } = require('./config/swagger');
 
-require('dotenv').config();
+require('dotenv').config();//load env var
 
 const app = express();
 
@@ -11,22 +11,25 @@ const app = express();
 connectDB();
 
 // Init Middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials: true
-}));
+app.use(express.json({ extended: false }));
+app.use(cors());
 
-// Swagger Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
-    explorer: true,
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'PowerWise API Documentation'
-}));
 
+//=============name feat/comp here ========
 // Define Routes
 app.use('/api/appliances', require('./routes/appliances'));
 app.use('/api/readings', require('./routes/readings'));
+
+
+//============================tariff calc=================
+const tariffRoutes = require('./routes/tariffRoutes');
+app.use('/api/v1/tariffs', tariffRoutes);
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'Server is running' });
+});
+
 
 // Root route
 app.get('/', (req, res) => {
