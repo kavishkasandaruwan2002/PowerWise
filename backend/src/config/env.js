@@ -16,3 +16,4 @@ export const email = {
     pass: process.env.EMAIL_PASS,
 };
 export const clientUrl = process.env.CLIENT_URL;
+export const adminSecret = process.env.ADMIN_SECRET_KEY || 'your-super-secret-admin-key-change-this';
