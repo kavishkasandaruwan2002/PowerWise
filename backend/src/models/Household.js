@@ -31,6 +31,15 @@ const householdSchema = new mongoose.Schema({
         min: 0,
         default: 0,
     },
+    // Add these new fields for QR code
+    qrToken: {
+        type: String,
+        unique: true,
+        sparse: true // Allows null values
+    },
+    qrGeneratedAt: {
+        type: Date
+    }
 }, {
     timestamps: true,
 });
