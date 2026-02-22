@@ -4,15 +4,15 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
-import specs from "./config/swagger.js";
-import AppError from './utils/AppError.js';
-import globalErrorHandler from './middleware/errorHandler.js';
+import specs from './config/swagger.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import globalErrorHandler from './middleware/errorHandler.js';
+import AppError from './utils/AppError.js';
 
 const app = express();
 
-// Security
+// Security middleware
 app.use(helmet());
 app.use(cors());
 app.use(express.json({ limit: '10kb' }));
@@ -25,20 +25,20 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Logging
+// Logging in development
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 
-// API routes
+// Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 
-// Swagger documentation
+// API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-// 404 handler
-app.use((req, res, next) => {
+// Handle undefined routes
+app.all('*', (req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
 
