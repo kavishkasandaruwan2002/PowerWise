@@ -1,7 +1,6 @@
 import express from 'express';
 import * as userController from '../controllers/userController.js';
 import { protect } from '../middleware/auth.js';
-import { restrictTo } from '../middleware/role.js';
 import validate from '../middleware/validate.js';
 import { updateProfileSchema, changePasswordSchema, budgetUpdateSchema } from '../validations/userValidation.js';
 
@@ -158,96 +157,5 @@ router.get('/budget/history', userController.getBudgetHistory);
  *         description: Invalid budget amount
  */
 router.patch('/budget', validate(budgetUpdateSchema), userController.updateBudget);
-
-// Admin only routes
-router.use(restrictTo('admin'));
-
-/**
- * @swagger
- * /users:
- *   get:
- *     summary: Get all users (admin only)
- *     tags: [Admin]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *         description: Page number
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *         description: Number of items per page
- *     responses:
- *       200:
- *         description: Paginated users list
- *       403:
- *         description: Forbidden (not admin)
- */
-router.get('/', userController.getAllUsers);
-
-/**
- * @swagger
- * /users/{id}/role:
- *   patch:
- *     summary: Update user role (admin only)
- *     tags: [Admin]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               role:
- *                 type: string
- *                 enum: [family_user, admin, utility_agent]
- *     responses:
- *       200:
- *         description: Updated user
- *       400:
- *         description: Invalid role
- *       404:
- *         description: User not found
- */
-router.patch('/:id/role', userController.updateUserRole);
-
-/**
- * @swagger
- * /users/assign-household:
- *   post:
- *     summary: Assign user to a different household (admin only)
- *     tags: [Admin]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               userId:
- *                 type: string
- *               householdId:
- *                 type: string
- *     responses:
- *       200:
- *         description: Updated user with new household
- *       404:
- *         description: User or household not found
- */
-router.post('/assign-household', userController.assignUserToHousehold);
 
 export default router;
