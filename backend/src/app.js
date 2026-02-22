@@ -7,6 +7,7 @@ import swaggerUi from 'swagger-ui-express';
 import specs from './config/swagger.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import adminRoutes from './routes/adminRoutes.js'; // Add this import
 import globalErrorHandler from './middleware/errorHandler.js';
 import AppError from './utils/AppError.js';
 
@@ -33,6 +34,7 @@ if (process.env.NODE_ENV === 'development') {
 // Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1', adminRoutes); // Add admin routes
 
 // API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
