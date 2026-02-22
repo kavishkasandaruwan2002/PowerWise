@@ -1,6 +1,7 @@
 {
   "name": "powerguard-backend",
   "version": "1.0.0",
+  "type": "module",
   "description": "User & Household Management API for PowerGuard",
   "main": "server.js",
   "scripts": {
