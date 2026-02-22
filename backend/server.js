@@ -1,35 +1,69 @@
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const { swaggerUi, specs } = require('./config/swagger');
 
-require('dotenv').config();//load env var
+require('dotenv').config();
 
 const app = express();
 
 // Connect Database
 connectDB();
 
-// Init Middleware
-app.use(express.json({ extended: false }));
-app.use(cors());
+// Middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true
+}));
 
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+    explorer: true,
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'PowerWise API Documentation'
+}));
 
-//=============name feat/comp here ========
-// Define Routes
+// Routes
 app.use('/api/appliances', require('./routes/appliances'));
 app.use('/api/readings', require('./routes/readings'));
 
-
-//============================tariff calc=================
+// ===== Tariff Routes =====
 const tariffRoutes = require('./routes/tariffRoutes');
 app.use('/api/v1/tariffs', tariffRoutes);
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'Server is running' });
+// Root route
+app.get('/', (req, res) => {
+    res.json({
+        message: 'PowerWise API is running',
+        version: '1.0.0',
+        documentation: `http://localhost:${process.env.PORT || 5000}/api-docs`
+    });
 });
 
+// Health check
+app.get('/health', (req, res) => {
+    res.json({ status: 'Server is running' });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        success: false,
+        error: process.env.NODE_ENV === 'development'
+            ? err.message
+            : 'Server Error'
+    });
+});
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({ success: false, error: 'Route not found' });
+});
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+
+module.exports = app;
