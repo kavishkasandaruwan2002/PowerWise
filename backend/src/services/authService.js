@@ -7,20 +7,33 @@ import { sendEmail } from '../utils/email.js';
 import { clientUrl } from '../config/env.js';
 
 export const registerUser = async (userData) => {
-    const { email, password, firstName, lastName, household } = userData;
-    const existingUser = await User.findOne({ email });
-    if (existingUser) throw new AppError('User already exists with this email', 400);
+    try {
+        const { email, password, firstName, lastName, household } = userData;
 
-    const newHousehold = await Household.create(household);
-    const user = await User.create({
-        email,
-        password,
-        firstName,
-        lastName,
-        householdId: newHousehold._id,
-    });
+        // Check if user exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) throw new AppError('User already exists with this email', 400);
 
-    return user;
+        // Create household first
+        console.log('Creating household with data:', household); // Add logging
+        const newHousehold = await Household.create(household);
+        console.log('Household created:', newHousehold);
+
+        // Create user
+        const user = await User.create({
+            email,
+            password,
+            firstName,
+            lastName,
+            householdId: newHousehold._id,
+        });
+
+        console.log('User created:', user);
+        return user;
+    } catch (error) {
+        console.error('Registration error:', error); // This will show in console
+        throw error; // Re-throw to be caught by catchAsync
+    }
 };
 
 export const loginUser = async (email, password) => {
