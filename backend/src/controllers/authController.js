@@ -2,13 +2,26 @@ import * as authService from '../services/authService.js';
 import catchAsync from '../utils/catchAsync.js';
 
 export const register = catchAsync(async (req, res, next) => {
-    const user = await authService.registerUser(req.body);
-    res.status(201).json({
-        status: 'success',
-        message: 'User registered successfully',
-        data: { user }
-    });
+    console.log('📝 AuthController: Register endpoint called');
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+
+    try {
+        const user = await authService.registerUser(req.body);
+        console.log('✅ Registration successful for user:', user.email);
+
+        res.status(201).json({
+            status: 'success',
+            message: 'User registered successfully',
+            data: { user }
+        });
+    } catch (error) {
+        console.log('❌ AuthController: Registration failed');
+        console.log('Error:', error);
+        next(error);
+    }
 });
+
+// ... rest of your controller functions
 
 export const login = catchAsync(async (req, res, next) => {
     const { email, password } = req.body;

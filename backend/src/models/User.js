@@ -47,26 +47,24 @@ const userSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// ✅ FIXED: Use regular function, NOT arrow function
-userSchema.pre('save', async function(next) {
-    try {
-        // Only hash the password if it has been modified (or is new)
-        if (!this.isModified('password')) {
-            return next();
-        }
-
-        // Hash the password with cost of 12
-        const hashedPassword = await bcrypt.hash(this.password, 12);
-        this.password = hashedPassword;
-        next();
-    } catch (error) {
-        next(error);
+// Pre-save middleware
+userSchema.pre('save', async function() {
+    // Only hash if password is modified
+    if (!this.isModified('password')) {
+        return;
     }
+
+    this.password = await bcrypt.hash(this.password, 12);
 });
 
-// Compare password method
+// Compare password method - FIXED (no 'next' here!)
 userSchema.methods.comparePassword = async function(candidatePassword) {
-    return await bcrypt.compare(candidatePassword, this.password);
+    try {
+        return await bcrypt.compare(candidatePassword, this.password);
+    } catch (error) {
+        console.error('Compare password error:', error);
+        return false;
+    }
 };
 
 // Check if password changed after JWT was issued

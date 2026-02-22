@@ -37,7 +37,7 @@ app.use('/api/v1/users', userRoutes);
 // API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-// Handle undefined routes - FIXED version
+// Handle undefined routes
 app.use((req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
