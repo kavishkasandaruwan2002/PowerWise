@@ -4,6 +4,7 @@ import { protect } from '../middleware/auth.js';
 import { restrictTo } from '../middleware/role.js';
 import validate from '../middleware/validate.js';
 import { adminRegisterSchema, updateRoleSchema, assignHouseholdSchema } from '../validations/adminValidation.js';
+import { downloadAllUsersReportPDF } from '../controllers/pdfController.js';
 
 const router = express.Router();
 
@@ -187,5 +188,25 @@ router.post('/admin/users/assign-household', validate(assignHouseholdSchema), ad
  *         description: User deleted
  */
 router.delete('/admin/users/:id', adminController.deleteUser);
+
+/**
+ * @swagger
+ * /admin/reports/users/download:
+ *   get:
+ *     summary: Download all users report as PDF (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: PDF file download
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ */
+router.get('/admin/reports/users/download', downloadAllUsersReportPDF);
+
 
 export default router;
