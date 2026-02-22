@@ -7,6 +7,8 @@ import swaggerUi from 'swagger-ui-express';
 import specs from "./config/swagger.js";
 import AppError from './utils/AppError.js';
 import globalErrorHandler from './middleware/errorHandler.js';
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 
@@ -27,6 +29,10 @@ app.use('/api', limiter);
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
+
+// API routes
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
