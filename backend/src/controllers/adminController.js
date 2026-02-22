@@ -5,6 +5,8 @@ import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/AppError.js';
 import { signAccessToken, signRefreshToken } from '../utils/token.js';
 import { adminSecret } from '../config/env.js';
+import BudgetHistory from '../models/BudgetHistory.js';
+import * as budgetService from '../services/budgetService.js';
 
 /**
  * @desc    Register a new admin user (requires admin secret)
@@ -202,5 +204,66 @@ export const deleteUser = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: 'success',
         message: 'User deleted successfully'
+    });
+});
+
+/**
+ * @desc    Get all budget history (admin)
+ * @route   GET /api/v1/admin/budget/all
+ * @access  Private/Admin
+ */
+export const getAllBudgetHistory = catchAsync(async (req, res, next) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const filter = {};
+    if (req.query.householdId) filter.householdId = req.query.householdId;
+    if (req.query.startDate || req.query.endDate) {
+        filter.createdAt = {};
+        if (req.query.startDate) filter.createdAt.$gte = new Date(req.query.startDate);
+        if (req.query.endDate) filter.createdAt.$lte = new Date(req.query.endDate);
+    }
+
+    const history = await BudgetHistory.find(filter)
+        .populate('householdId')
+        .populate('updatedBy', 'firstName lastName email')
+        .sort('-createdAt')
+        .skip(skip)
+        .limit(limit);
+
+    const total = await BudgetHistory.countDocuments(filter);
+
+    // Get summary statistics
+    const stats = await BudgetHistory.aggregate([
+        {
+            $group: {
+                _id: null,
+                totalUpdates: { $sum: 1 },
+                averageBudget: { $avg: '$budgetAmount' },
+                maxBudget: { $max: '$budgetAmount' },
+                minBudget: { $min: '$budgetAmount' },
+                totalIncrease: {
+                    $sum: { $cond: [{ $gt: ['$changeAmount', 0] }, '$changeAmount', 0] }
+                },
+                totalDecrease: {
+                    $sum: { $cond: [{ $lt: ['$changeAmount', 0] }, '$changeAmount', 0] }
+                }
+            }
+        }
+    ]);
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            history,
+            stats: stats[0] || {},
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        }
     });
 });
