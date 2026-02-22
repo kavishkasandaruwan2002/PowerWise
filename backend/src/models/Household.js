@@ -4,14 +4,17 @@ const householdSchema = new mongoose.Schema({
     address: {
         type: String,
         trim: true,
+        default: '',
     },
     size: {
         type: Number,
         min: 1,
+        default: 1,
     },
     incomeLevel: {
         type: String,
         enum: ['low', 'middle', 'high'],
+        default: 'middle',
     },
     type: {
         type: String,
@@ -32,4 +35,5 @@ const householdSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-export default mongoose.model('Household', householdSchema);
+const Household = mongoose.model('Household', householdSchema);
+export default Household;
