@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
+import AppError from './utils/AppError.js';
 
 const app = express();
 
@@ -27,3 +28,8 @@ if (process.env.NODE_ENV === 'development') {
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+// 404 handler
+app.use((req, res, next) => {
+    next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
+});
