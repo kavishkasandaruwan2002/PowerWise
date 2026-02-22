@@ -55,31 +55,3 @@ export const updateBudget = catchAsync(async (req, res, next) => {
         data: { household }
     });
 });
-
-// Admin controllers
-export const getAllUsers = catchAsync(async (req, res, next) => {
-    const result = await userService.getAllUsers(req.query);
-    res.status(200).json({
-        status: 'success',
-        data: result
-    });
-});
-
-export const updateUserRole = catchAsync(async (req, res, next) => {
-    const user = await userService.updateUserRole(req.params.id, req.body.role);
-    res.status(200).json({
-        status: 'success',
-        message: 'User role updated successfully',
-        data: { user }
-    });
-});
-
-export const assignUserToHousehold = catchAsync(async (req, res, next) => {
-    const { userId, householdId } = req.body;
-    const user = await userService.assignUserToHousehold(userId, householdId);
-    res.status(200).json({
-        status: 'success',
-        message: 'User assigned to household successfully',
-        data: { user }
-    });
-});
