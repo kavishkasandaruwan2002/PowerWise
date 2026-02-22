@@ -3,6 +3,7 @@ import * as userController from '../controllers/userController.js';
 import { protect } from '../middleware/auth.js';
 import validate from '../middleware/validate.js';
 import { updateProfileSchema, changePasswordSchema, budgetUpdateSchema } from '../validations/userValidation.js';
+import { downloadUserProfilePDF, downloadHouseholdReportPDF } from '../controllers/pdfController.js';
 
 const router = express.Router();
 
@@ -157,5 +158,43 @@ router.get('/budget/history', userController.getBudgetHistory);
  *         description: Invalid budget amount
  */
 router.patch('/budget', validate(budgetUpdateSchema), userController.updateBudget);
+
+/**
+ * @swagger
+ * /users/profile/download:
+ *   get:
+ *     summary: Download own profile as PDF
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: PDF file download
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ */
+router.get('/profile/download', downloadUserProfilePDF);
+
+/**
+ * @swagger
+ * /users/household/download:
+ *   get:
+ *     summary: Download household report as PDF
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: PDF file download
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ */
+router.get('/household/download', downloadHouseholdReportPDF);
 
 export default router;
