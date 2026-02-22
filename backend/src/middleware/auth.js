@@ -15,6 +15,7 @@ export const protect = async (req, res, next) => {
 
         const decoded = verifyAccessToken(token);
         const user = await User.findById(decoded.id).select('-password -refreshToken');
+
         if (!user) {
             return next(new AppError('The user belonging to this token no longer exists.', 401));
         }

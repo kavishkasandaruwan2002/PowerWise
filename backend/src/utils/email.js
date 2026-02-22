@@ -12,11 +12,17 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendEmail = async (to, subject, html) => {
-    const mailOptions = {
-        from: `"PowerGuard" <${email.user}>`,
-        to,
-        subject,
-        html,
-    };
-    await transporter.sendMail(mailOptions);
+    try {
+        const mailOptions = {
+            from: `"PowerGuard" <${email.user}>`,
+            to,
+            subject,
+            html,
+        };
+        await transporter.sendMail(mailOptions);
+        console.log(`📧 Email sent to ${to}`);
+    } catch (error) {
+        console.error('❌ Email sending failed:', error);
+        throw error;
+    }
 };

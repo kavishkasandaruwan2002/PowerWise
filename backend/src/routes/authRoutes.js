@@ -34,33 +34,45 @@ const router = express.Router();
  *             properties:
  *               email:
  *                 type: string
+ *                 example: john.doe@example.com
  *               password:
  *                 type: string
+ *                 example: password123
  *               firstName:
  *                 type: string
+ *                 example: John
  *               lastName:
  *                 type: string
+ *                 example: Doe
  *               household:
  *                 type: object
  *                 properties:
  *                   address:
  *                     type: string
+ *                     example: 123 Main St, Colombo
  *                   size:
  *                     type: number
+ *                     example: 4
  *                   incomeLevel:
  *                     type: string
  *                     enum: [low, middle, high]
+ *                     example: middle
  *                   type:
  *                     type: string
  *                     enum: [apartment, boarding, rural, other]
+ *                     example: apartment
  *                   tariffType:
  *                     type: string
  *                     enum: [domestic, religious, small_business]
+ *                     example: domestic
  *                   monthlyBudget:
  *                     type: number
+ *                     example: 25000
  *     responses:
  *       201:
- *         description: User created
+ *         description: User created successfully
+ *       400:
+ *         description: Validation error or user already exists
  */
 router.post('/register', validate(registerSchema), authController.register);
 
@@ -82,11 +94,15 @@ router.post('/register', validate(registerSchema), authController.register);
  *             properties:
  *               email:
  *                 type: string
+ *                 example: john.doe@example.com
  *               password:
  *                 type: string
+ *                 example: password123
  *     responses:
  *       200:
  *         description: Returns user, accessToken, refreshToken
+ *       401:
+ *         description: Invalid credentials
  */
 router.post('/login', validate(loginSchema), authController.login);
 
@@ -108,6 +124,8 @@ router.post('/login', validate(loginSchema), authController.login);
  *     responses:
  *       200:
  *         description: New access token
+ *       401:
+ *         description: Invalid refresh token
  */
 router.post('/refresh-token', authController.refreshToken);
 
@@ -126,9 +144,12 @@ router.post('/refresh-token', authController.refreshToken);
  *             properties:
  *               email:
  *                 type: string
+ *                 example: john.doe@example.com
  *     responses:
  *       200:
- *         description: Token sent to email
+ *         description: Reset token sent to email
+ *       404:
+ *         description: User not found
  */
 router.post('/forgot-password', authController.forgotPassword);
 
@@ -153,9 +174,12 @@ router.post('/forgot-password', authController.forgotPassword);
  *             properties:
  *               password:
  *                 type: string
+ *                 example: newPassword123
  *     responses:
  *       200:
  *         description: Password updated
+ *       400:
+ *         description: Invalid or expired token
  */
 router.patch('/reset-password/:token', authController.resetPassword);
 

@@ -1,39 +1,39 @@
-import crypto from 'crypto';
 import User from '../models/User.js';
 import Household from '../models/Household.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/token.js';
 import AppError from '../utils/AppError.js';
+import crypto from 'crypto';
 import { sendEmail } from '../utils/email.js';
 import { clientUrl } from '../config/env.js';
 
 export const registerUser = async (userData) => {
-    try {
-        const { email, password, firstName, lastName, household } = userData;
+    console.log('📝 Starting registration with data:', JSON.stringify(userData, null, 2));
 
-        // Check if user exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) throw new AppError('User already exists with this email', 400);
+    const { email, password, firstName, lastName, household } = userData;
 
-        // Create household first
-        console.log('Creating household with data:', household); // Add logging
-        const newHousehold = await Household.create(household);
-        console.log('Household created:', newHousehold);
-
-        // Create user
-        const user = await User.create({
-            email,
-            password,
-            firstName,
-            lastName,
-            householdId: newHousehold._id,
-        });
-
-        console.log('User created:', user);
-        return user;
-    } catch (error) {
-        console.error('Registration error:', error); // This will show in console
-        throw error; // Re-throw to be caught by catchAsync
+    // Check if user exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        throw new AppError('User already exists with this email', 400);
     }
+
+    // Create household
+    console.log('🏠 Creating household...');
+    const newHousehold = await Household.create(household);
+    console.log('✅ Household created:', newHousehold._id);
+
+    // Create user
+    console.log('👤 Creating user...');
+    const user = await User.create({
+        email,
+        password,
+        firstName,
+        lastName,
+        householdId: newHousehold._id,
+    });
+
+    console.log('✅ User created:', user._id);
+    return user;
 };
 
 export const loginUser = async (email, password) => {
@@ -76,7 +76,7 @@ export const forgotPassword = async (email) => {
     await user.save({ validateBeforeSave: false });
 
     const resetURL = `${clientUrl}/reset-password/${resetToken}`;
-    const message = `Forgot your password? Submit a PATCH request with your new password to: ${resetURL}.\nIf you didn't forget, ignore this email.`;
+    const message = `<p>Forgot your password? Click <a href="${resetURL}">here</a> to reset your password.</p><p>If you didn't request this, ignore this email.</p>`;
 
     await sendEmail(user.email, 'Your password reset token (valid for 10 min)', message);
 };

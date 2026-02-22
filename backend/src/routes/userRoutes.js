@@ -7,14 +7,15 @@ import { updateProfileSchema, changePasswordSchema, budgetUpdateSchema } from '.
 
 const router = express.Router();
 
+// All routes require authentication
+router.use(protect);
+
 /**
  * @swagger
  * tags:
  *   name: Users
  *   description: User profile and management
  */
-
-router.use(protect);
 
 /**
  * @swagger
@@ -26,7 +27,9 @@ router.use(protect);
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: User profile
+ *         description: User profile with household details
+ *       401:
+ *         description: Unauthorized
  */
 router.get('/profile', userController.getProfile);
 
@@ -69,6 +72,8 @@ router.get('/profile', userController.getProfile);
  *     responses:
  *       200:
  *         description: Updated profile
+ *       400:
+ *         description: Validation error
  */
 router.patch('/profile', validate(updateProfileSchema), userController.updateProfile);
 
@@ -91,9 +96,12 @@ router.patch('/profile', validate(updateProfileSchema), userController.updatePro
  *                 type: string
  *               newPassword:
  *                 type: string
+ *                 minLength: 6
  *     responses:
  *       200:
  *         description: Password changed
+ *       401:
+ *         description: Current password is incorrect
  */
 router.patch('/change-password', validate(changePasswordSchema), userController.changePassword);
 
@@ -107,7 +115,7 @@ router.patch('/change-password', validate(changePasswordSchema), userController.
  *       - bearerAuth: []
  *     responses:
  *       204:
- *         description: No content
+ *         description: Account deleted
  */
 router.delete('/profile', userController.deleteAccount);
 
@@ -142,9 +150,12 @@ router.get('/budget/history', userController.getBudgetHistory);
  *             properties:
  *               budgetAmount:
  *                 type: number
+ *                 minimum: 0
  *     responses:
  *       200:
  *         description: Updated household
+ *       400:
+ *         description: Invalid budget amount
  */
 router.patch('/budget', validate(budgetUpdateSchema), userController.updateBudget);
 
@@ -164,13 +175,17 @@ router.use(restrictTo('admin'));
  *         name: page
  *         schema:
  *           type: integer
+ *         description: Page number
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
+ *         description: Number of items per page
  *     responses:
  *       200:
  *         description: Paginated users list
+ *       403:
+ *         description: Forbidden (not admin)
  */
 router.get('/', userController.getAllUsers);
 
@@ -201,6 +216,10 @@ router.get('/', userController.getAllUsers);
  *     responses:
  *       200:
  *         description: Updated user
+ *       400:
+ *         description: Invalid role
+ *       404:
+ *         description: User not found
  */
 router.patch('/:id/role', userController.updateUserRole);
 
@@ -226,6 +245,8 @@ router.patch('/:id/role', userController.updateUserRole);
  *     responses:
  *       200:
  *         description: Updated user with new household
+ *       404:
+ *         description: User or household not found
  */
 router.post('/assign-household', userController.assignUserToHousehold);
 
