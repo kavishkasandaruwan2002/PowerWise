@@ -11,6 +11,15 @@ import {
     getBudgetForecast,
     exportBudgetHistory
 } from '../controllers/budgetController.js';
+import {
+    showHouseholdQR,
+    getHouseholdQRData,
+    downloadHouseholdQR,
+    getQRToken,
+    regenerateQR,
+    joinHouseholdByQR,
+    leaveHousehold
+} from '../controllers/qrController.js';
 
 
 const router = express.Router();
@@ -306,5 +315,123 @@ router.get('/budget/export', exportBudgetHistory);
 
 router.get('/household/qr', userController.getHouseholdQR);
 router.post('/household/join', userController.joinHouseholdByQR);
+
+/**
+ * @swagger
+ * /users/household/qr:
+ *   get:
+ *     summary: Display QR code for household (HTML page)
+ *     tags: [QR Code]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: HTML page with QR code
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ */
+router.get('/household/qr', showHouseholdQR);
+
+/**
+ * @swagger
+ * /users/household/qr-data:
+ *   get:
+ *     summary: Get QR code as data URL
+ *     tags: [QR Code]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: QR code data URL
+ */
+router.get('/household/qr-data', getHouseholdQRData);
+
+/**
+ * @swagger
+ * /users/household/qr/download:
+ *   get:
+ *     summary: Download QR code as PNG
+ *     tags: [QR Code]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: PNG file download
+ *         content:
+ *           image/png:
+ *             schema:
+ *               type: string
+ *               format: binary
+ */
+router.get('/household/qr/download', downloadHouseholdQR);
+
+/**
+ * @swagger
+ * /users/household/qr-token:
+ *   get:
+ *     summary: Get QR token info
+ *     tags: [QR Code]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Token information
+ */
+router.get('/household/qr-token', getQRToken);
+
+/**
+ * @swagger
+ * /users/household/qr/regenerate:
+ *   post:
+ *     summary: Regenerate QR token
+ *     tags: [QR Code]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Token regenerated
+ */
+router.post('/household/qr/regenerate', regenerateQR);
+
+/**
+ * @swagger
+ * /users/household/join:
+ *   post:
+ *     summary: Join household by scanning QR
+ *     tags: [QR Code]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               householdId:
+ *                 type: string
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successfully joined household
+ */
+router.post('/household/join', joinHouseholdByQR);
+
+/**
+ * @swagger
+ * /users/household/leave:
+ *   post:
+ *     summary: Leave current household
+ *     tags: [QR Code]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully left household
+ */
+router.post('/household/leave', leaveHousehold);
 
 export default router;

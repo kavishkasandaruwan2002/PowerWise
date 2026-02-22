@@ -10,6 +10,7 @@ import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js'; // Add this import
 import globalErrorHandler from './middleware/errorHandler.js';
 import AppError from './utils/AppError.js';
+import publicRoutes from './routes/publicRoutes.js';
 
 const app = express();
 
@@ -35,6 +36,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1', adminRoutes); // Add admin routes
+app.use('/api/v1/public', publicRoutes);
 
 // API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
