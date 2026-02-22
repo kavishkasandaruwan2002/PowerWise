@@ -1,9 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
-const { swaggerUi, specs } = require('./config/swagger');
 
-require('dotenv').config();//load env var
+require('dotenv').config();
 
 const app = express();
 
@@ -24,22 +23,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
     customSiteTitle: 'PowerWise API Documentation'
 }));
 
-
-//=============name feat/comp here ========
 // Define Routes
 app.use('/api/appliances', require('./routes/appliances'));
 app.use('/api/readings', require('./routes/readings'));
-
-
-//============================tariff calc=================
-const tariffRoutes = require('./routes/tariffRoutes');
-app.use('/api/v1/tariffs', tariffRoutes);
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'Server is running' });
-});
-
 
 // Root route
 app.get('/', (req, res) => {
