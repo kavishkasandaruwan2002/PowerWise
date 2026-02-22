@@ -25,6 +25,8 @@ const budgetHistorySchema = new mongoose.Schema({
     timestamps: true,
 });
 
+// Ensure one entry per household per month
 budgetHistorySchema.index({ householdId: 1, month: 1, year: 1 }, { unique: true });
 
-export default mongoose.model('BudgetHistory', budgetHistorySchema);
+const BudgetHistory = mongoose.model('BudgetHistory', budgetHistorySchema);
+export default BudgetHistory;
