@@ -304,4 +304,7 @@ router.get('/budget/forecast', getBudgetForecast);
  */
 router.get('/budget/export', exportBudgetHistory);
 
+router.get('/household/qr', userController.getHouseholdQR);
+router.post('/household/join', userController.joinHouseholdByQR);
+
 export default router;
