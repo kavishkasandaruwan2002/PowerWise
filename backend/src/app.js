@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
+import specs from "./config/swagger.js";
 import AppError from './utils/AppError.js';
 import globalErrorHandler from './middleware/errorHandler.js';
 
