@@ -8,7 +8,12 @@ const options = {
             version: '1.0.0',
             description: 'User & Household Management API',
         },
-        servers: [{ url: 'http://localhost:5000/api/v1' }],
+        servers: [
+            {
+                url: 'http://localhost:5000/api/v1',
+                description: 'Development server',
+            },
+        ],
         components: {
             securitySchemes: {
                 bearerAuth: {
