@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
 import AppError from './utils/AppError.js';
+import globalErrorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
@@ -33,3 +34,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use((req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
+
+// Global error handler
+app.use(globalErrorHandler);
+
+export default app;
