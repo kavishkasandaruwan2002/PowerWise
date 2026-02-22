@@ -47,11 +47,17 @@ const userSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// Hash password before saving
+// ✅ FIXED: Use regular function, NOT arrow function
 userSchema.pre('save', async function(next) {
     try {
-        if (!this.isModified('password')) return next();
-        this.password = await bcrypt.hash(this.password, 12);
+        // Only hash the password if it has been modified (or is new)
+        if (!this.isModified('password')) {
+            return next();
+        }
+
+        // Hash the password with cost of 12
+        const hashedPassword = await bcrypt.hash(this.password, 12);
+        this.password = hashedPassword;
         next();
     } catch (error) {
         next(error);
