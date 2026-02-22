@@ -29,6 +29,11 @@ const applianceSchema = new mongoose.Schema({
     min: [0, 'Usage hours cannot be negative'],
     max: [24, 'Usage hours cannot exceed 24']
   },
+  quantity: {
+    type: Number,
+    default: 1,
+    min: [1, 'Quantity must be at least 1']
+  },
   efficiencyRating: {
     type: String,
     enum: ['Old', 'Standard', 'EnergySaving'],
@@ -62,6 +67,10 @@ const applianceSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
+// Index for efficient queries
+applianceSchema.index({ createdBy: 1, category: 1 });
+applianceSchema.index({ householdId: 1 });
+
 // Virtual for daily consumption in kWh
 applianceSchema.virtual('dailyConsumptionKWh').get(function () {
   return (this.wattage * this.dailyUsageHours) / 1000;
@@ -69,7 +78,12 @@ applianceSchema.virtual('dailyConsumptionKWh').get(function () {
 
 // Virtual for monthly consumption in kWh (30 days)
 applianceSchema.virtual('monthlyConsumptionKWh').get(function () {
-  return (this.dailyConsumptionKWh * 30);
+  return this.dailyConsumptionKWh * 30;
+});
+
+// Virtual for impact classification
+applianceSchema.virtual('impactLevel').get(function () {
+  return this.wattage > 500 ? 'High' : 'Low';
 });
 
 module.exports = mongoose.model('Appliance', applianceSchema);
