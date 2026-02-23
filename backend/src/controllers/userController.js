@@ -2,18 +2,31 @@ import * as userService from '../services/userService.js';
 import * as budgetService from '../services/budgetService.js';
 import catchAsync from '../utils/catchAsync.js';
 import User from '../models/User.js';
-import { generateHouseholdQR } from '../services/qrService.js';
+import Household from '../models/Household.js';
+import AppError from '../utils/AppError.js';
 
+/**
+ * @desc    Get current user profile
+ * @route   GET /api/v1/users/profile
+ * @access  Private
+ */
 export const getProfile = catchAsync(async (req, res, next) => {
     const user = await userService.getProfile(req.user.id);
+
     res.status(200).json({
         status: 'success',
         data: { user }
     });
 });
 
+/**
+ * @desc    Update user profile
+ * @route   PATCH /api/v1/users/profile
+ * @access  Private
+ */
 export const updateProfile = catchAsync(async (req, res, next) => {
     const user = await userService.updateProfile(req.user.id, req.body);
+
     res.status(200).json({
         status: 'success',
         message: 'Profile updated successfully',
@@ -21,98 +34,162 @@ export const updateProfile = catchAsync(async (req, res, next) => {
     });
 });
 
+/**
+ * @desc    Change password
+ * @route   PATCH /api/v1/users/change-password
+ * @access  Private
+ */
 export const changePassword = catchAsync(async (req, res, next) => {
-    await userService.changePassword(req.user.id, req.body.currentPassword, req.body.newPassword);
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+        return next(new AppError('Please provide current and new password', 400));
+    }
+
+    if (newPassword.length < 6) {
+        return next(new AppError('New password must be at least 6 characters', 400));
+    }
+
+    await userService.changePassword(req.user.id, currentPassword, newPassword);
+
     res.status(200).json({
         status: 'success',
         message: 'Password changed successfully'
     });
 });
 
+/**
+ * @desc    Delete user account
+ * @route   DELETE /api/v1/users/profile
+ * @access  Private
+ */
 export const deleteAccount = catchAsync(async (req, res, next) => {
     await userService.deleteAccount(req.user.id);
+
     res.status(204).send();
 });
 
+/**
+ * @desc    Get budget history for user's household
+ * @route   GET /api/v1/users/budget/history
+ * @access  Private
+ */
 export const getBudgetHistory = catchAsync(async (req, res, next) => {
     const user = await User.findById(req.user.id);
-    const history = await budgetService.getBudgetHistory(user.householdId);
-    res.status(200).json({
-        status: 'success',
-        data: history
-    });
-});
 
-export const updateBudget = catchAsync(async (req, res, next) => {
-    const { budgetAmount } = req.body;
-    const user = await User.findById(req.user.id);
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const year = now.getFullYear();
-    const household = await budgetService.updateBudget(user.householdId, budgetAmount, month, year);
+    if (!user.householdId) {
+        return next(new AppError('You are not part of any household. Please join or create a household first.', 404));
+    }
+
+    const options = {
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 12,
+        startDate: req.query.startDate,
+        endDate: req.query.endDate
+    };
+
+    const result = await budgetService.getBudgetHistory(user.householdId, options);
+
     res.status(200).json({
         status: 'success',
-        message: 'Budget updated successfully',
-        data: { household }
+        data: result
     });
 });
 
 /**
- * @desc    Generate QR code for user's household
- * @route   GET /api/v1/users/household/qr
+ * @desc    Update monthly budget
+ * @route   PATCH /api/v1/users/budget
  * @access  Private
  */
-export const getHouseholdQR = catchAsync(async (req, res, next) => {
-    const user = await User.findById(req.user.id).populate('householdId');
+export const updateBudget = catchAsync(async (req, res, next) => {
+    const { budgetAmount, notes } = req.body;
+
+    if (!budgetAmount || budgetAmount < 0) {
+        return next(new AppError('Please provide a valid budget amount', 400));
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user.householdId) {
+        return next(new AppError('You are not part of any household. Please join or create a household first.', 404));
+    }
+
+    const result = await budgetService.updateBudget(
+        user.householdId,
+        budgetAmount,
+        req.user.id,
+        'manual_update',
+        notes || `Budget updated by ${req.user.firstName} ${req.user.lastName}`
+    );
+
+    res.status(200).json({
+        status: 'success',
+        message: 'Budget updated successfully',
+        data: {
+            household: result.household,
+            historyEntry: result.historyEntry
+        }
+    });
+});
+
+/**
+ * @desc    Get budget comparison (month over month, year over year)
+ * @route   GET /api/v1/users/budget/comparison
+ * @access  Private
+ */
+export const getBudgetComparison = catchAsync(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
 
     if (!user.householdId) {
         return next(new AppError('You are not part of any household', 404));
     }
 
-    const qrCode = await generateHouseholdQR(
-        user.householdId._id,
-        user.householdId.address || 'My Household'
-    );
-
-    // Return as HTML for easy viewing
-    res.send(`
-        <html>
-            <head><title>Household QR Code</title></head>
-            <body style="text-align:center; font-family:Arial;">
-                <h2>🏠 Household QR Code</h2>
-                <p>Address: ${user.householdId.address || 'Not specified'}</p>
-                <img src="${qrCode}" style="width:300px; height:300px;"/>
-                <p>Scan to join this household or view details</p>
-                <p><small>Generated: ${new Date().toLocaleString()}</small></p>
-            </body>
-        </html>
-    `);
-});
-
-/**
- * @desc    Join household by scanning QR
- * @route   POST /api/v1/users/household/join
- * @access  Private
- */
-export const joinHouseholdByQR = catchAsync(async (req, res, next) => {
-    const { householdId, token } = req.body;
-
-    // Verify token (simplified - in production, validate properly)
-    const isValid = await verifyQRToken(householdId, token);
-    if (!isValid) {
-        return next(new AppError('Invalid QR code', 400));
-    }
-
-    // Update user's household
-    const user = await User.findByIdAndUpdate(
-        req.user.id,
-        { householdId },
-        { new: true }
-    ).populate('householdId');
+    const comparison = await budgetService.getBudgetComparison(user.householdId);
 
     res.status(200).json({
         status: 'success',
-        message: 'Successfully joined household',
-        data: { user }
+        data: comparison
     });
+});
+
+/**
+ * @desc    Get budget forecast
+ * @route   GET /api/v1/users/budget/forecast
+ * @access  Private
+ */
+export const getBudgetForecast = catchAsync(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+
+    if (!user.householdId) {
+        return next(new AppError('You are not part of any household', 404));
+    }
+
+    const forecast = await budgetService.getBudgetForecast(user.householdId);
+
+    res.status(200).json({
+        status: 'success',
+        data: forecast
+    });
+});
+
+/**
+ * @desc    Export budget history as CSV
+ * @route   GET /api/v1/users/budget/export
+ * @access  Private
+ */
+export const exportBudgetHistory = catchAsync(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+
+    if (!user.householdId) {
+        return next(new AppError('You are not part of any household', 404));
+    }
+
+    const csvData = await budgetService.exportBudgetHistory(user.householdId);
+
+    const filename = `budget-history-${user.householdId}-${Date.now()}.csv`;
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', Buffer.byteLength(csvData));
+
+    res.send(csvData);
 });
