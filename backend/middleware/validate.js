@@ -7,9 +7,11 @@ const Joi = require('joi');
  */
 const validate = (schema) => {
     return (req, res, next) => {
+        console.log(`[Validation Check] ${req.method} ${req.originalUrl} - Body:`, req.body);
         const { error } = schema.validate(req.body, { abortEarly: false, stripUnknown: true });
         if (error) {
             const messages = error.details.map(d => d.message);
+            console.error('[Validation Error]:', messages);
             return res.status(400).json({
                 success: false,
                 error: messages.length === 1 ? messages[0] : messages

@@ -12,8 +12,22 @@ connectDB();
 
 // Init Middleware
 app.use(express.json({ limit: '10mb' }));
+
+// Improve CORS for development/Swagger
+const allowedOrigins = [
+    process.env.FRONTEND_URL || 'http://localhost:5173',
+    'http://localhost:5000', // Swagger self-origin
+    'http://127.0.0.1:5000'
+];
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
 }));
 
