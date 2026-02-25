@@ -33,6 +33,10 @@ const budgetRoutes = require('../routes/budgetRoutes');
 app.use('/api/v1/budgets', budgetRoutes);
 
 
+//bill prediction routes
+const billPredictionRoutes = require('./routes/billPredictionRoutes');
+app.use('/api/v1/predictions', billPredictionRoutes);
+
 // Root route
 app.get('/', (req, res) => {
     res.json({
