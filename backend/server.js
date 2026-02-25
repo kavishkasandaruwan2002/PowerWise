@@ -27,6 +27,12 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
 app.use('/api/appliances', require('./routes/appliances'));
 app.use('/api/readings', require('./routes/readings'));
 
+
+//budget routes 
+const budgetRoutes = require('../routes/budgetRoutes');
+app.use('/api/v1/budgets', budgetRoutes);
+
+
 // Root route
 app.get('/', (req, res) => {
     res.json({
