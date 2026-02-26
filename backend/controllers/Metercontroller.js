@@ -4,7 +4,7 @@ const CalculationService = require('../services/CalculationService');
 
 // @desc    Submit a new meter reading
 // @route   POST /api/readings
-// @access  Private
+
 exports.submitReading = async (req, res) => {
     try {
         // Set user and household from JWT token
