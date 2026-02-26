@@ -8,6 +8,19 @@ const protect = async (req, res, next) => {
         token = req.headers.authorization.split(' ')[1];
     }
     if (!token) {
+        // DEVELOPMENT OVERRIDE: If no token is provided, we can simulate a user for testing purposes
+        if (process.env.NODE_ENV === 'development') {
+            req.user = {
+                id: '65c23b12a8b9c8d7e6f5a4b3',
+                role: 'USER',
+                householdId: '65c23b12a8b9c8d7e6f5a4c1',
+                location: {
+                    lat: 6.9271,   // Colombo
+                    lon: 79.8612
+                }
+            };
+            return next();
+        }
         return res.status(401).json({ success: false, message: 'Not authorized. No token provided.' });
     }
     try {
