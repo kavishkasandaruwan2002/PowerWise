@@ -32,12 +32,18 @@ app.use('/api/readings', require('./routes/readings'));
 const budgetRoutes = require('../routes/budgetRoutes');
 app.use('/api/v1/budgets', budgetRoutes);
 
+//consumption
+app.use('/api/v1/consumption', authMiddleware, consumptionRoutes);
 
 //bill prediction routes
 const billPredictionRoutes = require('./routes/billPredictionRoutes');
 app.use('/api/v1/predictions', billPredictionRoutes);
 
-// Root route
+//alert r
+app.use('/api/v1/alerts', authMiddleware, alertRoutes);
+
+
+//root route
 app.get('/', (req, res) => {
     res.json({
         message: 'PowerWise API is running',
