@@ -47,7 +47,6 @@ const alertSchema = new mongoose.Schema(
       description: 'Alert severity level'
     },
 
-    // Alert source (which feature triggered it)
     sourceModule: {
       type: String,
       enum: ['budget', 'consumption', 'prediction', 'spike_detection', 'tariff'],
@@ -135,38 +134,25 @@ const alertSchema = new mongoose.Schema(
   }
 );
 
-// Instance Methods
-
-/**
- * Mark alert as read
- */
 alertSchema.methods.markAsRead = function() {
   this.isRead = true;
   this.readAt = new Date();
   return this.save();
 };
 
-/**
- * Mark alert as unread
- */
+
 alertSchema.methods.markAsUnread = function() {
   this.isRead = false;
   this.readAt = null;
   return this.save();
 };
 
-/**
- * Dismiss alert
- */
 alertSchema.methods.dismiss = function() {
   this.isDismissed = true;
   this.dismissedAt = new Date();
   return this.save();
 };
 
-/**
- * Mark alert as resolved
- */
 alertSchema.methods.markAsResolved = function(notes = '') {
   this.isResolved = true;
   this.resolvedAt = new Date();
@@ -174,9 +160,6 @@ alertSchema.methods.markAsResolved = function(notes = '') {
   return this.save();
 };
 
-/**
- * Get alert summary
- */
 alertSchema.methods.getSummary = function() {
   return {
     _id: this._id,
@@ -191,11 +174,6 @@ alertSchema.methods.getSummary = function() {
   };
 };
 
-// Static Methods
-
-/**
- * Get unread alerts for user
- */
 alertSchema.statics.getUnreadAlerts = function(userId) {
   return this.find({
     userId,
@@ -204,9 +182,6 @@ alertSchema.statics.getUnreadAlerts = function(userId) {
   }).sort({ createdAt: -1 });
 };
 
-/**
- * Get unread alerts for household
- */
 alertSchema.statics.getUnreadByHousehold = function(householdId) {
   return this.find({
     householdId,
@@ -215,9 +190,6 @@ alertSchema.statics.getUnreadByHousehold = function(householdId) {
   }).sort({ severity: -1, createdAt: -1 });
 };
 
-/**
- * Get critical alerts
- */
 alertSchema.statics.getCriticalAlerts = function(userId) {
   return this.find({
     userId,
@@ -226,9 +198,6 @@ alertSchema.statics.getCriticalAlerts = function(userId) {
   }).sort({ createdAt: -1 });
 };
 
-/**
- * Get alerts by type
- */
 alertSchema.statics.getByType = function(userId, type) {
   return this.find({
     userId,
@@ -237,9 +206,6 @@ alertSchema.statics.getByType = function(userId, type) {
   }).sort({ createdAt: -1 });
 };
 
-/**
- * Get alerts by household and type
- */
 alertSchema.statics.getByHouseholdAndType = function(householdId, type) {
   return this.find({
     householdId,
@@ -248,9 +214,6 @@ alertSchema.statics.getByHouseholdAndType = function(householdId, type) {
   }).sort({ createdAt: -1 });
 };
 
-/**
- * Count unread alerts
- */
 alertSchema.statics.countUnread = function(userId) {
   return this.countDocuments({
     userId,
@@ -259,9 +222,6 @@ alertSchema.statics.countUnread = function(userId) {
   });
 };
 
-/**
- * Get alerts for date range
- */
 alertSchema.statics.getAlertsInRange = function(userId, startDate, endDate) {
   return this.find({
     userId,
