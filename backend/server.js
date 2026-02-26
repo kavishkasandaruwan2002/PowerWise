@@ -17,7 +17,7 @@ app.use(cors({
     credentials: true
 }));
 
-// Swagger Documentation
+// Swagger Documentations
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
     explorer: true,
     customCss: '.swagger-ui .topbar { display: none }',
