@@ -101,7 +101,7 @@ app.listen(PORT, () => {
     console.log(`  📖  Swagger UI →  http://localhost:${PORT}/api/docs`);
     console.log(`  📄  API JSON   →  http://localhost:${PORT}/api/docs.json`);
     console.log(`  💚  Health     →  http://localhost:${PORT}/api/health`);
-    console.log(`  🌿  MongoDB    →  ${process.env.MONGO_URI}`);
+    console.log(`  🌿  MongoDB    →  ${process.env.MONGODB_URI}`);
     console.log('  ⚡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⚡');
     console.log('');
 });
