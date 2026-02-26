@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const tariffController = require('../controllers/tariffController');
 
-const { authMiddleware } = require('../middleware/auth');
+const { protect: authMiddleware } = require('../middleware/auth');
 const { adminOnly } = require('../middleware/adminOnly');
 
-router.get('/', 
+router.get('/',
   authMiddleware,
   tariffController.getAllTariffs
 );

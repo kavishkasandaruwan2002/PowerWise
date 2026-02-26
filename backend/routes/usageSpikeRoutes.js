@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const usageSpikeController = require('../controllers/usageSpikeController');
 
-const { authMiddleware } = require('../middleware/auth');
+const { protect: authMiddleware } = require('../middleware/auth');
 
 router.post('/check-spike',
   authMiddleware,

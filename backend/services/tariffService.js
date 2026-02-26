@@ -1,4 +1,4 @@
-const TariffPlan = require('./models/tariffPlan');
+const TariffPlan = require('../models/TariffPlan');
 
 class TariffService {
   /**
@@ -10,7 +10,7 @@ class TariffService {
       if (isActive !== undefined) {
         query.isActive = isActive;
       }
-      
+
       return await TariffPlan.find(query)
         .sort({ effectiveFrom: -1 })
         .select('-__v');
@@ -25,11 +25,11 @@ class TariffService {
   async getTariffById(tariffId) {
     try {
       const tariff = await TariffPlan.findById(tariffId);
-      
+
       if (!tariff) {
         throw new Error('Tariff plan not found');
       }
-      
+
       return tariff;
     } catch (error) {
       throw new Error(`Failed to get tariff: ${error.message}`);
@@ -42,11 +42,11 @@ class TariffService {
   async getActiveTariff() {
     try {
       const tariff = await TariffPlan.getActiveTariff();
-      
+
       if (!tariff) {
         throw new Error('No active tariff found');
       }
-      
+
       return tariff;
     } catch (error) {
       throw new Error(`Failed to get active tariff: ${error.message}`);
@@ -62,41 +62,41 @@ class TariffService {
       if (!tariffData.blocks || tariffData.blocks.length === 0) {
         throw new Error('At least one tariff block is required');
       }
-      
+
       // Sort blocks by minUsage
       tariffData.blocks.sort((a, b) => a.minUsage - b.minUsage);
-      
+
       // Validate block sequence
       for (let i = 0; i < tariffData.blocks.length; i++) {
         const block = tariffData.blocks[i];
-        
+
         if (i === 0 && block.minUsage !== 0) {
           throw new Error('First block must start at 0 kWh');
         }
-        
+
         if (i > 0) {
           const prevBlock = tariffData.blocks[i - 1];
           if (block.minUsage !== prevBlock.maxUsage) {
             throw new Error('Blocks must be continuous with no gaps');
           }
         }
-        
+
         if (block.minUsage >= block.maxUsage) {
           throw new Error('minUsage must be less than maxUsage');
         }
-        
+
         if (block.ratePerUnit <= 0) {
           throw new Error('Rate per unit must be greater than 0');
         }
       }
-      
+
       // Set metadata
       tariffData.createdBy = userId;
       tariffData.lastModifiedBy = userId;
-      
+
       const tariff = new TariffPlan(tariffData);
       await tariff.save();
-      
+
       return tariff;
     } catch (error) {
       throw new Error(`Failed to create tariff: ${error.message}`);
@@ -109,22 +109,22 @@ class TariffService {
   async updateTariff(tariffId, updateData, userId) {
     try {
       const tariff = await TariffPlan.findById(tariffId);
-      
+
       if (!tariff) {
         throw new Error('Tariff plan not found');
       }
-      
+
       // Validate blocks if updating
       if (updateData.blocks && updateData.blocks.length > 0) {
         updateData.blocks.sort((a, b) => a.minUsage - b.minUsage);
-        
+
         for (let i = 0; i < updateData.blocks.length; i++) {
           const block = updateData.blocks[i];
-          
+
           if (i === 0 && block.minUsage !== 0) {
             throw new Error('First block must start at 0 kWh');
           }
-          
+
           if (i > 0) {
             const prevBlock = updateData.blocks[i - 1];
             if (block.minUsage !== prevBlock.maxUsage) {
@@ -133,19 +133,19 @@ class TariffService {
           }
         }
       }
-      
+
       // Prevent changing immutable fields
       delete updateData.name;
       delete updateData.provider;
       delete updateData.createdBy;
-      
+
       // Update fields
       Object.assign(tariff, updateData);
       tariff.lastModifiedBy = userId;
       tariff.version += 1;
-      
+
       await tariff.save();
-      
+
       return tariff;
     } catch (error) {
       throw new Error(`Failed to update tariff: ${error.message}`);
@@ -166,11 +166,11 @@ class TariffService {
         },
         { new: true }
       );
-      
+
       if (!tariff) {
         throw new Error('Tariff plan not found');
       }
-      
+
       return tariff;
     } catch (error) {
       throw new Error(`Failed to deactivate tariff: ${error.message}`);
@@ -188,15 +188,15 @@ class TariffService {
       }
 
       const tariff = await TariffPlan.findById(tariffId);
-      
+
       if (!tariff) {
         throw new Error('Tariff plan not found');
       }
-      
+
       if (!tariff.isCurrentlyActive()) {
         throw new Error('This tariff plan is not currently active');
       }
-      
+
       return tariff.calculateBill(consumption);
     } catch (error) {
       throw new Error(`Failed to calculate bill: ${error.message}`);
@@ -230,16 +230,16 @@ class TariffService {
       }
 
       const tariff = await TariffPlan.findById(tariffId);
-      
+
       if (!tariff) {
         throw new Error('Tariff plan not found');
       }
-      
+
       const scenarios = consumptionLevels.map(consumption => ({
         consumption,
         bill: tariff.calculateBill(consumption)
       }));
-      
+
       return scenarios;
     } catch (error) {
       throw new Error(`Failed to compare scenarios: ${error.message}`);
@@ -258,7 +258,7 @@ class TariffService {
           { description: { $regex: searchTerm, $options: 'i' } }
         ]
       };
-      
+
       return await TariffPlan.find(query).sort({ name: 1 });
     } catch (error) {
       throw new Error(`Failed to search tariffs: ${error.message}`);
@@ -271,11 +271,11 @@ class TariffService {
   async exportTariff(tariffId) {
     try {
       const tariff = await TariffPlan.findById(tariffId);
-      
+
       if (!tariff) {
         throw new Error('Tariff plan not found');
       }
-      
+
       return tariff.toObject();
     } catch (error) {
       throw new Error(`Failed to export tariff: ${error.message}`);
