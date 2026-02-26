@@ -1,72 +1,62 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-// Protect routes
-exports.protect = async (req, res, next) => {
+// ── Protect: verify JWT ────────────────────────────────────────────────────
+const protect = async (req, res, next) => {
     let token;
-
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.startsWith('Bearer')
-    ) {
-        // Set token from Bearer token in header
+    if (req.headers.authorization?.startsWith('Bearer ')) {
         token = req.headers.authorization.split(' ')[1];
-    } else if (req.header('x-auth-token')) {
-        // Set token from x-auth-token header
-        token = req.header('x-auth-token');
     }
-
-    // Check if not token
     if (!token) {
         // DEVELOPMENT OVERRIDE: If no token is provided, we can simulate a user for testing purposes
         if (process.env.NODE_ENV === 'development') {
             req.user = {
                 id: '65c23b12a8b9c8d7e6f5a4b3',
                 role: 'USER',
-                householdId: '65c23b12a8b9c8d7e6f5a4c1'
+                householdId: '65c23b12a8b9c8d7e6f5a4c1',
+                location: {
+                    lat: 6.9271,   // Colombo
+                    lon: 79.8612
+                }
             };
             return next();
         }
-        return res.status(401).json({ success: false, message: 'No token, authorization denied' });
+        return res.status(401).json({ success: false, message: 'Not authorized. No token provided.' });
     }
-
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
-
-        // Payload: { id, email, role, householdId }
-        req.user = decoded;
-        next();
-    } catch (err) {
-        res.status(401).json({ success: false, message: 'Token is not valid' });
-    }
-};
-
-// Grant access to specific roles
-exports.authorize = (...roles) => {
-    return (req, res, next) => {
-        if (!roles.includes(req.user.role)) {
-            return res.status(403).json({
-                success: false,
-                message: `User role ${req.user.role} is not authorized to access this route`
-            });
+        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+        req.user = await User.findById(decoded.id).select('-password');
+        if (!req.user || !req.user.isActive) {
+            return res.status(401).json({ success: false, message: 'User not found or deactivated.' });
         }
         next();
-    };
+    } catch (err) {
+        return res.status(401).json({ success: false, message: 'Token invalid or expired.' });
+    }
 };
 
-// Verify household ownership
-exports.checkOwnership = (req, res, next) => {
-    // Admins can bypass ownership check
-    if (req.user.role === 'ADMIN') {
-        return next();
-    }
+// ── Admin Only ─────────────────────────────────────────────────────────────
+const adminOnly = (req, res, next) => {
+    if (req.user?.role === 'admin') return next();
+    return res.status(403).json({ success: false, message: 'Access denied. Admins only.' });
+};
 
-    const requestedHouseholdId = req.params.householdId || req.body.householdId;
-
-    if (requestedHouseholdId && req.user.householdId !== requestedHouseholdId) {
-        return res.status(403).json({
-            success: false,
-            message: 'Not authorized to access data for this household'
-        });
+// ── Household Access ───────────────────────────────────────────────────────
+const householdAccess = async (req, res, next) => {
+    const Household = require('../models/Household');
+    const household = await Household.findById(req.params.householdId || req.params.id);
+    if (!household) {
+        return res.status(404).json({ success: false, message: 'Household not found.' });
     }
+    const userId  = req.user._id.toString();
+    const isOwner  = household.owner.toString() === userId;
+    const isMember = household.members.map((m) => m.toString()).includes(userId);
+    const isAdmin  = req.user.role === 'admin';
+    if (!isOwner && !isMember && !isAdmin) {
+        return res.status(403).json({ success: false, message: 'Access denied. You do not belong to this household.' });
+    }
+    req.household = household;
     next();
 };
+
+module.exports = { protect, adminOnly, householdAccess };

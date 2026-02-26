@@ -25,10 +25,12 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
 }));
 
 // Define Routes
-app.use('/api/appliances', require('./routes/appliances'));
-app.use('/api/readings', require('./routes/readings'));
+app.use('/api/auth',       require('./routes/authRoutes'));
+app.use('/api/households', require('./routes/householdRoutes'));
+app.use('/api/admin',      require('./routes/adminRoutes'));
+app.use('/api/prediction', require('./routes/predictionRoutes'));
 
-//======================= Tariff Routes =====
+// ======================= Tariff Routes =======================
 const tariffRoutes = require('./routes/tariffRoutes');
 app.use('/api/v1/tariffs', tariffRoutes);
 
@@ -52,8 +54,7 @@ app.use('/api/v1/alerts', alertRoutes);
 const usageSpikeRoutes = require('./routes/usageSpikeRoutes');
 app.use('/api/v1/usage', usageSpikeRoutes);
 
-
-//root route
+// Root route
 app.get('/', (req, res) => {
     res.json({
         message: 'PowerWise API is running',
@@ -76,7 +77,9 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
         success: false,
-        error: process.env.NODE_ENV === 'development' ? err.message : 'Server Error'
+        error: process.env.NODE_ENV === 'development'
+            ? err.message
+            : 'Server Error'
     });
 });
 
