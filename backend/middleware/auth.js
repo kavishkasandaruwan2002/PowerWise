@@ -48,10 +48,10 @@ const householdAccess = async (req, res, next) => {
     if (!household) {
         return res.status(404).json({ success: false, message: 'Household not found.' });
     }
-    const userId  = req.user._id.toString();
-    const isOwner  = household.owner.toString() === userId;
+    const userId = req.user._id.toString();
+    const isOwner = household.owner.toString() === userId;
     const isMember = household.members.map((m) => m.toString()).includes(userId);
-    const isAdmin  = req.user.role === 'admin';
+    const isAdmin = req.user.role === 'admin';
     if (!isOwner && !isMember && !isAdmin) {
         return res.status(403).json({ success: false, message: 'Access denied. You do not belong to this household.' });
     }

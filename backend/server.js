@@ -7,7 +7,7 @@ require('dotenv').config();
 
 const app = express();
 
-// Connect Databas
+// Connect Database
 connectDB();
 
 // Init Middleware

@@ -27,7 +27,7 @@ const validate = (schema) => {
  */
 const validateUpdate = (schema) => {
     return (req, res, next) => {
-        // Fork the schema to make everything optional for updates
+
         const updateSchema = schema.fork(
             Object.keys(schema.describe().keys),
             (field) => field.optional()

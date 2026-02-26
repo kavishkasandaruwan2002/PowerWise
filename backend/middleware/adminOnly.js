@@ -1,7 +1,4 @@
-/**
- * Admin Only Middleware
- * Checks if user has admin role
- */
+
 
 const adminOnly = (req, res, next) => {
   try {
