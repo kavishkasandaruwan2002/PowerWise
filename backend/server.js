@@ -56,9 +56,9 @@ app.get('/api/docs.json', (req, res) => {
 });
 
 // ── API Routes ─────────────────────────────────────────────────────────────
-// app.use('/api/auth',       require('./routes/authRoutes'));
-// app.use('/api/households', require('./routes/householdRoutes'));
-// app.use('/api/admin',      require('./routes/adminRoutes'));
+app.use('/api/auth',       require('./routes/authRoutes'));
+app.use('/api/households', require('./routes/householdRoutes'));
+app.use('/api/admin',      require('./routes/adminRoutes'));
 
 // ── Health Check ───────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) =>
@@ -85,7 +85,7 @@ app.use((err, req, res, next) => {
     console.error('❌', err.stack);
     res.status(err.statusCode || 500).json({
         success: false,
-        message:'Internal Server Error',
+        message: err.message || 'Internal Server Error',
     });
 });
 
@@ -101,7 +101,6 @@ app.listen(PORT, () => {
     console.log(`  📖  Swagger UI →  http://localhost:${PORT}/api/docs`);
     console.log(`  📄  API JSON   →  http://localhost:${PORT}/api/docs.json`);
     console.log(`  💚  Health     →  http://localhost:${PORT}/api/health`);
-    console.log(`  🌿  MongoDB    →  ${process.env.MONGODB_URI}`);
     console.log('  ⚡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⚡');
     console.log('');
 });
