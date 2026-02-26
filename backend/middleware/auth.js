@@ -22,7 +22,11 @@ exports.protect = async (req, res, next) => {
             req.user = {
                 id: '65c23b12a8b9c8d7e6f5a4b3',
                 role: 'USER',
-                householdId: '65c23b12a8b9c8d7e6f5a4c1'
+                householdId: '65c23b12a8b9c8d7e6f5a4c1',
+                location: {
+                    lat: 6.9271,   // Colombo
+                    lon: 79.8612
+                }
             };
             return next();
         }
