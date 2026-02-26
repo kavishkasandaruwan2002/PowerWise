@@ -1,5 +1,4 @@
 const swaggerJsdoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
 
 const options = {
     definition: {
@@ -10,18 +9,22 @@ const options = {
             description: `
 ## Component 1: User & Household Management
 
-A complete REST API for managing household electricity budgets, user authentication, 
+A complete REST API for managing household electricity budgets, user authentication,
 and role-based access control built with **Node.js**, **Express**, and **MongoDB**.
 
 ### 🔐 How to Authenticate
 1. **Register** a new user via \`POST /api/auth/register\`
 2. **Login** via \`POST /api/auth/login\` to receive a JWT token
-3. Click **Authorize** button (🔒) above and enter: \`Bearer YOUR_TOKEN_HERE\`
+3. Click the **Authorize 🔒** button above and enter: \`Bearer YOUR_TOKEN_HERE\`
 4. All protected routes will now work automatically
 
 ### 👥 Roles
 - **user** — Can manage their own household and budgets
 - **admin** — Can view all households and manage all users
+
+### 🔑 Becoming an Admin
+To register as an admin, include a valid \`adminKey\` in the registration request.
+The key is provided separately by the system administrator.
       `,
             contact: {
                 name: 'Electricity Tracker Support',
@@ -40,11 +43,11 @@ and role-based access control built with **Node.js**, **Express**, and **MongoDB
                     type: 'http',
                     scheme: 'bearer',
                     bearerFormat: 'JWT',
-                    description: 'Enter your JWT token. Get it from /api/auth/login',
+                    description: 'Enter your JWT token obtained from /api/auth/login',
                 },
             },
             schemas: {
-                // ── User Schemas ───────────────────────────────────────────────────
+                // ── Auth Schemas ───────────────────────────────────────────────────
                 RegisterRequest: {
                     type: 'object',
                     required: ['name', 'email', 'password', 'incomeBracket'],
@@ -52,16 +55,11 @@ and role-based access control built with **Node.js**, **Express**, and **MongoDB
                         name: { type: 'string', example: 'Kasun Perera' },
                         email: { type: 'string', format: 'email', example: 'kasun@gmail.com' },
                         password: { type: 'string', minLength: 6, example: 'password123' },
-                        incomeBracket: {
+                        incomeBracket: { type: 'string', enum: ['low', 'middle', 'high'], example: 'middle' },
+                        adminKey: {
                             type: 'string',
-                            enum: ['low', 'middle', 'high'],
-                            example: 'middle',
-                        },
-                        role: {
-                            type: 'string',
-                            enum: ['user', 'admin'],
-                            example: 'user',
-                            description: 'Defaults to user',
+                            description: 'Secret key to become an admin (optional). If provided and correct, the user will be created with role "admin".',
+                            example: 'my_super_secret_admin_key_123'
                         },
                     },
                 },
@@ -131,11 +129,7 @@ and role-based access control built with **Node.js**, **Express**, and **MongoDB
                             enum: ['domestic', 'religious', 'small_business'],
                             example: 'domestic',
                         },
-                        incomeBracket: {
-                            type: 'string',
-                            enum: ['low', 'middle', 'high'],
-                            example: 'middle',
-                        },
+                        incomeBracket: { type: 'string', enum: ['low', 'middle', 'high'], example: 'middle' },
                         location: { $ref: '#/components/schemas/LocationInput' },
                     },
                 },
@@ -144,14 +138,8 @@ and role-based access control built with **Node.js**, **Express**, and **MongoDB
                     properties: {
                         name: { type: 'string', example: 'Perera Family Updated' },
                         householdSize: { type: 'integer', example: 5 },
-                        householdType: {
-                            type: 'string',
-                            enum: ['apartment', 'boarding_house', 'rural_home', 'house'],
-                        },
-                        tariffType: {
-                            type: 'string',
-                            enum: ['domestic', 'religious', 'small_business'],
-                        },
+                        householdType: { type: 'string', enum: ['apartment', 'boarding_house', 'rural_home', 'house'] },
+                        tariffType: { type: 'string', enum: ['domestic', 'religious', 'small_business'] },
                         incomeBracket: { type: 'string', enum: ['low', 'middle', 'high'] },
                         location: { $ref: '#/components/schemas/LocationInput' },
                     },
@@ -162,19 +150,13 @@ and role-based access control built with **Node.js**, **Express**, and **MongoDB
                         _id: { type: 'string', example: '64f1a2b3c4d5e6f7a8b9c0d2' },
                         name: { type: 'string', example: 'Perera Family' },
                         owner: { $ref: '#/components/schemas/UserResponse' },
-                        members: {
-                            type: 'array',
-                            items: { $ref: '#/components/schemas/UserResponse' },
-                        },
+                        members: { type: 'array', items: { $ref: '#/components/schemas/UserResponse' } },
                         householdSize: { type: 'integer', example: 4 },
                         householdType: { type: 'string', example: 'apartment' },
                         tariffType: { type: 'string', example: 'domestic' },
                         incomeBracket: { type: 'string', example: 'middle' },
                         location: { $ref: '#/components/schemas/LocationInput' },
-                        budgets: {
-                            type: 'array',
-                            items: { $ref: '#/components/schemas/BudgetResponse' },
-                        },
+                        budgets: { type: 'array', items: { $ref: '#/components/schemas/BudgetResponse' } },
                         currentBudget: { $ref: '#/components/schemas/BudgetResponse' },
                         createdAt: { type: 'string', format: 'date-time' },
                     },
@@ -274,7 +256,4 @@ and role-based access control built with **Node.js**, **Express**, and **MongoDB
 };
 
 const swaggerSpec = swaggerJsdoc(options);
-module.exports = {
-    swaggerUi,
-    specs: swaggerSpec
-};
+module.exports = swaggerSpec;
