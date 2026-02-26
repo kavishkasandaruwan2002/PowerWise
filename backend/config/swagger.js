@@ -1,4 +1,5 @@
 const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 const options = {
     definition: {
@@ -257,4 +258,4 @@ The key is provided separately by the system administrator.
 };
 
 const swaggerSpec = swaggerJsdoc(options);
-module.exports = swaggerSpec;
+module.exports = { swaggerUi, specs: swaggerSpec };
