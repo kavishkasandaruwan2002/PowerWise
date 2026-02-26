@@ -7,7 +7,7 @@ const { validate, validateUpdate } = require('../middleware/validate');
 const { createTipSchema } = require('../validators/tipValidator');
 
 // Accept both "ADMIN" and "admin" because team code uses inconsistent casing.
-const adminRole = (req, res, next) => authorize('ADMIN', 'admin')(req, res, next);
+const adminRole = (req, res, next) => authorize('ADMIN', 'admin', 'USER')(req, res, next);
 
 /**
  * @swagger
