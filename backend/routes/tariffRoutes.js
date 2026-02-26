@@ -2,131 +2,71 @@ const express = require('express');
 const router = express.Router();
 const tariffController = require('../controllers/tariffController');
 
-// Middleware (uncomment as you set them up)
-// const { authMiddleware } = require('../middleware/auth');
-// const { adminOnly } = require('../middleware/adminOnly');
+const { authMiddleware } = require('../middleware/auth');
+const { adminOnly } = require('../middleware/adminOnly');
 
-/**
- * DOMESTIC TARIFF ROUTES
- * Base path: /api/v1/tariffs
- */
-
-// ===== PUBLIC ROUTES (Authentication Required) =====
-
-/**
- * GET /api/v1/tariffs
- * Get all tariff plans
- */
 router.get('/', 
-  // authMiddleware,
+  authMiddleware,
   tariffController.getAllTariffs
 );
 
-/**
- * GET /api/v1/tariffs/active
- * Get currently active domestic tariff
- */
 router.get('/active',
-  // authMiddleware,
+  authMiddleware,
   tariffController.getActiveTariff
 );
 
-/**
- * GET /api/v1/tariffs/:id
- * Get specific tariff by ID
- */
 router.get('/:id',
-  // authMiddleware,
+  authMiddleware,
   tariffController.getTariffById
 );
 
-/**
- * POST /api/v1/tariffs/calculate-bill
- * Calculate bill using active tariff (MOST COMMONLY USED)
- * Body: { consumption: number }
- */
 router.post('/calculate-bill',
-  // authMiddleware,
+  authMiddleware,
   tariffController.calculateBillActive
 );
 
-/**
- * POST /api/v1/tariffs/compare
- * Compare bills across different consumption levels
- * Body: { tariffId: string, consumptionLevels: [number] }
- */
 router.post('/compare',
-  // authMiddleware,
+  authMiddleware,
   tariffController.compareScenarios
 );
 
-/**
- * GET /api/v1/tariffs/search/:searchTerm
- * Search tariffs by name
- */
 router.get('/search/:searchTerm',
-  // authMiddleware,
+  authMiddleware,
   tariffController.searchTariffs
 );
 
-// ===== PROTECTED ROUTES (Admin Only) =====
-
-/**
- * POST /api/v1/tariffs
- * Create new tariff plan
- */
+//admin onl protected
 router.post('/',
-  // authMiddleware,
-  // adminOnly,
+  authMiddleware,
+  adminOnly,
   tariffController.createTariff
 );
 
-/**
- * PUT /api/v1/tariffs/:id
- * Update tariff plan
- */
 router.put('/:id',
-  // authMiddleware,
-  // adminOnly,
+  authMiddleware,
+  adminOnly,
   tariffController.updateTariff
 );
 
-/**
- * DELETE /api/v1/tariffs/:id
- * Deactivate tariff plan
- */
 router.delete('/:id',
-  // authMiddleware,
-  // adminOnly,
+  authMiddleware,
+  adminOnly,
   tariffController.deleteTariff
 );
 
-/**
- * POST /api/v1/tariffs/:id/calculate-bill
- * Calculate bill for specific tariff
- * Body: { consumption: number }
- */
 router.post('/:id/calculate-bill',
-  // authMiddleware,
+  authMiddleware,
   tariffController.calculateBill
 );
 
-/**
- * GET /api/v1/tariffs/:id/history
- * Get tariff history/versions
- */
 router.get('/:id/history',
-  // authMiddleware,
+  authMiddleware,
   tariffController.getTariffHistory
 );
 
-/**
- * GET /api/v1/tariffs/:id/export
- * Export tariff as JSON file
- */
 router.get('/:id/export',
-  // authMiddleware,
-  // adminOnly,
+  authMiddleware,
+  adminOnly,
   tariffController.exportTariff
 );
 
