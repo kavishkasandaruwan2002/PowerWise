@@ -4,7 +4,7 @@ const CarbonFootprintService = require('../services/CarbonFootprintService');
 
 // @desc    Get all appliances for user
 // @route   GET /api/appliances
-// @access  Private
+
 exports.getAppliances = async (req, res) => {
     try {
         const filter = { createdBy: req.user.id };
