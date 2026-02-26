@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const { swaggerUi, specs } = require('./config/swagger');
 
 require('dotenv').config();
 
@@ -27,20 +28,29 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
 app.use('/api/appliances', require('./routes/appliances'));
 app.use('/api/readings', require('./routes/readings'));
 
+//======================= Tariff Routes =====
+const tariffRoutes = require('./routes/tariffRoutes');
+app.use('/api/v1/tariffs', tariffRoutes);
 
-//budget routes 
-const budgetRoutes = require('../routes/budgetRoutes');
+// Budget Module Routes
+const budgetRoutes = require('./routes/budgetRoutes');
 app.use('/api/v1/budgets', budgetRoutes);
 
-//consumption
-app.use('/api/v1/consumption', authMiddleware, consumptionRoutes);
+// Consumption Module Routes
+const consumptionRoutes = require('./routes/consumptionRoutes');
+app.use('/api/v1/consumption', consumptionRoutes);
 
-//bill prediction routes
+// Bill Prediction Module Routes
 const billPredictionRoutes = require('./routes/billPredictionRoutes');
 app.use('/api/v1/predictions', billPredictionRoutes);
 
-//alert r
-app.use('/api/v1/alerts', authMiddleware, alertRoutes);
+// Alert Module Routes
+const alertRoutes = require('./routes/alertRoutes');
+app.use('/api/v1/alerts', alertRoutes);
+
+// Usage Spike Detection Routes
+const usageSpikeRoutes = require('./routes/usageSpikeRoutes');
+app.use('/api/v1/usage', usageSpikeRoutes);
 
 
 //root route
@@ -79,4 +89,4 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
-module.exports = app; // Export for testing
+module.exports = app;
