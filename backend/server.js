@@ -25,10 +25,12 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
 }));
 
 // Define Routes
-app.use('/api/auth',       require('./routes/authRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/households', require('./routes/householdRoutes'));
-app.use('/api/admin',      require('./routes/adminRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/prediction', require('./routes/predictionRoutes'));
+app.use('/api/appliances', require('./routes/appliances'));
+app.use('/api/readings', require('./routes/readings'));
 
 // ======================= Tariff Routes =======================
 const tariffRoutes = require('./routes/tariffRoutes');
@@ -53,6 +55,10 @@ app.use('/api/v1/alerts', alertRoutes);
 // Usage Spike Detection Routes
 const usageSpikeRoutes = require('./routes/usageSpikeRoutes');
 app.use('/api/v1/usage', usageSpikeRoutes);
+
+// Energy Tips Routes
+app.use('/api/v1/tips', require('./routes/tips'));
+app.use('/api/v1/admin-tips', require('./routes/adminTips'));
 
 // Root route
 app.get('/', (req, res) => {
