@@ -59,6 +59,7 @@ app.get('/api/docs.json', (req, res) => {
 app.use('/api/auth',       require('./routes/authRoutes'));
 app.use('/api/households', require('./routes/householdRoutes'));
 app.use('/api/admin',      require('./routes/adminRoutes'));
+app.use('/api/prediction', require('./routes/predictionRoutes'));
 
 // ── Health Check ───────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) =>

@@ -250,6 +250,7 @@ The key is provided separately by the system administrator.
             { name: '👥 Members', description: 'Shared Household Member Management' },
             { name: '💰 Budget', description: 'Monthly Electricity Budget Setting & History' },
             { name: '👑 Admin', description: 'Admin-Only Dashboard & User Management' },
+            { name: '🌤️ Weather & Prediction', description: 'Weather data and consumption prediction' }
         ],
     },
     apis: ['./routes/*.js'],
