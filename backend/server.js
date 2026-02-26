@@ -30,6 +30,29 @@ app.use('/api/households', require('./routes/householdRoutes'));
 app.use('/api/admin',      require('./routes/adminRoutes'));
 app.use('/api/prediction', require('./routes/predictionRoutes'));
 
+// ======================= Tariff Routes =======================
+const tariffRoutes = require('./routes/tariffRoutes');
+app.use('/api/v1/tariffs', tariffRoutes);
+
+// Budget Module Routes
+const budgetRoutes = require('./routes/budgetRoutes');
+app.use('/api/v1/budgets', budgetRoutes);
+
+// Consumption Module Routes
+const consumptionRoutes = require('./routes/consumptionRoutes');
+app.use('/api/v1/consumption', consumptionRoutes);
+
+// Bill Prediction Module Routes
+const billPredictionRoutes = require('./routes/billPredictionRoutes');
+app.use('/api/v1/predictions', billPredictionRoutes);
+
+// Alert Module Routes
+const alertRoutes = require('./routes/alertRoutes');
+app.use('/api/v1/alerts', alertRoutes);
+
+// Usage Spike Detection Routes
+const usageSpikeRoutes = require('./routes/usageSpikeRoutes');
+app.use('/api/v1/usage', usageSpikeRoutes);
 
 // Root route
 app.get('/', (req, res) => {
@@ -54,7 +77,9 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
         success: false,
-        error: process.env.NODE_ENV === 'development' ? err.message : 'Server Error'
+        error: process.env.NODE_ENV === 'development'
+            ? err.message
+            : 'Server Error'
     });
 });
 
@@ -67,4 +92,4 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
-module.exports = app; // Export for testing
+module.exports = app;
