@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="45471504-22a4-4633-b7e3-cc5f2c79a373" name="Changes" comment="update 80%" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_/home/user/3y1s AF project/PowerWise" value="3ACGFb1am0t3JeXE8t45oMtFtnp" />
+    </persistenceIdMap>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="28" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;nadeeshan1&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/kavishkasandaruwan2002/PowerWise.git&quot;,
+    &quot;accountId&quot;: &quot;5da9369c-6270-4e1a-8552-0da994d1d746&quot;
+  },
+  &quot;recentNewPullRequestHead&quot;: {
+    &quot;server&quot;: {
+      &quot;useHttp&quot;: false,
+      &quot;host&quot;: &quot;github.com&quot;,
+      &quot;port&quot;: null,
+      &quot;suffix&quot;: null
+    },
+    &quot;owner&quot;: &quot;kavishkasandaruwan2002&quot;,
+    &quot;repository&quot;: &quot;PowerWise&quot;
+  }
+}</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="3ACGFb1am0t3JeXE8t45oMtFtnp" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "99233282",
+    "javascript.preferred.runtime.type.id": "node",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/user/3y1s AF project/PowerWise",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "configurable.group.appearance",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "/home/user/.local/share/JetBrains/Toolbox/apps/intellij-idea/plugins/javascript-plugin/jsLanguageServicesImpl/external",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.31033.145" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.31033.145" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="45471504-22a4-4633-b7e3-cc5f2c79a373" name="Changes" comment="" />
+      <created>1772089036091</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1772089036091</updated>
+      <workItem from="1772089037237" duration="660000" />
+      <workItem from="1772089929331" duration="8622000" />
+      <workItem from="1772105778941" duration="539000" />
+      <workItem from="1772116093921" duration="14000" />
+      <workItem from="1772118622045" duration="8000" />
+      <workItem from="1772128334449" duration="2856000" />
+      <workItem from="1772132513501" duration="843000" />
+    </task>
+    <task id="LOCAL-00001" summary="udate">
+      <option name="closed" value="true" />
+      <created>1772089374653</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1772089374654</updated>
+    </task>
+    <task id="LOCAL-00002" summary="delete">
+      <option name="closed" value="true" />
+      <created>1772090146913</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1772090146913</updated>
+    </task>
+    <task id="LOCAL-00003" summary="remove">
+      <option name="closed" value="true" />
+      <created>1772090164259</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1772090164259</updated>
+    </task>
+    <task id="LOCAL-00004" summary="fixed connection error">
+      <option name="closed" value="true" />
+      <created>1772090176219</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1772090176219</updated>
+    </task>
+    <task id="LOCAL-00005" summary="fixed un use variables">
+      <option name="closed" value="true" />
+      <created>1772090280630</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1772090280630</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Register, Login, Logout, Profile">
+      <option name="closed" value="true" />
+      <created>1772090474313</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1772090474313</updated>
+    </task>
+    <task id="LOCAL-00007" summary="ousehold CRUD + Members + Budgets">
+      <option name="closed" value="true" />
+      <created>1772090490699</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1772090490699</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Admin dashboard &amp; user management">
+      <option name="closed" value="true" />
+      <created>1772090503748</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1772090503748</updated>
+    </task>
+    <task id="LOCAL-00009" summary="protect (JWT) | adminOnly |">
+      <option name="closed" value="true" />
+      <created>1772090794455</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1772090794455</updated>
+    </task>
+    <task id="LOCAL-00010" summary="User schema (bcrypt password)">
+      <option name="closed" value="true" />
+      <created>1772090814959</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1772090814959</updated>
+    </task>
+    <task id="LOCAL-00011" summary="ousehold + embedded budgets">
+      <option name="closed" value="true" />
+      <created>1772090836658</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1772090836658</updated>
+    </task>
+    <task id="LOCAL-00012" summary="/api/auth/* + Swagger docs">
+      <option name="closed" value="true" />
+      <created>1772090865248</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1772090865248</updated>
+    </task>
+    <task id="LOCAL-00013" summary="/api/auth/* + Swagger docs">
+      <option name="closed" value="true" />
+      <created>1772090877850</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1772090877850</updated>
+    </task>
+    <task id="LOCAL-00014" summary="/api/admin/* + Swagger docs">
+      <option name="closed" value="true" />
+      <created>1772090891068</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1772090891068</updated>
+    </task>
+    <task id="LOCAL-00015" summary="update Admine register">
+      <option name="closed" value="true" />
+      <created>1772096212279</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1772096212279</updated>
+    </task>
+    <task id="LOCAL-00016" summary="update Add User model with password hashing, validation, and role-based schemaAdmine register">
+      <option name="closed" value="true" />
+      <created>1772096272697</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1772096272697</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Set up Express server with Swagger docs, API routing, health check, and error handling">
+      <option name="closed" value="true" />
+      <created>1772096335948</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1772096335948</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Add household routes with Swagger docs for CRUD, member management, ownership transfer, and budget operations">
+      <option name="closed" value="true" />
+      <created>1772096399445</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1772096399445</updated>
+    </task>
+    <task id="LOCAL-00019" summary="**`Implement household controller with CRUD, member management, ownership transfer, and budget operations`**">
+      <option name="closed" value="true" />
+      <created>1772096432995</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1772096432995</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Add Household model with embedded budget schema, location support, and current budget virtual">
+      <option name="closed" value="true" />
+      <created>1772096478917</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1772096478917</updated>
+    </task>
+    <task id="LOCAL-00021" summary="Add auth routes with validation, JWT protection, admin registration, and Swagger documentation">
+      <option name="closed" value="true" />
+      <created>1772096523657</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1772096523657</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Implement auth controller with user/admin registration, JWT login, profile management, and password update">
+      <option name="closed" value="true" />
+      <created>1772096557298</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1772096557298</updated>
+    </task>
+    <task id="LOCAL-00023" summary="**`Add authentication middleware for JWT protection, admin authorization, and household access control`**">
+      <option name="closed" value="true" />
+      <created>1772096587650</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1772096587650</updated>
+    </task>
+    <task id="LOCAL-00024" summary="**`Add admin routes with role-based protection, user management, household management, and dashboard stats (Swagger documented)`**">
+      <option name="closed" value="true" />
+      <created>1772096620800</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1772096620800</updated>
+    </task>
+    <task id="LOCAL-00025" summary="**`Implement admin controller with user management, household oversight, role control, and aggregated dashboard statistics`**">
+      <option name="closed" value="true" />
+      <created>1772096648797</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1772096648797</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Add weather-based consumption prediction feature&#10;&#10;- Integrate OpenWeatherMap API to fetch current weather and forecast for household locations.&#10;- Add prediction endpoint that estimates next month's consumption using past budgets and temperature trend.&#10;- Create weather utility, prediction controller, and routes.&#10;- Update Swagger docs with new tag and endpoints.&#10;- Install axios for HTTP requests.&quot;">
+      <option name="closed" value="true" />
+      <created>1772097520936</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1772097520936</updated>
+    </task>
+    <task id="LOCAL-00027" summary="install axios">
+      <option name="closed" value="true" />
+      <created>1772098672323</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1772098672323</updated>
+    </task>
+    <task id="LOCAL-00028" summary="update">
+      <option name="closed" value="true" />
+      <created>1772117340070</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1772117340070</updated>
+    </task>
+    <task id="LOCAL-00029" summary="update">
+      <option name="closed" value="true" />
+      <created>1772117362594</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1772117362594</updated>
+    </task>
+    <task id="LOCAL-00030" summary="remove">
+      <option name="closed" value="true" />
+      <created>1772117601012</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1772117601012</updated>
+    </task>
+    <task id="LOCAL-00031" summary="update">
+      <option name="closed" value="true" />
+      <created>1772117870348</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1772117870348</updated>
+    </task>
+    <task id="LOCAL-00032" summary="remove">
+      <option name="closed" value="true" />
+      <created>1772117905181</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1772117905181</updated>
+    </task>
+    <task id="LOCAL-00033" summary="update">
+      <option name="closed" value="true" />
+      <created>1772128669028</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1772128669028</updated>
+    </task>
+    <task id="LOCAL-00034" summary="update">
+      <option name="closed" value="true" />
+      <created>1772128706879</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1772128706879</updated>
+    </task>
+    <task id="LOCAL-00035" summary="update 80%">
+      <option name="closed" value="true" />
+      <created>1772129551627</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1772129551627</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fixed un use variables" />
+    <MESSAGE value="Register, Login, Logout, Profile" />
+    <MESSAGE value="ousehold CRUD + Members + Budgets" />
+    <MESSAGE value="Admin dashboard &amp; user management" />
+    <MESSAGE value="protect (JWT) | adminOnly |" />
+    <MESSAGE value="User schema (bcrypt password)" />
+    <MESSAGE value="ousehold + embedded budgets" />
+    <MESSAGE value="/api/auth/* + Swagger docs" />
+    <MESSAGE value="/api/admin/* + Swagger docs" />
+    <MESSAGE value="update Admine register" />
+    <MESSAGE value="update Add User model with password hashing, validation, and role-based schemaAdmine register" />
+    <MESSAGE value="Set up Express server with Swagger docs, API routing, health check, and error handling" />
+    <MESSAGE value="Add household routes with Swagger docs for CRUD, member management, ownership transfer, and budget operations" />
+    <MESSAGE value="**`Implement household controller with CRUD, member management, ownership transfer, and budget operations`**" />
+    <MESSAGE value="Add Household model with embedded budget schema, location support, and current budget virtual" />
+    <MESSAGE value="Add auth routes with validation, JWT protection, admin registration, and Swagger documentation" />
+    <MESSAGE value="Implement auth controller with user/admin registration, JWT login, profile management, and password update" />
+    <MESSAGE value="**`Add authentication middleware for JWT protection, admin authorization, and household access control`**" />
+    <MESSAGE value="**`Add admin routes with role-based protection, user management, household management, and dashboard stats (Swagger documented)`**" />
+    <MESSAGE value="**`Implement admin controller with user management, household oversight, role control, and aggregated dashboard statistics`**" />
+    <MESSAGE value="Add weather-based consumption prediction feature&#10;&#10;- Integrate OpenWeatherMap API to fetch current weather and forecast for household locations.&#10;- Add prediction endpoint that estimates next month's consumption using past budgets and temperature trend.&#10;- Create weather utility, prediction controller, and routes.&#10;- Update Swagger docs with new tag and endpoints.&#10;- Install axios for HTTP requests.&quot;" />
+    <MESSAGE value="install axios" />
+    <MESSAGE value="remove" />
+    <MESSAGE value="update" />
+    <MESSAGE value="update 80%" />
+    <option name="LAST_COMMIT_MESSAGE" value="update 80%" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
+  </component>
+</project>
