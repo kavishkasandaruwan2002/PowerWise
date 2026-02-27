@@ -111,3 +111,5 @@ const getAdminStats = async (req, res) => {
 };
 
 module.exports = { getAllUsers, getAllHouseholds, getHouseholdById, toggleUserActive, changeUserRole, getAdminStats };
+
+// 80% completed
