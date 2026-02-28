@@ -50,7 +50,7 @@ const loginValidation = [
  *       409:
  *         description: Email already registered
  */
-router.post('/register', registerValidation, register);
+router.post('/register', ...registerValidation, register);
 
 /**
  * @swagger
@@ -116,7 +116,7 @@ router.post('/register', registerValidation, register);
  *       409:
  *         description: Email already registered
  */
-router.post('/register-admin', registerValidation, registerAdmin);
+router.post('/register-admin', ...registerValidation, registerAdmin);
 
 /**
  * @swagger
@@ -154,7 +154,7 @@ router.post('/register-admin', registerValidation, registerAdmin);
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', loginValidation, login);
+router.post('/login', ...loginValidation, login);
 
 /**
  * @swagger

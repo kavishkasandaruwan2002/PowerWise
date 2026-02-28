@@ -34,6 +34,8 @@ const register = async (req, res) => {
 
 // ── Admin Registration (requires secret key) ───────────────────────────────
 const registerAdmin = async (req, res) => {
+        console.log('ENV CHECK:', process.env.JWT_ACCESS_SECRET, process.env.ADMIN_SECRET_KEY);
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
     try {
