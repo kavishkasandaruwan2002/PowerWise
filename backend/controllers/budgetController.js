@@ -1,5 +1,5 @@
 const budgetService = require('../services/budgetService');
-const { validateCreateBudget, validateUpdateBudget } = require('../validators/budgetValidator');
+const { validateCreateBudget, validateUpdateBudget } = require('../validators/budgetValidators');
 
 class budgetController {
 

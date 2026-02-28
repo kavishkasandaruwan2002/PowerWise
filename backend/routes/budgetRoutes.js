@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const budgetController = require('../controllers/budgetController');
 
-const { authMiddleware } = require('../middleware/auth');
-const { householdOwnerCheck } = require('../middleware/householdCheck');
-
+const  { protect: authMiddleware } = require('../middleware/auth');
+const householdOwnerCheck  = require('../middleware/householdOwnerCheck');
+const { adminOnly } = require('../middleware/adminOnly');
 
 // ===== USER ROUTES =====
 
