@@ -1,10 +1,8 @@
-const BudgetPlan = require('./models/budgetPlan');
-const TariffPlan = require('./models/tariffPlan');
+const BudgetPlan = require('../models/budgetPlan');
+const TariffPlan = require('../models/TariffPlan');
 
-class BudgetService {
-  /**
-   * Create a new budget
-   */
+class budgetService {
+  //new budget
   async createBudget(budgetData, userId) {
     try {
       // Validate required fields
@@ -44,9 +42,7 @@ class BudgetService {
     }
   }
 
-  /**
-   * Get all budgets
-   */
+  //all budgets
   async getAllBudgets(filters = {}) {
     try {
       const query = { isActive: true };
@@ -74,9 +70,7 @@ class BudgetService {
     }
   }
 
-  /**
-   * Get budget by ID
-   */
+  //budget by ID
   async getBudgetById(budgetId) {
     try {
       const budget = await BudgetPlan.findById(budgetId)
@@ -94,9 +88,7 @@ class BudgetService {
     }
   }
 
-  /**
-   * Get active budget for household
-   */
+  //active budget for household
   async getActiveBudget(householdId) {
     try {
       const budget = await BudgetPlan.getActiveBudget(householdId)
@@ -114,9 +106,7 @@ class BudgetService {
     }
   }
 
-  /**
-   * Get current month budget
-   */
+  //month budget
   async getCurrentMonthBudget(householdId) {
     try {
       const budget = await BudgetPlan.getCurrentMonthBudget(householdId)
@@ -134,9 +124,7 @@ class BudgetService {
     }
   }
 
-  /**
-   * Update budget
-   */
+  //Update budget
   async updateBudget(budgetId, updateData, userId) {
     try {
       const budget = await BudgetPlan.findById(budgetId);
@@ -168,9 +156,7 @@ class BudgetService {
     }
   }
 
-  /**
-   * Update consumption and calculate bill
-   */
+  //Update consumption and calculate bill
   async updateConsumption(budgetId, consumption) {
     try {
       if (typeof consumption !== 'number' || consumption < 0) {
@@ -216,9 +202,7 @@ class BudgetService {
     }
   }
 
-  /**
-   * Get budget progress
-   */
+  //get budget progress
   async getBudgetProgress(budgetId) {
     try {
       const budget = await BudgetPlan.findById(budgetId)
@@ -248,9 +232,6 @@ class BudgetService {
     }
   }
 
-  /**
-   * Deactivate budget (soft delete)
-   */
   async deactivateBudget(budgetId, userId) {
     try {
       const budget = await BudgetPlan.findByIdAndUpdate(
@@ -273,9 +254,6 @@ class BudgetService {
     }
   }
 
-  /**
-   * Compare budget vs actual
-   */
   async compareBudgetVsActual(budgetId) {
     try {
       const budget = await BudgetPlan.findById(budgetId)
@@ -318,9 +296,6 @@ class BudgetService {
     }
   }
 
-  /**
-   * Get budgets in date range
-   */
   async getBudgetsInRange(householdId, startDate, endDate) {
     try {
       if (!householdId || !startDate || !endDate) {
@@ -335,9 +310,6 @@ class BudgetService {
     }
   }
 
-  /**
-   * Get all alerts for a budget
-   */
   async getBudgetAlerts(budgetId) {
     try {
       const budget = await BudgetPlan.findById(budgetId);
@@ -357,9 +329,6 @@ class BudgetService {
     }
   }
 
-  /**
-   * Mark alert as read
-   */
   async markAlertAsRead(budgetId, alertIndex) {
     try {
       const budget = await BudgetPlan.findById(budgetId);
@@ -380,9 +349,6 @@ class BudgetService {
     }
   }
 
-  /**
-   * Get households with exceeded budgets
-   */
   async getExceededBudgets() {
     try {
       return await BudgetPlan.find({
@@ -397,9 +363,6 @@ class BudgetService {
     }
   }
 
-  /**
-   * Forecast next month budget
-   */
   async forecastNextMonthBudget(budgetId) {
     try {
       const currentBudget = await BudgetPlan.findById(budgetId)
@@ -440,4 +403,4 @@ class BudgetService {
   }
 }
 
-module.exports = new BudgetService();
+module.exports = new budgetService();

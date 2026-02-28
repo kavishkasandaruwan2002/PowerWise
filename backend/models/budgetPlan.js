@@ -408,4 +408,4 @@ budgetPlanSchema.statics.getBudgetsInRange = function(householdId, startDate, en
   }).sort({ startDate: -1 });
 };
 
-module.exports = mongoose.model('BudgetPlan', budgetPlanSchema);
+module.exports = mongoose.model('budgetPlan', budgetPlanSchema);

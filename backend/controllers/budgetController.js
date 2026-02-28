@@ -1,7 +1,7 @@
-const budgetService = require('./services/budgetService');
+const budgetService = require('../services/budgetService');
 const { validateCreateBudget, validateUpdateBudget } = require('../validators/budgetValidator');
 
-class BudgetController {
+class budgetController {
 
   async createBudget(req, res) {
     try {
@@ -313,4 +313,4 @@ class BudgetController {
   }
 }
 
-module.exports = new BudgetController();
+module.exports = new budgetController();
