@@ -37,16 +37,16 @@ const tariffRoutes = require('./routes/tariffRoutes');
 app.use('/api/v1/tariffs', tariffRoutes);
 
 // Budget Module Routes
-// const budgetRoutes = require('./routes/budgetRoutes');
-// app.use('/api/v1/budgets', budgetRoutes);
+const budgetRoutes = require('./routes/BudgetRoutes');
+app.use('/api/v1/budgets', budgetRoutes);
 
 // Consumption Module Routes
-// const consumptionRoutes = require('./routes/consumptionRoutes');
-// app.use('/api/v1/consumption', consumptionRoutes);
+const consumptionRoutes = require('./routes/consumptionRoutes');
+app.use('/api/v1/consumption', consumptionRoutes);
 
 // Bill Prediction Module Routes
-// const billPredictionRoutes = require('./routes/billPredictionRoutes');
-// app.use('/api/v1/predictions', billPredictionRoutes);
+const billPredictionRoutes = require('./routes/billPredictionRoutes');
+app.use('/api/v1/predictions', billPredictionRoutes);
 
 // Alert Module Routes
 const alertRoutes = require('./routes/alertRoutes');
