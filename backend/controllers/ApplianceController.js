@@ -66,10 +66,18 @@ exports.getAppliance = async (req, res) => {
 // @access  Private
 exports.addAppliance = async (req, res) => {
     try {
+        console.log('Received addAppliance request body:', req.body);
+        console.log('User from token:', req.user);
+
         // Add user to body
         req.body.createdBy = req.user.id;
-        // Use householdId from authenticated user
-        req.body.householdId = req.user.householdId;
+
+        // Use householdId from authenticated user if not provided in body
+        if (!req.body.householdId) {
+            req.body.householdId = req.user.householdId;
+        }
+
+        console.log('Processed body for DB:', req.body || 'Empty Body');
 
         const appliance = await Appliance.create(req.body);
 

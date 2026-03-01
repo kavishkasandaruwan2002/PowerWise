@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/elecracity', {
+        const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/powerwise', {
             // These options are no longer necessary in Mongoose 6+, but keeping for safety if older version
             // useNewUrlParser: true,
             // useUnifiedTopology: true,

@@ -7,11 +7,16 @@ const CalculationService = require('../services/CalculationService');
 
 exports.submitReading = async (req, res) => {
     try {
+        console.log('Received submitReading request body:', req.body);
+        console.log('User from token:', req.user);
+
         // Set user and household from JWT token
         req.body.submittedBy = req.user.id;
         if (!req.body.householdId) {
             req.body.householdId = req.user.householdId;
         }
+
+        console.log('Processed body for DB:', req.body || 'Empty Body');
 
         const reading = await MeterReading.create(req.body);
 
