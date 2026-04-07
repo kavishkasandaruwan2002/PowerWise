@@ -13,7 +13,7 @@ import { cn } from '../components/ui';
 import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
-    const { user, logout } = useAuth();
+    const { user, logout, checkAuth } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState('');
@@ -35,7 +35,8 @@ const Settings = () => {
         setSuccess('');
         setError('');
         try {
-            await api.put('/auth/profile', profile);
+            await api.put('/auth/me', profile);
+            await checkAuth(); // Refresh global user state
             setSuccess('Profile synchronized successfully.');
         } catch (err) {
             setError(err.response?.data?.message || 'Update failed.');

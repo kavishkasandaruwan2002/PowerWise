@@ -76,7 +76,7 @@ meterReadingSchema.pre('save', function (next) {
                 next();
             });
     } else {
-        next();
+        next(err);
     }
 });
 
