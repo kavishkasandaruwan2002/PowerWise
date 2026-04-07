@@ -13,7 +13,7 @@ const meterReadingSchema = new mongoose.Schema({
     },
     readingType: {
         type: String,
-        enum: ['Monthly', 'Weekly', 'Custom'],
+        enum: ['Monthly', 'Weekly', 'Custom', 'Actual'],
         default: 'Monthly'
     },
     readingDate: {
@@ -26,8 +26,7 @@ const meterReadingSchema = new mongoose.Schema({
         min: 0
     },
     consumption: {
-        type: Number,
-        min: 0
+        type: Number
     },
     estimatedConsumption: {
         type: Number,

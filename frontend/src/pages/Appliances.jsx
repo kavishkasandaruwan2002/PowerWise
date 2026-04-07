@@ -52,7 +52,8 @@ const Appliances = () => {
     try {
       const res = await api.post('/appliances', {
         ...newAppliance,
-        wattage: Number(newAppliance.wattage)
+        wattage: Number(newAppliance.wattage),
+        dailyUsageHours: Number(newAppliance.dailyUsageHours)
       });
       setAppliances([res.data.data, ...appliances]);
       setIsAdding(false);
@@ -67,7 +68,8 @@ const Appliances = () => {
     try {
       const res = await api.put(`/appliances/${editingAppliance._id}`, {
         ...editingAppliance,
-        wattage: Number(editingAppliance.wattage)
+        wattage: Number(editingAppliance.wattage),
+        dailyUsageHours: Number(editingAppliance.dailyUsageHours)
       });
       setAppliances(appliances.map(app => app._id === editingAppliance._id ? res.data.data : app));
       setIsEditing(false);

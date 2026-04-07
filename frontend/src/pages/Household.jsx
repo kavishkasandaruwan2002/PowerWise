@@ -8,8 +8,10 @@ import {
 import { Card, Button, Badge } from '../components/ui';
 import { cn } from '../components/ui';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const Household = () => {
+    const { checkAuth } = useAuth();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -17,7 +19,7 @@ const Household = () => {
         name: '',
         address: '',
         location: { latitude: 0, longitude: 0 },
-        houseType: 'Apartment',
+        houseType: 'apartment',
         occupants: 1
     });
 
@@ -34,7 +36,7 @@ const Household = () => {
                 name: household.name || '',
                 address: household.location?.city || '',
                 location: household.location || { latitude: 0, longitude: 0 },
-                houseType: household.householdType || 'Apartment',
+                houseType: household.householdType || 'apartment',
                 occupants: household.householdSize || 1
             });
         } catch (err) {
@@ -64,9 +66,12 @@ const Household = () => {
                     name: formData.name,
                     householdSize: formData.occupants,
                     householdType: formData.houseType,
-                    location: formData.location
+                    location: formData.location,
+                    incomeBracket: profile?.incomeBracket || 'middle'
                 });
                 setProfile(res.data.household);
+                // Refresh global user state to get the new household ID
+                await checkAuth();
             }
         } catch (err) {
             console.error('Update failed:', err);
@@ -150,10 +155,10 @@ const Household = () => {
                                 value={formData.houseType}
                                 onChange={e => setFormData({...formData, houseType: e.target.value})}
                             >
-                                <option value="Apartment">Apartment Complex</option>
-                                <option value="Bungalow">Bungalow / Detached</option>
-                                <option value="Office">Industrial Node</option>
-                                <option value="Other">Standard Facility</option>
+                                <option value="apartment">Apartment Complex</option>
+                                <option value="house">Bungalow / Detached</option>
+                                <option value="rural_home">Rural / Farm Home</option>
+                                <option value="boarding_house">Boarding / Shared House</option>
                             </select>
                         </div>
                         <div className="flex flex-col gap-3 md:col-span-2">

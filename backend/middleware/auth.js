@@ -17,6 +17,7 @@ const protect = async (req, res, next) => {
                 _id: '65c23b12a8b9c8d7e6f5a4b3',
                 id: '65c23b12a8b9c8d7e6f5a4b3',
                 role: 'user',
+                household: '65c23b12a8b9c8d7e6f5a4c1',
                 householdId: '65c23b12a8b9c8d7e6f5a4c1',
                 location: {
                     lat: 6.9271,   // Colombo

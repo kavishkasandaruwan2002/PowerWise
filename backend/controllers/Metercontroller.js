@@ -12,11 +12,24 @@ exports.submitReading = async (req, res) => {
 
         // Set user and household from JWT token
         req.body.submittedBy = req.user.id;
-        if (!req.body.householdId) {
-            req.body.householdId = req.user.householdId;
+        
+        // Ensure case-sensitivity for enums doesn't block the request
+        if (req.body.readingType && req.body.readingType.toLowerCase() === 'actual') {
+            req.body.readingType = 'Actual';
         }
 
-        console.log('Processed body for DB:', req.body || 'Empty Body');
+        if (!req.body.householdId) {
+            req.body.householdId = req.user.household || req.user.householdId;
+        }
+
+        if (!req.body.householdId) {
+            return res.status(400).json({ 
+                success: false, 
+                error: ['Household configuration required. Please set up your household node in settings first.'] 
+            });
+        }
+
+        console.log('Processed body for DB:', req.body);
 
         const reading = await MeterReading.create(req.body);
 
@@ -195,9 +208,12 @@ exports.deleteReading = async (req, res) => {
             return res.status(404).json({ success: false, error: 'Reading not found' });
         }
 
-        // Check ownership
-        if (reading.submittedBy.toString() !== req.user.id) {
-            return res.status(403).json({ success: false, error: 'Not authorized' });
+        // Check ownership - robustly compare IDs
+        const submittedBy = reading.submittedBy.toString();
+        const userId = req.user.id || req.user._id.toString();
+
+        if (submittedBy !== userId) {
+            return res.status(403).json({ success: false, error: 'Not authorized to delete this reading' });
         }
 
         await reading.deleteOne();
