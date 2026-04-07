@@ -28,6 +28,7 @@ const register = async (req, res) => {
             user: { id: user._id, name: user.name, email: user.email, role: user.role, incomeBracket: user.incomeBracket },
         });
     } catch (err) {
+        console.error('REGISTRATION ERROR:', err);
         return res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -92,6 +93,7 @@ const login = async (req, res) => {
             user: { id: user._id, name: user.name, email: user.email, role: user.role, incomeBracket: user.incomeBracket, household },
         });
     } catch (err) {
+        console.error('LOGIN ERROR:', err);
         return res.status(500).json({ success: false, message: err.message });
     }
 };

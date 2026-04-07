@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { Card, Button, Badge } from '../components/ui';
 import { cn } from '../components/ui';
+import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
 const Analytics = () => {
     const { user } = useAuth();
@@ -39,13 +41,13 @@ const Analytics = () => {
             }
 
             const [compareRes, readingsRes, predictRes] = await Promise.all(endpoints);
-            
+
             setComparison(compareRes.data.data);
             if (predictRes) setPrediction(predictRes.data.prediction);
 
             // Fetch actual readings for the bar chart
             const sortedReadings = (readingsRes.data.data || []).sort((a, b) => new Date(a.readingDate) - new Date(b.readingDate));
-            
+
             const charted = sortedReadings.map(r => ({
                 month: new Date(r.readingDate).toLocaleDateString(undefined, { month: 'short' }),
                 actual: r.consumption || 0,
@@ -61,7 +63,7 @@ const Analytics = () => {
                     predicted: pred.estimatedAmount
                 });
             }
-            
+
             setHistoricalData(charted.length > 0 ? charted : [
                 { month: 'No Data', actual: 0, predicted: 0 }
             ]);

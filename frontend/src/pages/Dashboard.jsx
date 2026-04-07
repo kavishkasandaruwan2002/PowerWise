@@ -13,11 +13,13 @@ import {
 } from 'lucide-react';
 import { Card, Button, Badge } from '../components/ui';
 import { cn } from '../components/ui';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [summary, setSummary] = useState(null);
   const [prediction, setPrediction] = useState(null);
@@ -172,7 +174,7 @@ const Dashboard = () => {
           </div>
           <div>
             <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em] mb-3">
-               {prediction ? "AI Projected Bill" : "Est. Monthly Bill"}
+              {prediction ? "AI Projected Bill" : "Est. Monthly Bill"}
             </p>
             <h3 className="text-4xl font-black text-white tracking-tighter transition-colors group-hover:text-emerald-400">
               {prediction?.estimatedBillRs ? `Rs.${prediction.estimatedBillRs}` : (summary?.estimatedBillRs ? `Rs.${summary.estimatedBillRs}` : "$142.50")}
