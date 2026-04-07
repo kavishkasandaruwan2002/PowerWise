@@ -73,7 +73,7 @@ meterReadingSchema.pre('save', function (next) {
             })
             .catch(err => {
                 // Ignore errors in pre-save, proceed with save
-                next();
+                next(err);
             });
     } else {
         next();
