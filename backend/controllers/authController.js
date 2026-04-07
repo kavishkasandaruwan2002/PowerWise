@@ -11,9 +11,14 @@ const generateToken = (userId) =>
 // ── User Registration ───────────────────────────────────────────────────────
 const register = async (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
+    if (!errors.isEmpty()) {
+        const errorMsg = errors.array().map(err => err.msg).join(', ');
+        return res.status(400).json({ success: false, message: errorMsg, errors: errors.array() });
+    }
     try {
-        const { name, email, password, incomeBracket } = req.body;
+        let { name, email, password, incomeBracket } = req.body;
+        email = email.toLowerCase().trim();
+        
         if (await User.findOne({ email })) {
             return res.status(409).json({ success: false, message: 'Email already registered.' });
         }
@@ -38,9 +43,14 @@ const registerAdmin = async (req, res) => {
         console.log('ENV CHECK:', process.env.JWT_ACCESS_SECRET, process.env.ADMIN_SECRET_KEY);
 
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
+    if (!errors.isEmpty()) {
+        const errorMsg = errors.array().map(err => err.msg).join(', ');
+        return res.status(400).json({ success: false, message: errorMsg, errors: errors.array() });
+    }
     try {
-        const { name, email, password, incomeBracket, adminKey } = req.body;
+        let { name, email, password, incomeBracket, adminKey } = req.body;
+        email = email.toLowerCase().trim();
+
         if (!adminKey || adminKey !== process.env.ADMIN_SECRET_KEY) {
             return res.status(403).json({ success: false, message: 'Invalid or missing admin key.' });
         }
@@ -65,9 +75,14 @@ const registerAdmin = async (req, res) => {
 // ── Login ──────────────────────────────────────────────────────────────────
 const login = async (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
+    if (!errors.isEmpty()) {
+        const errorMsg = errors.array().map(err => err.msg).join(', ');
+        return res.status(400).json({ success: false, message: errorMsg, errors: errors.array() });
+    }
     try {
-        const { email, password } = req.body;
+        let { email, password } = req.body;
+        email = email.toLowerCase().trim();
+        
         const user = await User.findOne({ email }).select('+password');
         console.log('LOGIN ATTEMPT BY:', email);
         if (user) {
