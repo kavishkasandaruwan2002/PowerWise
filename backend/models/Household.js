@@ -77,6 +77,7 @@ const HouseholdSchema = new mongoose.Schema(
 // Virtual: current month's budget
 HouseholdSchema.virtual('currentBudget').get(function () {
     const now = new Date();
+    if(!Array.isArray(this.budgets)) return null; //added safeguard :)
     return (
         this.budgets.find(
             (b) => b.month === now.getMonth() + 1 && b.year === now.getFullYear()
