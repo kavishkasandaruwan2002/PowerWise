@@ -32,6 +32,8 @@ const Navbar = () => {
     navigate('/login');
   };
 
+  const isHomePage = location.pathname === '/';
+
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={18} /> },
     { name: 'Telemetry', path: '/analytics', icon: <BarChart3 size={18} /> },
@@ -74,59 +76,72 @@ const Navbar = () => {
 
         {user ? (
           <>
-            {/* Authenticated Desktop Nav */}
-            <div className="hidden lg:flex items-center bg-[#0b0e14]/50 rounded-[1.5rem] p-1.5 border border-slate-800/50 shadow-inner">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  className={({ isActive }) => cn(
-                    "flex items-center space-x-3 px-8 py-3 rounded-xl transition-all duration-500 font-black text-[10px] uppercase tracking-[0.2em] relative overflow-hidden italic",
-                    isActive 
-                      ? "text-blue-500 bg-blue-500/5" 
-                      : "text-slate-500 hover:text-slate-200 hover:bg-white/5"
-                  )}
-                >
-                  <span className={cn(
-                    "transition-colors",
-                    location.pathname === item.path ? "text-blue-500" : "text-slate-600"
-                  )}>{item.icon}</span>
-                  <span>{item.name}</span>
-                  {location.pathname === item.path && (
-                    <motion.div 
-                      layoutId="active-nav"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 shadow-[0_0_8px_#3b82f6]"
-                    />
-                  )}
-                </NavLink>
-              ))}
-            </div>
+            {/* Authenticated Desktop Nav - Hidden on Home Page */}
+            {!isHomePage && (
+              <div className="hidden lg:flex items-center bg-[#0b0e14]/50 rounded-[1.5rem] p-1.5 border border-slate-800/50 shadow-inner">
+                {navItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={({ isActive }) => cn(
+                      "flex items-center space-x-3 px-8 py-3 rounded-xl transition-all duration-500 font-black text-[10px] uppercase tracking-[0.2em] relative overflow-hidden italic",
+                      isActive 
+                        ? "text-blue-500 bg-blue-500/5" 
+                        : "text-slate-500 hover:text-slate-200 hover:bg-white/5"
+                    )}
+                  >
+                    <span className={cn(
+                      "transition-colors",
+                      location.pathname === item.path ? "text-blue-500" : "text-slate-600"
+                    )}>{item.icon}</span>
+                    <span>{item.name}</span>
+                    {location.pathname === item.path && (
+                      <motion.div 
+                        layoutId="active-nav"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 shadow-[0_0_8px_#3b82f6]"
+                      />
+                    )}
+                  </NavLink>
+                ))}
+              </div>
+            )}
 
             {/* Desktop User Actions */}
             <div className="hidden lg:flex items-center space-x-6">
-              <div className="flex items-center space-x-4 pr-6 border-r border-slate-800">
-                <div className="flex flex-col items-end">
-                    <span className="text-[10px] font-black text-white uppercase italic tracking-tighter">{user.name || 'Admin Node'}</span>
-                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Operator v02</span>
-                </div>
-                <div className="avatar w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-500 font-black text-sm shadow-xl relative group cursor-pointer transition-transform hover:scale-105 active:scale-95">
-                  {user.name?.[0] || 'A'}
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-[#161b2a] shadow-[0_0_5px_#3b82f6] animate-pulse" />
-                </div>
-              </div>
+              {isHomePage ? (
+                <Button 
+                  onClick={() => navigate('/dashboard')}
+                  className="h-14 px-10 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.3em] shadow-2xl shadow-blue-600/20 border-none flex items-center gap-4 transition-all"
+                >
+                  Launch Dashboard <ArrowRight size={16} />
+                </Button>
+              ) : (
+                <>
+                  <div className="flex items-center space-x-4 pr-6 border-r border-slate-800">
+                    <div className="flex flex-col items-end">
+                        <span className="text-[10px] font-black text-white uppercase italic tracking-tighter">{user.name || 'Admin Node'}</span>
+                        <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Operator v02</span>
+                    </div>
+                    <div className="avatar w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-500 font-black text-sm shadow-xl relative group cursor-pointer transition-transform hover:scale-105 active:scale-95">
+                      {user.name?.[0] || 'A'}
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-[#161b2a] shadow-[0_0_5px_#3b82f6] animate-pulse" />
+                    </div>
+                  </div>
 
-              <div className="flex items-center space-x-2">
-                  <Button variant="ghost" className="h-12 w-12 p-0 rounded-2xl bg-slate-900/50 border border-slate-800 text-slate-500 hover:text-blue-500 hover:border-blue-500/30 transition-all">
-                    <Bell size={20} />
-                  </Button>
-                  <Button 
-                    onClick={handleLogout} 
-                    className="h-12 px-6 bg-[#0b0e14] border border-red-900/20 text-red-500 hover:bg-red-500/10 font-black text-[10px] rounded-2xl uppercase tracking-widest flex items-center gap-3 transition-all"
-                  >
-                    <LogOut size={16} />
-                    <span>Disconnect</span>
-                  </Button>
-              </div>
+                  <div className="flex items-center space-x-2">
+                      <Button variant="ghost" className="h-12 w-12 p-0 rounded-2xl bg-slate-900/50 border border-slate-800 text-slate-500 hover:text-blue-500 hover:border-blue-500/30 transition-all">
+                        <Bell size={20} />
+                      </Button>
+                      <Button 
+                        onClick={handleLogout} 
+                        className="h-12 px-6 bg-[#0b0e14] border border-red-900/20 text-red-500 hover:bg-red-500/10 font-black text-[10px] rounded-2xl uppercase tracking-widest flex items-center gap-3 transition-all"
+                      >
+                        <LogOut size={16} />
+                        <span>Disconnect</span>
+                      </Button>
+                  </div>
+                </>
+              )}
             </div>
           </>
         ) : (
