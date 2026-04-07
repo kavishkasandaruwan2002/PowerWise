@@ -7,12 +7,16 @@ const protect = async (req, res, next) => {
     if (req.headers.authorization?.startsWith('Bearer ')) {
         token = req.headers.authorization.split(' ')[1];
     }
+    console.log(`AUTH MIDDLEWARE - URL: ${req.url} | TOKEN PRESENT: ${!!token}`);
     if (!token) {
-        // DEVELOPMENT OVERRIDE: If no token is provided, we can simulate a user for testing purposes
+        console.log('AUTH MIDDLEWARE - NO TOKEN PROVIDED');
+        // DEVELOPMENT OVERRIDE...
         if (process.env.NODE_ENV === 'development') {
+            console.log('AUTH MIDDLEWARE - USING DEV MOCK USER');
             req.user = {
+                _id: '65c23b12a8b9c8d7e6f5a4b3',
                 id: '65c23b12a8b9c8d7e6f5a4b3',
-                role: 'USER',
+                role: 'user',
                 householdId: '65c23b12a8b9c8d7e6f5a4c1',
                 location: {
                     lat: 6.9271,   // Colombo
@@ -25,13 +29,21 @@ const protect = async (req, res, next) => {
     }
     try {
         const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+        console.log('AUTH MIDDLEWARE - DECODED:', decoded);
         req.user = await User.findById(decoded.id).select('-password');
-        if (!req.user || !req.user.isActive) {
-            return res.status(401).json({ success: false, message: 'User not found or deactivated.' });
+        if (!req.user) {
+            console.log('AUTH MIDDLEWARE - USER NOT FOUND IN DB FOR ID:', decoded.id);
+            return res.status(401).json({ success: false, message: 'User not found.' });
         }
+        if (!req.user.isActive) {
+            console.log('AUTH MIDDLEWARE - USER DEACTIVATED:', req.user.email);
+            return res.status(401).json({ success: false, message: 'User deactivated.' });
+        }
+        console.log('AUTH MIDDLEWARE - SUCCESS FOR:', req.user.email);
         next();
     } catch (err) {
-        return res.status(401).json({ success: false, message: 'Token invalid or expired.' });
+        console.log('AUTH MIDDLEWARE - ERROR:', err.message);
+        return res.status(401).json({ success: false, message: 'Token invalid.' });
     }
 };
 

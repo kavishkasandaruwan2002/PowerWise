@@ -18,12 +18,16 @@ function toObjectId(id) {
  */
 exports.getRecommendations = async (req, res) => {
   try {
-    const userId = req.user?.id;
-    const householdId = req.user?.householdId;
+    const userId = req.user?._id;
+    const householdId = req.user?.household;
     const location = req.user?.location;
 
     if (!userId || !householdId) {
-      return res.status(401).json({ success: false, message: 'Authentication required' });
+      console.log(`TIPS CONTROLLER - SKIPPING RECOMMENDATIONS (NO HOUSEHOLD) | USER: ${userId}`);
+      return res.status(200).json({ 
+        success: true, 
+        data: { recommendations: [], message: 'Please set up your household profile to get personalized tips.' } 
+      });
     }
 
     // Requirements:
@@ -65,8 +69,8 @@ exports.getRecommendations = async (req, res) => {
  */
 exports.getMyInteractions = async (req, res) => {
   try {
-    const userId = req.user?.id;
-    const householdId = req.user?.householdId;
+    const userId = req.user?._id;
+    const householdId = req.user?.household;
     const docs = await TipInteraction.find({ userId, householdId })
       .populate('tipId')
       .sort({ updatedAt: -1 });
@@ -83,11 +87,11 @@ exports.getMyInteractions = async (req, res) => {
 exports.bookmarkTip = async (req, res) => {
   try {
     const { tipId } = req.params;
-    const userId = toObjectId(req.user?.id);
-    const householdId = toObjectId(req.user?.householdId);
+    const userId = toObjectId(req.user?._id);
+    const householdId = toObjectId(req.user?.household);
 
     if (!userId || !householdId) {
-      return res.status(401).json({ success: false, message: 'Authentication required' });
+      return res.status(400).json({ success: false, message: 'Please set up your household profile before managing tips.' });
     }
 
     const tipExists = await EnergyTip.exists({ _id: tipId, isActive: true });
@@ -133,12 +137,12 @@ exports.unbookmarkTip = async (req, res) => {
 exports.implementTip = async (req, res) => {
   try {
     const { tipId } = req.params;
-    const userId = req.user?.id;
-    const householdId = req.user?.householdId;
+    const userId = req.user?._id;
+    const householdId = req.user?.household;
     const location = req.user?.location;
 
     if (!userId || !householdId) {
-      return res.status(401).json({ success: false, message: 'Authentication required' });
+      return res.status(400).json({ success: false, message: 'Please set up your household profile before implementing tips.' });
     }
 
     const tip = await EnergyTip.findById(tipId);
@@ -200,10 +204,10 @@ exports.implementTip = async (req, res) => {
 exports.feedbackTip = async (req, res) => {
   try {
     const { tipId } = req.params;
-    const userId = toObjectId(req.user?.id);
-    const householdId = toObjectId(req.user?.householdId);
+    const userId = toObjectId(req.user?._id);
+    const householdId = toObjectId(req.user?.household);
     if (!userId || !householdId) {
-      return res.status(401).json({ success: false, message: 'Authentication required' });
+      return res.status(400).json({ success: false, message: 'Please set up your household profile before providing feedback.' });
     }
 
     const doc = await TipInteraction.findOneAndUpdate(
@@ -232,8 +236,8 @@ exports.feedbackTip = async (req, res) => {
 exports.dismissTip = async (req, res) => {
   try {
     const { tipId } = req.params;
-    const userId = toObjectId(req.user?.id);
-    const householdId = toObjectId(req.user?.householdId);
+    const userId = toObjectId(req.user?._id);
+    const householdId = toObjectId(req.user?.household);
     const days = Number(req.body?.days || 14);
     const dismissedUntil = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
 
