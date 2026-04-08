@@ -147,10 +147,10 @@ WattWise-Energy-Manager/
 
 | Name | Role / Component | GitHub |
 | :--- | :--- | :--- |
-| **Member 1** | User & Household Management | [kavishkasandaruwan2002]https://github.com/kavishkasandaruwan2002/ |
-| **Member 2** | Appliance Tracking | [@username](https://github.com/) |
-| **Member 3** | Bill Prediction & Algorithms | [@ImeshaDissa](https://github.com/ImeshaDissa) |
-| **Member 4** | Smart Tips & Gamification | [@username](https://github.com/) |
+| **Member 1** | Appliance & Usage Tracking | [kavishkasandaruwan2002]https://github.com/kavishkasandaruwan2002/ |
+| **Member 2** | User & Household Management | [@nadeeshan1](https://github.com/nadeeshan1) |
+| **Member 3** | Bill Prediction & Budget Management | [@ImeshaDissa](https://github.com/ImeshaDissa) |
+| **Member 4** | Personalized Energy tips & Goal Tracking | [@theShihamAhamed](https://github.com/theShihamAhamed) |
 
 ---
 
