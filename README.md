@@ -149,7 +149,7 @@ WattWise-Energy-Manager/
 | :--- | :--- | :--- |
 | **Member 1** | User & Household Management | [kavishkasandaruwan2002]https://github.com/kavishkasandaruwan2002/ |
 | **Member 2** | Appliance Tracking | [@username](https://github.com/) |
-| **Member 3** | Bill Prediction & Algorithms | [@username](https://github.com/) |
+| **Member 3** | Bill Prediction & Algorithms | [@ImeshaDissa](https://github.com/ImeshaDissa) |
 | **Member 4** | Smart Tips & Gamification | [@username](https://github.com/) |
 
 ---
