@@ -10,7 +10,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const TariffPlan = require('./models/tariffPlan');
+const TariffPlan = require('../models/TariffPlan');
 
 const domesticTariffs = [
   {
