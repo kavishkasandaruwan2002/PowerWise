@@ -104,17 +104,17 @@ const Register = () => {
                         <Activity size={56} strokeWidth={1} />
                     </motion.div>
                     <h2 className="text-6xl font-black text-white italic uppercase tracking-tighter mb-6 leading-none">
-                        Join the <br/><span className="text-blue-600">Grid.</span>
+                        Join <br/><span className="text-blue-600">PowerWise.</span>
                     </h2>
                     <p className="text-slate-500 text-xl font-bold italic leading-relaxed mb-12">
-                        Enlist your household into the world's most advanced energy intelligence network. Start monitoring your grid in seconds.
+                        Sign up for our advanced energy intelligence network and start monitoring your usage in seconds.
                     </p>
 
                     <div className="space-y-6 text-left max-w-sm mx-auto">
                         {[
-                            "Real-time Neural Telemetry",
+                            "Real-time Data Telemetry",
                             "AI-Powered Bill Predictions",
-                            "Quantum Tunnel Encryption"
+                            "Advanced Encryption"
                         ].map((text, i) => (
                             <motion.div 
                                 key={i}
@@ -142,10 +142,10 @@ const Register = () => {
                             animate={{ opacity: 1, x: 0 }}
                             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/10 border border-blue-500/20 text-blue-500 text-[9px] font-black uppercase tracking-[0.3em] italic"
                         >
-                            <UserPlus size={12} className="fill-blue-500" /> New Node Enlistment
+                            <UserPlus size={12} className="fill-blue-500" /> Member Registration
                         </motion.div>
                         <h1 className="text-4xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none">
-                            Establish <br/><span className="text-blue-600">Profile.</span>
+                            Create <br/><span className="text-blue-600">Account.</span>
                         </h1>
                     </header>
 
@@ -163,7 +163,7 @@ const Register = () => {
                             <InputField
                                 id="name"
                                 type="text"
-                                label="Operator Name"
+                                label="Full Name"
                                 placeholder="Kasun Perera"
                                 value={formData.name}
                                 onChange={handleChange}
@@ -173,8 +173,8 @@ const Register = () => {
                             <InputField
                                 id="email"
                                 type="email"
-                                label="Uplink Ident"
-                                placeholder="operator@grid.net"
+                                label="Email Address"
+                                placeholder="user@example.com"
                                 value={formData.email}
                                 onChange={handleChange}
                                 icon={Mail}
@@ -186,7 +186,7 @@ const Register = () => {
                             <InputField
                                 id="password"
                                 type="password"
-                                label="Secure Key"
+                                label="Password"
                                 placeholder="••••••••"
                                 value={formData.password}
                                 onChange={handleChange}
@@ -196,7 +196,7 @@ const Register = () => {
                             <InputField
                                 id="confirmPassword"
                                 type="password"
-                                label="Re-Verify Key"
+                                label="Confirm Password"
                                 placeholder="••••••••"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
@@ -237,8 +237,8 @@ const Register = () => {
                                 <InputField
                                     id="adminKey"
                                     type="password"
-                                    label="Admin Override Key"
-                                    placeholder="Enter access code"
+                                    label="Admin Authentication Key"
+                                    placeholder="Enter admin passcode"
                                     value={formData.adminKey}
                                     onChange={handleChange}
                                     icon={ShieldCheck}
@@ -254,15 +254,15 @@ const Register = () => {
                             {loading ? (
                                 <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                             ) : (
-                                <>Initialize Link <ArrowRight size={16} /></>
+                                <>Create Account <ArrowRight size={16} /></>
                             )}
                         </button>
                     </form>
 
                     <p className="text-center text-[10px] font-black text-slate-600 uppercase tracking-widest pt-4">
-                        Already Synchronized?{' '}
+                        Already Have An Account?{' '}
                         <Link to="/login" className="text-blue-600 hover:text-blue-400 transition-colors ml-2 underline decoration-2 underline-offset-4">
-                            Access Terminal
+                            Log In Here
                         </Link>
                     </p>
                 </div>

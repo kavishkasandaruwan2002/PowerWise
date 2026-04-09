@@ -222,7 +222,9 @@ const Analytics = () => {
                         <div className="text-4xl font-black text-white italic tracking-tighter mb-2 tracking-tighter uppercase transition-colors group-hover:text-blue-500">
                             LKR {prediction?.forecast?.projectedBill || (comparison?.estimatedBillRs || '0.00')}
                         </div>
-                        <p className="text-slate-600 text-[10px] font-black uppercase tracking-[0.2em] mb-8">Structural Prediction</p>
+                        <p className="text-slate-400 text-[8px] font-black uppercase tracking-[0.1em] mb-8 leading-relaxed max-w-[200px]">
+                            {prediction?.forecast?.description || "Structural Prediction"}
+                        </p>
 
                         <div className="flex items-center justify-between p-5 bg-[#0b0e14] rounded-[2rem] border border-slate-800 transition-all hover:border-blue-500/30">
                             <div className="flex items-center text-[9px] text-blue-500 font-black uppercase tracking-widest italic">
