@@ -285,6 +285,13 @@ class BillPredictionController {
             daysElapsed: prediction.analysisData.daysElapsed
           },
           historical: prediction.historicalData,
+          forecast: {
+            projectedConsumption: prediction.predictions.consumptionPrediction.value,
+            projectedBill: prediction.predictions.billPrediction.value,
+            confidence: `${prediction.predictions.billPrediction.confidence}`,
+            breakdown: prediction.predictions.billPrediction.breakdown,
+            description: prediction.predictions.consumptionPrediction.description
+          },
           predictions: prediction.predictions,
           budgetComparison: prediction.budgetComparison,
           recommendations: prediction.recommendations,
@@ -323,8 +330,9 @@ class BillPredictionController {
           forecast: {
             projectedConsumption: prediction.predictions.consumptionPrediction.value,
             projectedBill: prediction.predictions.billPrediction.value,
-            confidence: `${prediction.predictions.billPrediction.confidence}%`,
-            breakdown: prediction.predictions.billPrediction.breakdown
+            confidence: `${prediction.predictions.billPrediction.confidence}`,
+            breakdown: prediction.predictions.billPrediction.breakdown,
+            description: prediction.predictions.consumptionPrediction.description
           },
           scenarios: prediction.predictions.scenarios,
           budgetStatus: prediction.budgetComparison,

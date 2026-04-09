@@ -106,10 +106,10 @@ const Login = () => {
                animate={{ opacity: 1, x: 0 }}
                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/10 border border-blue-500/20 text-blue-500 text-[9px] font-black uppercase tracking-[0.3em] italic"
              >
-                <Zap size={12} className="fill-blue-500" /> Uplink Active
+                <Zap size={12} className="fill-blue-500" /> System Online
              </motion.div>
              <h1 className="text-4xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none">
-                Access <br/><span className="text-blue-600">Terminal.</span>
+                Welcome <br/><span className="text-blue-600">Back.</span>
              </h1>
           </header>
 
@@ -127,8 +127,8 @@ const Login = () => {
               <InputField
                 id="email"
                 type="email"
-                label="Operator Ident"
-                placeholder="operator@powerwise.net"
+                label="Email Address"
+                placeholder="user@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 icon={Mail}
@@ -137,8 +137,8 @@ const Login = () => {
 
               <PasswordField
                 id="password"
-                label="Secure Key"
-                placeholder="Enter access code"
+                label="Password"
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 showPassword={showPassword}
@@ -150,10 +150,10 @@ const Login = () => {
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <input type="checkbox" className="w-4 h-4 rounded border-slate-800 bg-[#0b0e14] text-blue-600 focus:ring-blue-500/20" />
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-slate-300">Persist</span>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-slate-300">Remember Me</span>
               </label>
               <button type="button" className="text-[10px] font-black text-blue-500 uppercase tracking-widest hover:text-blue-400">
-                Recover Key
+                Forgot Password?
               </button>
             </div>
 
@@ -165,7 +165,7 @@ const Login = () => {
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
               ) : (
-                <>Establish Link <ArrowRight size={16} /></>
+                <>Log In <ArrowRight size={16} /></>
               )}
             </button>
 
@@ -174,7 +174,7 @@ const Login = () => {
                 <div className="w-full border-t border-slate-900"></div>
               </div>
               <div className="relative flex justify-center text-[9px] uppercase tracking-[0.3em]">
-                <span className="bg-[#0b0e14] px-4 text-slate-600 font-black">Third-party Link</span>
+                <span className="bg-[#0b0e14] px-4 text-slate-600 font-black">Or continue with</span>
               </div>
             </div>
 
@@ -186,12 +186,20 @@ const Login = () => {
             </button>
           </form>
 
-          <p className="text-center text-[10px] font-black text-slate-600 uppercase tracking-widest pt-4">
-             New Node?{' '}
-             <Link to="/register" className="text-blue-600 hover:text-blue-400 transition-colors ml-2 underline decoration-2 underline-offset-4">
-                Enlist
-             </Link>
-          </p>
+          <div className="pt-8 border-t border-slate-900">
+            <p className="text-center text-[10px] font-black text-slate-600 uppercase tracking-widest">
+              Don't have an account?{' '}
+              <Link to="/register" className="text-blue-600 hover:text-blue-400 transition-colors ml-2 underline decoration-2 underline-offset-4">
+                Sign Up
+              </Link>
+            </p>
+            <p className="text-center text-[10px] font-black text-slate-600 uppercase tracking-widest mt-4">
+              Administrator Profile?{' '}
+              <Link to="/admin/register" className="text-purple-600 hover:text-purple-400 transition-colors ml-2 underline decoration-2 underline-offset-4">
+                Register as Admin
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
 
@@ -211,10 +219,10 @@ const Login = () => {
               <ShieldCheck size={56} strokeWidth={1} />
            </motion.div>
            <h2 className="text-6xl font-black text-white italic uppercase tracking-tighter mb-6 leading-none">
-              Secured <br/><span className="text-blue-600">Grid Hub.</span>
+              Smart Energy <br/><span className="text-blue-600">Analytics.</span>
            </h2>
            <p className="text-slate-500 text-xl font-bold italic leading-relaxed mb-12">
-              Managing the future of household energy through real-time geo-telemetry and neural grid prediction models.
+              Manage your household energy usage with advanced tracking and AI-powered prediction models.
            </p>
 
            <div className="grid grid-cols-3 gap-8 pt-10 border-t border-slate-900">
@@ -224,11 +232,11 @@ const Login = () => {
               </div>
               <div className="text-center">
                  <p className="text-3xl font-black text-white italic tracking-tighter">4.2M</p>
-                 <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest">Active Ops</p>
+                 <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest">Active Users</p>
               </div>
               <div className="text-center">
                  <p className="text-3xl font-black text-white italic tracking-tighter">AES-GCM</p>
-                 <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest">Logic Tier</p>
+                 <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest">Encryption</p>
               </div>
            </div>
         </div>

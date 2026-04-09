@@ -1,19 +1,17 @@
 const MeterReading = require('../models/MeterReading');
+const ConsumptionRecord = require('../models/consumptionRecord');
 const Appliance = require('../models/Appliance');
 const CalculationService = require('../services/CalculationService');
 
 // @desc    Submit a new meter reading
 // @route   POST /api/readings
-
 exports.submitReading = async (req, res) => {
     try {
         console.log('Received submitReading request body:', req.body);
         console.log('User from token:', req.user);
 
-        // Set user and household from JWT token
         req.body.submittedBy = req.user.id;
         
-        // Ensure case-sensitivity for enums doesn't block the request
         if (req.body.readingType && req.body.readingType.toLowerCase() === 'actual') {
             req.body.readingType = 'Actual';
         }
@@ -32,6 +30,27 @@ exports.submitReading = async (req, res) => {
         console.log('Processed body for DB:', req.body);
 
         const reading = await MeterReading.create(req.body);
+
+        // Also create a ConsumptionRecord for bill prediction
+        if (reading.consumption != null && reading.consumption > 0) {
+            try {
+                await ConsumptionRecord.create({
+                    householdId: reading.householdId,
+                    userId: req.user.id,
+                    consumption: reading.consumption,
+                    readingDate: reading.readingDate,
+                    period: 'daily',
+                    meterReading: reading.readingValue,
+                    previousMeterReading: reading.previousReading,
+                    isManualEntry: true,
+                    status: 'recorded',
+                    sourceSystem: 'manualEntry',
+                    createdBy: req.user.id
+                });
+            } catch (crErr) {
+                console.error('Failed to create ConsumptionRecord:', crErr.message);
+            }
+        }
 
         // Build comparison data
         let comparison = null;
@@ -78,12 +97,10 @@ exports.getReadings = async (req, res) => {
     try {
         const filter = { submittedBy: req.user.id };
 
-        // Filter by type if specified
         if (req.query.type) {
             filter.readingType = req.query.type;
         }
 
-        // Pagination
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
         const skip = (page - 1) * limit;
@@ -113,12 +130,10 @@ exports.getReadings = async (req, res) => {
 // @access  Private
 exports.compareUsage = async (req, res) => {
     try {
-        // Get all user appliances
         const appliances = await Appliance.find({ createdBy: req.user.id });
         const breakdown = CalculationService.calculateCategoryBreakdown(appliances);
         const estimatedMonthlyKWh = breakdown.totalUsage;
 
-        // Get last 2 readings
         const readings = await MeterReading.find({ submittedBy: req.user.id })
             .sort({ readingDate: -1 })
             .limit(2);
@@ -132,7 +147,6 @@ exports.compareUsage = async (req, res) => {
                 (new Date(readings[0].readingDate) - new Date(readings[1].readingDate)) / (1000 * 60 * 60 * 24)
             );
             daysElapsed = Math.round(days);
-            // Normalize to 30 days
             actualMonthlyKWh = parseFloat(((diff / days) * 30).toFixed(2));
         }
 
@@ -144,13 +158,9 @@ exports.compareUsage = async (req, res) => {
 
         let status = 'No data';
         if (hasActual) {
-            if (Math.abs(difference) < estimatedMonthlyKWh * 0.1) {
-                status = 'On Track ✅';
-            } else if (actualMonthlyKWh > estimatedMonthlyKWh) {
-                status = 'Over-consuming ⚠️';
-            } else {
-                status = 'Efficient 🌟';
-            }
+            if (Math.abs(difference) < estimatedMonthlyKWh * 0.1) status = 'On Track ✅';
+            else if (actualMonthlyKWh > estimatedMonthlyKWh) status = 'Over-consuming ⚠️';
+            else status = 'Efficient 🌟';
         }
 
         res.json({
@@ -183,7 +193,7 @@ exports.detectAnomalies = async (req, res) => {
     try {
         const readings = await MeterReading.find({ submittedBy: req.user.id })
             .sort({ readingDate: -1 })
-            .limit(12); // Last 12 readings
+            .limit(12);
 
         const result = CalculationService.detectAnomalies(readings);
 
@@ -208,7 +218,6 @@ exports.deleteReading = async (req, res) => {
             return res.status(404).json({ success: false, error: 'Reading not found' });
         }
 
-        // Check ownership - robustly compare IDs
         const submittedBy = reading.submittedBy.toString();
         const userId = req.user.id || req.user._id.toString();
 

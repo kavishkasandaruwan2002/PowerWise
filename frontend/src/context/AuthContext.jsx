@@ -54,7 +54,8 @@ export const AuthProvider = ({ children }) => {
     };
 
     const register = async (userData) => {
-        const res = await api.post('/auth/register', userData);
+        const route = userData.adminKey ? '/auth/register-admin' : '/auth/register';
+        const res = await api.post(route, userData);
         const { token, user } = res.data;
         const normalizedUser = { ...user, id: user.id || user._id, _id: user._id || user.id };
         localStorage.setItem('token', token);
