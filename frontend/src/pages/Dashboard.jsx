@@ -65,17 +65,17 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const endpoints = [
-        api.get("/readings"),
-        api.get("/readings/compare"),
-        api.get("/appliances"),
-        api.get("/v1/alerts"),
+        api.get("/readings").catch(() => null),
+        api.get("/readings/compare").catch(() => null),
+        api.get("/appliances").catch(() => null),
+        api.get("/v1/alerts").catch(() => null),
       ];
 
       const hasHousehold = !!user?.household;
       if (hasHousehold) {
         const householdId = user.household._id || user.household;
-        endpoints.push(api.post(`/v1/predictions/${householdId}/forecast`));
-        endpoints.push(api.get("/v1/tips/recommendations"));
+        endpoints.push(api.post(`/v1/predictions/${householdId}/forecast`).catch(() => null));
+        endpoints.push(api.get("/v1/tips/recommendations").catch(() => null));
       }
 
       const results = await Promise.all(endpoints);
@@ -378,9 +378,10 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="h-[450px] w-full">
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-              <AreaChart data={data}>
+          <div className="w-full">
+            {data && data.length > 0 ? (
+              <ResponsiveContainer width="100%" height="400%" minWidth="0%">
+                <AreaChart data={data}>
                 <defs>
                   <linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
@@ -425,8 +426,16 @@ const Dashboard = () => {
                   animationDuration={2500}
                   animationEasing="ease-in-out"
                 />
-              </AreaChart>
-            </ResponsiveContainer>
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center py-24 border-2 border-dashed border-slate-800/50 rounded-[2rem]">
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] flex items-center">
+                  <Activity size={14} className="mr-2 opacity-50" />
+                  No consumption data for this period
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

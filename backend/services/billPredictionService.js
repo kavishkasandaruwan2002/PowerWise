@@ -179,6 +179,19 @@ class BillPredictionService {
           warningLevel: this.getWarningLevel((projectedBill.total / budget.monthlyLimit) * 100)
         };
 
+        // Dispatch global alert if budget prediction threshold passed
+        const percentage = predictionData.budgetComparison.percentageOfBudget;
+        if (percentage >= 80) {
+            setImmediate(async () => {
+                try {
+                    const alertService = require('./alertService');
+                    await alertService.createPredictionAlert(householdId, predictionData.userId || budget.userId, predictionData.budgetComparison);
+                } catch (err) {
+                    console.error('Failed to dispatch prediction alert globally:', err.message);
+                }
+            });
+        }
+
         predictionData.recommendations = this.generateRecommendations(
           projectedBill.total,
           budget.monthlyLimit,

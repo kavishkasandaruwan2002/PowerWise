@@ -32,21 +32,21 @@ const Analytics = () => {
             const householdId = user?.household?._id || user?.household;
 
             const endpoints = [
-                api.get('/readings/compare'),
-                api.get('/readings')
+                api.get('/readings/compare').catch(() => null),
+                api.get('/readings').catch(() => null)
             ];
 
             if (hasHousehold && householdId) {
-                endpoints.push(api.post(`/v1/predictions/${householdId}/forecast`));
+                endpoints.push(api.post(`/v1/predictions/${householdId}/forecast`).catch(() => null));
             }
 
             const [compareRes, readingsRes, predictRes] = await Promise.all(endpoints);
 
-            setComparison(compareRes.data.data);
-            if (predictRes) setPrediction(predictRes.data.data);
+            setComparison(compareRes?.data?.data || null);
+            if (predictRes) setPrediction(predictRes?.data?.data);
 
             // Fetch actual readings for the bar chart
-            const sortedReadings = (readingsRes.data.data || []).sort((a, b) => new Date(a.readingDate) - new Date(b.readingDate));
+            const sortedReadings = (readingsRes?.data?.data || []).sort((a, b) => new Date(a.readingDate) - new Date(b.readingDate));
 
             const charted = sortedReadings.map(r => ({
                 month: new Date(r.readingDate).toLocaleDateString(undefined, { month: 'short' }),
