@@ -23,6 +23,16 @@ const Settings = () => {
         email: user?.email || '',
         incomeBracket: user?.incomeBracket || 'middle'
     });
+
+    React.useEffect(() => {
+        if (user) {
+            setProfile({
+                name: user.name || '',
+                email: user.email || '',
+                incomeBracket: user.incomeBracket || 'middle'
+            });
+        }
+    }, [user]);
     const [passwords, setPasswords] = useState({
         currentPassword: '',
         newPassword: '',

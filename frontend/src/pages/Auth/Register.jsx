@@ -41,8 +41,10 @@ const Register = () => {
         email: '',
         password: '',
         confirmPassword: '',
-        incomeBracket: 'middle'
+        incomeBracket: 'middle',
+        adminKey: ''
     });
+    const [isAdmin, setIsAdmin] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const { register } = useAuth();
@@ -62,12 +64,22 @@ const Register = () => {
 
         setLoading(true);
         try {
-            await register({
+            const submitData = {
                 name: formData.name,
                 email: formData.email,
                 password: formData.password,
                 incomeBracket: formData.incomeBracket
-            });
+            };
+            
+            if (isAdmin) {
+                if (!formData.adminKey) {
+                    setLoading(false);
+                    return setError('Admin Override Key is required');
+                }
+                submitData.adminKey = formData.adminKey;
+            }
+
+            await register(submitData);
             navigate('/dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed. Try a different email.');
@@ -212,6 +224,27 @@ const Register = () => {
                                  ))}
                              </div>
                         </div>
+
+                        <div className="flex items-center gap-2 mt-4 cursor-pointer" onClick={() => setIsAdmin(!isAdmin)}>
+                            <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors ${isAdmin ? 'bg-blue-600 border-blue-600' : 'bg-[#0b0e14] border-slate-700'}`}>
+                                {isAdmin && <CheckCircle2 size={12} className="text-white" />}
+                            </div>
+                            <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Register as System Admin</span>
+                        </div>
+
+                        {isAdmin && (
+                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="pt-2">
+                                <InputField
+                                    id="adminKey"
+                                    type="password"
+                                    label="Admin Override Key"
+                                    placeholder="Enter access code"
+                                    value={formData.adminKey}
+                                    onChange={handleChange}
+                                    icon={ShieldCheck}
+                                />
+                            </motion.div>
+                        )}
 
                         <button 
                             type="submit" 

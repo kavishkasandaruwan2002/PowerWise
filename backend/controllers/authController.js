@@ -147,7 +147,7 @@ const updatePassword = async (req, res) => {
 const updateProfile = async (req, res) => {
     try {
         const { name, email, incomeBracket } = req.body;
-        const user = await User.findById(req.user._id);
+        const user = await User.findById(req.user._id).select('+password');
 
         if (name) user.name = name;
         if (email) {

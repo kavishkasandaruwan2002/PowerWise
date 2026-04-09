@@ -23,6 +23,7 @@ const Dashboard = () => {
   const [data, setData] = useState([]);
   const [summary, setSummary] = useState(null);
   const [prediction, setPrediction] = useState(null);
+  const [showBreakdown, setShowBreakdown] = useState(false);
   const [loading, setLoading] = useState(true);
   const [alerts, setAlerts] = useState([]);
   const [tips, setTips] = useState([]);
@@ -44,7 +45,7 @@ const Dashboard = () => {
       const hasHousehold = !!user?.household;
       if (hasHousehold) {
         const householdId = user.household._id || user.household;
-        endpoints.push(api.get(`/prediction/${householdId}/predict`));
+        endpoints.push(api.post(`/v1/predictions/${householdId}/forecast`));
         endpoints.push(api.get('/v1/tips/recommendations'));
       }
 
@@ -68,7 +69,7 @@ const Dashboard = () => {
       if (appliancesRes) setAppliances(appliancesRes.data.data || []);
       if (alertsRes) setAlerts((alertsRes.data.data || []).slice(0, 3));
       if (tipsRes) setTips((tipsRes.data.data?.recommendations || []).slice(0, 2));
-      if (predictionRes) setPrediction(predictionRes.data.prediction);
+      if (predictionRes) setPrediction(predictionRes.data.data);
 
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
@@ -98,9 +99,9 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b0e14] p-8 pb-32 overflow-x-hidden">
+    <div className="min-h-screen bg-[#0b0e14] p-4 md:p-8 pb-32 overflow-x-hidden">
       {/* Dashboard Topbar */}
-      <header className="flex items-center justify-between mb-12">
+      <header className="flex items-center justify-between mb-8 md:mb-12">
         <button className="p-2 text-slate-500 hover:text-white transition-colors">
           <Menu size={24} />
         </button>
@@ -109,10 +110,10 @@ const Dashboard = () => {
             <Bell size={24} />
             <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
           </button>
-          <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <p className="text-sm font-bold text-white">User Profile</p>
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">Regular User</p>
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-bold text-white">{user?.name || 'User Profile'}</p>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">{user?.role === 'admin' ? 'System Admin' : 'Regular User'}</p>
             </div>
             <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-black border-4 border-slate-900 shadow-xl overflow-hidden ring-4 ring-blue-500/10">
               {user?.name?.[0] || 'U'}
@@ -140,9 +141,9 @@ const Dashboard = () => {
       </div>
 
       {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-8 md:mb-12">
         {/* Live Usage */}
-        <div className="bg-[#161b2a] p-10 rounded-[2.5rem] border border-slate-800 relative transition-all hover:scale-[1.02] cursor-pointer shadow-2xl group overflow-hidden">
+        <div className="bg-[#161b2a] p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] border border-slate-800 relative transition-all hover:scale-[1.02] cursor-pointer shadow-2xl group overflow-hidden">
           <div className="flex items-center justify-between mb-10">
             <div className="p-4 bg-blue-500/10 text-blue-500 rounded-2xl shadow-inner">
               <Zap size={28} />
@@ -162,7 +163,7 @@ const Dashboard = () => {
         </div>
 
         {/* Monthly Bill */}
-        <div className="bg-[#161b2a] p-10 rounded-[2.5rem] border border-slate-800 relative transition-all hover:scale-[1.02] cursor-pointer shadow-2xl group overflow-hidden">
+        <div className="bg-[#161b2a] p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] border border-slate-800 relative transition-all hover:scale-[1.02] cursor-pointer shadow-2xl group overflow-hidden">
           <div className="flex items-center justify-between mb-10">
             <div className="p-4 bg-emerald-500/10 text-emerald-500 rounded-2xl shadow-inner">
               <DollarSign size={28} />
@@ -172,19 +173,54 @@ const Dashboard = () => {
               -3.2%
             </div>
           </div>
-          <div>
-            <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em] mb-3">
-              {prediction ? "AI Projected Bill" : "Est. Monthly Bill"}
-            </p>
-            <h3 className="text-4xl font-black text-white tracking-tighter transition-colors group-hover:text-emerald-400">
-              {prediction?.estimatedBillRs ? `Rs.${prediction.estimatedBillRs}` : (summary?.estimatedBillRs ? `Rs.${summary.estimatedBillRs}` : "$142.50")}
+          <div className="relative z-10 w-full" onClick={() => prediction?.forecast?.breakdown && setShowBreakdown(true)}>
+            <div className="flex justify-between items-start mb-3">
+                <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">
+                  {prediction ? "AI Projected Bill" : "Est. Monthly Bill"}
+                </p>
+                {prediction?.budgetComparison && prediction.budgetComparison.monthlyBudget > 0 && (
+                    <Badge variant="outline" className={prediction.budgetComparison.willExceed ? "text-red-500 border-red-500/20 bg-red-500/10" : "text-emerald-500 border-emerald-500/20 bg-emerald-500/10"}>
+                        {prediction.budgetComparison.percentageOfBudget}%
+                    </Badge>
+                )}
+            </div>
+            <h3 className="text-4xl font-black text-white tracking-tighter transition-colors group-hover:text-emerald-400 mb-4">
+              {prediction?.forecast?.projectedBill ? `Rs.${prediction.forecast.projectedBill}` : (summary?.estimatedBillRs ? `Rs.${summary.estimatedBillRs}` : "$142.50")}
             </h3>
+            
+            {/* Visual Budget Progress Bar */}
+            {prediction?.budgetComparison && prediction.budgetComparison.monthlyBudget > 0 && (
+                <div className="space-y-2 mt-4">
+                    <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-500">
+                        <span>Cur: Rs.{prediction.current.bill?.toFixed(0)}</span>
+                        <span>Lim: Rs.{prediction.budgetComparison.monthlyBudget}</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                        <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(100, (prediction.current.bill / prediction.budgetComparison.monthlyBudget) * 100)}%` }}
+                            transition={{ duration: 1.5, ease: "easeOut" }}
+                            className={cn(
+                                "h-full rounded-full shadow-[0_0_10px_rgba(0,0,0,0.5)]",
+                                prediction.current.bill > prediction.budgetComparison.monthlyBudget ? "bg-red-500 shadow-red-500/50" :
+                                prediction.current.bill > prediction.budgetComparison.monthlyBudget * 0.8 ? "bg-amber-500 shadow-amber-500/50" : "bg-emerald-500 shadow-emerald-500/50"
+                            )}
+                        />
+                    </div>
+                </div>
+            )}
+            
+            {prediction?.forecast?.breakdown && (
+                <button className="mt-4 text-[9px] text-slate-500 uppercase tracking-widest font-black block group-hover:text-white transition-colors flex items-center">
+                    View AI Breakdown <ChevronRight size={12} className="ml-1" />
+                </button>
+            )}
           </div>
-          <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-emerald-500/5 blur-[40px] rounded-full group-hover:bg-emerald-500/10 transition-all" />
+          <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-emerald-500/5 blur-[40px] rounded-full group-hover:bg-emerald-500/10 transition-all pointer-events-none" />
         </div>
 
         {/* Active Devices */}
-        <div className="bg-[#161b2a] p-10 rounded-[2.5rem] border border-slate-800 relative transition-all hover:scale-[1.02] cursor-pointer shadow-2xl group overflow-hidden">
+        <div className="bg-[#161b2a] p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] border border-slate-800 relative transition-all hover:scale-[1.02] cursor-pointer shadow-2xl group overflow-hidden">
           <div className="flex items-center justify-between mb-10">
             <div className="p-4 bg-slate-800 text-slate-100 rounded-2xl shadow-inner">
               <Activity size={28} strokeWidth={2.5} />
@@ -199,7 +235,7 @@ const Dashboard = () => {
         </div>
 
         {/* Efficiency */}
-        <div className="bg-[#161b2a] p-10 rounded-[2.5rem] border border-slate-800 relative transition-all hover:scale-[1.02] cursor-pointer shadow-2xl group overflow-hidden">
+        <div className="bg-[#161b2a] p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] border border-slate-800 relative transition-all hover:scale-[1.02] cursor-pointer shadow-2xl group overflow-hidden">
           <div className="flex items-center justify-between mb-10">
             <div className="p-4 bg-amber-500/10 text-amber-500 rounded-2xl shadow-inner">
               <TrendingUp size={28} />
@@ -217,8 +253,8 @@ const Dashboard = () => {
       </div>
 
       {/* Main Charts Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div className="lg:col-span-3 bg-[#161b2a] p-10 rounded-[3rem] border border-slate-800 shadow-2xl relative overflow-hidden group">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-8">
+        <div className="lg:col-span-3 bg-[#161b2a] p-6 lg:p-10 rounded-[2rem] lg:rounded-[3rem] border border-slate-800 shadow-2xl relative overflow-hidden group">
           <div className="flex items-center justify-between mb-12">
             <div className="flex items-center space-x-3">
               <BarChart3 className="text-blue-500" size={24} />
@@ -240,7 +276,7 @@ const Dashboard = () => {
           </div>
 
           <div className="h-[450px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <AreaChart data={data}>
                 <defs>
                   <linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1">
@@ -287,7 +323,7 @@ const Dashboard = () => {
         </div>
 
         {/* Side Distribution */}
-        <div className="bg-[#161b2a] p-10 rounded-[3rem] border border-slate-800 shadow-2xl flex flex-col h-full transform transition-all hover:translate-y-[-5px]">
+        <div className="bg-[#161b2a] p-6 lg:p-10 rounded-[2rem] lg:rounded-[3rem] border border-slate-800 shadow-2xl flex flex-col h-full transform transition-all hover:translate-y-[-5px]">
           <div className="flex items-center space-x-3 mb-10">
             <Zap className="text-emerald-500" size={24} />
             <h4 className="text-xl font-bold text-white tracking-tight italic">Energy Distribution</h4>
@@ -320,6 +356,69 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      <AnimatePresence>
+        {showBreakdown && prediction?.forecast?.breakdown && (
+            <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                onClick={() => setShowBreakdown(false)}
+            >
+                <motion.div 
+                    initial={{ scale: 0.95, y: 20 }}
+                    animate={{ scale: 1, y: 0 }}
+                    exit={{ scale: 0.95, y: 20 }}
+                    onClick={e => e.stopPropagation()}
+                    className="bg-[#161b2a] border border-slate-800 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 max-w-lg w-full shadow-2xl relative overflow-hidden mx-4 md:mx-0"
+                >
+                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/20 blur-[50px] rounded-full pointer-events-none" />
+                    <div className="flex justify-between items-start mb-10 relative z-10">
+                        <div>
+                            <h3 className="text-3xl font-black text-white italic uppercase tracking-tighter">AI Breakdown</h3>
+                            <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">CEB Block Simulation Data</p>
+                        </div>
+                        <button onClick={() => setShowBreakdown(false)} className="p-3 text-slate-500 hover:text-white bg-slate-900 rounded-2xl hover:bg-red-500 hover:text-white transition-colors shadow-inner">
+                            <XCircle size={20} />
+                        </button>
+                    </div>
+
+                    <div className="space-y-4 relative z-10">
+                        <div className="flex justify-between items-center p-5 bg-[#0b0e14] rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
+                            <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Energy Charge</span>
+                            <span className="text-sm font-black text-white italic tracking-tighter">Rs. {prediction.forecast.breakdown.energyCharge?.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between items-center p-5 bg-[#0b0e14] rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
+                            <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Fixed Charge</span>
+                            <span className="text-sm font-black text-white italic tracking-tighter">Rs. {prediction.forecast.breakdown.fixedCharge?.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between items-center p-5 bg-[#0b0e14] rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
+                            <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Additional</span>
+                            <span className="text-sm font-black text-amber-500 italic tracking-tighter">Rs. {prediction.forecast.breakdown.additionalCharges?.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between items-center p-5 bg-[#0b0e14] rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
+                            <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Taxes & VAT</span>
+                            <span className="text-sm font-black text-amber-500 italic tracking-tighter">Rs. {(prediction.forecast.breakdown.taxes + prediction.forecast.breakdown.VAT)?.toFixed(2)}</span>
+                        </div>
+                        
+                        <div className="mt-10 pt-8 border-t border-slate-800 flex justify-between items-end">
+                            <div>
+                                <span className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em] block mb-2">Total Prediction</span>
+                                <span className="text-5xl font-black text-blue-500 tracking-tighter italic leading-none">Rs. {prediction.forecast.projectedBill?.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        
+                        <div className="mt-8 flex justify-center">
+                            <div className="px-4 py-2 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-full text-[9px] uppercase tracking-widest font-black inline-flex items-center shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+                                <ShieldCheck size={12} className="mr-2" />
+                                Confidence Level: {prediction.forecast.confidence}
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+            </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

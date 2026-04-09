@@ -168,8 +168,8 @@ const Household = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0b0e14] p-8 pb-32">
-            <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+        <div className="min-h-screen bg-[#0b0e14] p-4 md:p-8 pb-32">
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-10 md:mb-16">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                     <div className="flex items-center gap-4">
                         <h1 className="text-4xl font-black text-white tracking-tight mb-2 uppercase italic">
@@ -200,10 +200,10 @@ const Household = () => {
                 )}
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10 max-w-7xl mx-auto">
                 {/* Visual Location Card */}
-                <Card className="lg:col-span-1 bg-[#161b2a] border border-slate-800 rounded-[3rem] p-10 overflow-hidden relative shadow-2xl h-fit">
-                    <div className="p-6 bg-blue-600 rounded-[1.5rem] w-fit mb-8 shadow-xl shadow-blue-600/20">
+                <Card className="lg:col-span-1 bg-[#161b2a] border border-slate-800 rounded-[2rem] md:rounded-[3rem] p-6 lg:p-10 overflow-hidden relative shadow-2xl h-fit">
+                    <div className="p-6 bg-blue-600 rounded-[1.5rem] w-fit mb-6 md:mb-8 shadow-xl shadow-blue-600/20">
                         <Map size={32} className="text-white" />
                     </div>
                     <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-4">Geolocation</h3>
@@ -233,8 +233,8 @@ const Household = () => {
                 </Card>
 
                 {/* Settings Form */}
-                <Card className="lg:col-span-2 bg-[#161b2a] border border-slate-800 rounded-[3rem] p-12 overflow-hidden relative shadow-2xl h-full flex flex-col">
-                    <div className="flex items-center justify-between mb-12 relative z-10">
+                <Card className="lg:col-span-2 bg-[#161b2a] border border-slate-800 rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 overflow-hidden relative shadow-2xl h-full flex flex-col">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 md:mb-12 relative z-10">
                          <div className="flex items-center gap-4">
                             <div className="p-4 bg-blue-600/10 text-blue-500 border border-blue-500/20 rounded-[1.5rem] shadow-xl">
                                 <Settings size={28} />
@@ -279,7 +279,7 @@ const Household = () => {
                         </div>
                         <div className="flex flex-col gap-3 md:col-span-2">
                             <label className="text-[10px] text-slate-500 uppercase font-black tracking-[0.2em] ml-1">Coordinate Mapping (lat, lon)</label>
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                                 <input 
                                     className="bg-[#0b0e14] border border-slate-800 text-white rounded-2xl p-4 focus:outline-none focus:border-blue-500/50 transition-all font-bold text-sm italic"
                                     type="number"
@@ -344,9 +344,9 @@ const Household = () => {
             </div>
 
             {profile && profile._id !== 'new' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 max-w-7xl mx-auto mt-10">
-                    <Card className="lg:col-span-1 bg-[#161b2a] border border-slate-800 rounded-[3rem] p-10 overflow-hidden relative shadow-2xl h-fit">
-                        <div className="p-6 bg-emerald-600 rounded-[1.5rem] w-fit mb-8 shadow-xl shadow-emerald-600/20">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10 max-w-7xl mx-auto mt-8 md:mt-10">
+                    <Card className="lg:col-span-1 bg-[#161b2a] border border-slate-800 rounded-[2rem] md:rounded-[3rem] p-6 lg:p-10 overflow-hidden relative shadow-2xl h-fit">
+                        <div className="p-6 bg-emerald-600 rounded-[1.5rem] w-fit mb-6 shadow-xl shadow-emerald-600/20">
                             <DollarSign size={32} className="text-white" />
                         </div>
                         <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-4">Set Budget</h3>
@@ -401,7 +401,7 @@ const Household = () => {
                         </form>
                     </Card>
 
-                    <Card className="lg:col-span-2 bg-[#161b2a] border border-slate-800 rounded-[3rem] p-12 overflow-hidden relative shadow-2xl h-full flex flex-col">
+                    <Card className="lg:col-span-2 bg-[#161b2a] border border-slate-800 rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 overflow-hidden relative shadow-2xl h-full flex flex-col">
                         <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-8">Historical Budgets</h3>
                         <div className="space-y-4 overflow-y-auto pr-4 max-h-[400px] custom-scrollbar">
                             {budgets.length === 0 ? (
