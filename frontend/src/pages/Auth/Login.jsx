@@ -186,12 +186,20 @@ const Login = () => {
             </button>
           </form>
 
-          <p className="text-center text-[10px] font-black text-slate-600 uppercase tracking-widest pt-4">
-             New Node?{' '}
-             <Link to="/register" className="text-blue-600 hover:text-blue-400 transition-colors ml-2 underline decoration-2 underline-offset-4">
+          <div className="pt-8 border-t border-slate-900">
+            <p className="text-center text-[10px] font-black text-slate-600 uppercase tracking-widest">
+              New Node?{' '}
+              <Link to="/register" className="text-blue-600 hover:text-blue-400 transition-colors ml-2 underline decoration-2 underline-offset-4">
                 Enlist
-             </Link>
-          </p>
+              </Link>
+            </p>
+            <p className="text-center text-[10px] font-black text-slate-600 uppercase tracking-widest mt-4">
+              Command Access?{' '}
+              <Link to="/admin/register" className="text-purple-600 hover:text-purple-400 transition-colors ml-2 underline decoration-2 underline-offset-4">
+                Admin Enlistment
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
 

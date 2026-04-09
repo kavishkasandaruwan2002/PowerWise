@@ -1,9 +1,10 @@
 import React from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { 
-  LayoutDashboard, Zap, TrendingUp, Lightbulb, 
-  AlertCircle, Home, LogOut, Settings, Activity
+import {
+  LayoutDashboard, Zap, TrendingUp, Lightbulb,
+  AlertCircle, Home, LogOut, Settings, Activity,
+  ShieldCheck, Users
 } from 'lucide-react';
 import { cn } from '../ui';
 import { motion } from 'framer-motion';
@@ -12,13 +13,16 @@ const Sidebar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isAdmin = user?.role === 'admin';
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const navItems = [
+  const navItems = isAdmin ? [
+    { name: 'Admin Dashboard', path: '/admin/dashboard', icon: <ShieldCheck size={20} /> },
+  ] : [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
     { name: 'Meter Readings', path: '/readings', icon: <Activity size={20} /> },
     { name: 'Appliances', path: '/appliances', icon: <Zap size={20} /> },
@@ -73,14 +77,23 @@ const Sidebar = () => {
 
       {/* Bottom Actions */}
       <div className="p-8 border-t border-slate-800/30 space-y-4">
-        <button 
+        {isAdmin && (
+          <div className="mb-4 p-4 bg-purple-500/10 border border-purple-500/20 rounded-2xl">
+            <div className="flex items-center gap-3 mb-2">
+              <ShieldCheck size={16} className="text-purple-500" />
+              <span className="text-[9px] font-black text-purple-500 uppercase tracking-widest">Admin Mode</span>
+            </div>
+            <p className="text-[9px] text-slate-500 font-bold">{user?.email}</p>
+          </div>
+        )}
+        <button
           onClick={() => navigate('/settings')}
           className="flex items-center space-x-4 px-6 py-3 rounded-xl text-slate-500 hover:text-white transition-all w-full text-sm font-bold"
         >
           <Settings size={20} />
           <span>Settings</span>
         </button>
-        <button 
+        <button
           onClick={handleLogout}
           className="flex items-center space-x-4 px-6 py-4 rounded-2xl text-slate-500 hover:text-red-400 transition-all w-full group"
         >

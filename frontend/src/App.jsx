@@ -7,6 +7,8 @@ import Sidebar from './components/layout/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import AdminRegister from './pages/Admin/AdminRegister';
 import Analytics from './pages/Analytics';
 import Appliances from './pages/Appliances';
 import Landing from './pages/Landing';
@@ -24,7 +26,26 @@ const PrivateRoute = ({ children }) => {
       <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
-  return user ? children : <Navigate to="/" />;
+  if (!user) return <Navigate to="/" />;
+
+  // Redirect admins to admin dashboard if they try to access user dashboard
+  if (user.role === 'admin') {
+    return <Navigate to="/admin/dashboard" />;
+  }
+
+  return children;
+};
+
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return (
+    <div className="min-h-screen bg-[#0b0e14] flex items-center justify-center">
+      <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+  if (!user) return <Navigate to="/login" />;
+  if (user.role !== 'admin') return <Navigate to="/dashboard" />;
+  return children;
 };
 
 const ScrollProgressBar = () => {
@@ -71,29 +92,35 @@ const ScrollToTop = () => {
 const AppContent = () => {
   const { user } = useAuth();
   const { pathname } = useLocation();
-  const isAuthPage = ['/login', '/register'].includes(pathname);
+  const isAuthPage = ['/login', '/register', '/admin/register'].includes(pathname);
   const isLandingPage = pathname === '/';
+  const isAdminRoute = pathname.startsWith('/admin');
 
-  // Landing page and operational dashboard logic 
+  // Landing page and operational dashboard logic
   const showSidebar = user && !isLandingPage && !isAuthPage;
   const showNavbar = !showSidebar && !isAuthPage;
+
+  // Determine redirect based on role
+  const userDashboard = user?.role === 'admin' ? '/admin/dashboard' : '/dashboard';
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200 selection:bg-blue-500 selection:text-white overflow-x-hidden">
       <ScrollProgressBar />
       <ScrollToTop />
-      
+
       {showNavbar && <Navbar key={user ? 'auth' : 'guest'} />}
-      
+
       <div className={showSidebar ? "flex min-h-screen" : "relative"}>
         {showSidebar && <Sidebar className="shrink-0" />}
-        
+
         <main className={showSidebar ? "flex-1 lg:ml-72 w-full min-h-screen relative" : "w-full pt-16 lg:pt-20"}>
           <Routes>
             <Route path="/" element={<Landing />} />
-            <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
-            <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />
+            <Route path="/login" element={!user ? <Login /> : <Navigate to={userDashboard} />} />
+            <Route path="/register" element={!user ? <Register /> : <Navigate to={userDashboard} />} />
+            <Route path="/admin/register" element={!user ? <AdminRegister /> : <Navigate to={userDashboard} />} />
 
+            {/* User Routes */}
             <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             <Route path="/analytics" element={<PrivateRoute><Analytics /></PrivateRoute>} />
             <Route path="/appliances" element={<PrivateRoute><Appliances /></PrivateRoute>} />
@@ -102,6 +129,9 @@ const AppContent = () => {
             <Route path="/alerts" element={<PrivateRoute><Alerts /></PrivateRoute>} />
             <Route path="/households" element={<PrivateRoute><Household /></PrivateRoute>} />
             <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
+
+            {/* Admin Routes */}
+            <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
 
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
