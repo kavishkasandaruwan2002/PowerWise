@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const TipInteraction = require('../models/TipInteraction');
 const EnergyTip = require('../models/EnergyTip');
+const Household = require('../models/Household');
 const { getWeatherState } = require('../services/weatherService');
 const { recommendTips } = require('../services/tipRecommendationService');
 
@@ -12,43 +13,89 @@ function toObjectId(id) {
   }
 }
 
+function mapIncomeBracketToTag(incomeBracket) {
+  const value = String(incomeBracket || '').toLowerCase();
+  if (value === 'low') return 'LOW';
+  if (value === 'middle' || value === 'mid') return 'MID';
+  if (value === 'high') return 'HIGH';
+  return 'ALL';
+}
+
+async function getUserContext(req) {
+  const userId = req.user?._id || req.user?.id;
+  const householdId = req.user?.household || req.user?.householdId;
+
+  if (!userId || !householdId) {
+    return {
+      userId: null,
+      householdId: null,
+      household: null,
+      incomeTag: 'ALL',
+      lat: null,
+      lon: null
+    };
+  }
+
+  const household = await Household.findById(householdId).lean();
+
+  const incomeTag = mapIncomeBracketToTag(
+    household?.incomeBracket || req.user?.incomeBracket
+  );
+
+  const lat = household?.location?.latitude ?? req.user?.location?.lat ?? null;
+  const lon = household?.location?.longitude ?? req.user?.location?.lon ?? null;
+
+  return {
+    userId,
+    householdId,
+    household,
+    incomeTag,
+    lat: Number(lat),
+    lon: Number(lon)
+  };
+}
+
+async function ensureActiveTip(tipId) {
+  if (!mongoose.isValidObjectId(tipId)) {
+    return null;
+  }
+
+  return EnergyTip.findOne({ _id: tipId, isActive: true });
+}
+
 /**
  * GET /api/v1/tips/recommendations
  * Query: limit (lat/lon read from user profile; income is fixed to LOW)
  */
 exports.getRecommendations = async (req, res) => {
   try {
-    const userId = req.user?.id;
-    const householdId = req.user?.householdId;
-    const location = req.user?.location;
+    const context = await getUserContext(req);
 
-    if (!userId || !householdId) {
-      return res.status(401).json({ success: false, message: 'Authentication required' });
-    }
-
-    // Requirements:
-    // - Always use LOW income focus
-    // - Always fetch weather from free 3rd-party API (no caching)
-    // - Get {lat, lon} from the user profile (User schema)
-    const incomeTag = 'LOW';
-    const lat = location?.lat;
-    const lon = location?.lon;
-
-    if (!Number.isFinite(Number(lat)) || !Number.isFinite(Number(lon))) {
-      return res.status(400).json({
-        success: false,
-        message: 'User location is not set. Update your profile with { lat, lon } before requesting recommendations.'
+    if (!context.userId || !context.householdId) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          recommendations: [],
+          meta: null,
+          message: 'Please create a household profile first to get personalized tips.'
+        }
       });
     }
 
-    const limit = Number(req.query.limit || 5);
+    if (!Number.isFinite(context.lat) || !Number.isFinite(context.lon)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Household location is missing. Please update the household with latitude and longitude.'
+      });
+    }
 
-    const weather = await getWeatherState({ lat, lon });
+    const limit = Math.min(20, Math.max(1, Number(req.query.limit) || 5));
+    const weather = await getWeatherState({ lat: context.lat, lon: context.lon });
 
     const data = await recommendTips({
-      userId,
-      householdId,
-      incomeTag,
+      userId: context.userId,
+      householdId: context.householdId,
+      incomeTag: context.incomeTag,
       weather,
       limit
     });
@@ -65,9 +112,20 @@ exports.getRecommendations = async (req, res) => {
  */
 exports.getMyInteractions = async (req, res) => {
   try {
-    const userId = req.user?.id;
-    const householdId = req.user?.householdId;
-    const docs = await TipInteraction.find({ userId, householdId })
+    const context = await getUserContext(req);
+
+    if (!context.userId || !context.householdId) {
+      return res.status(200).json({
+        success: true,
+        count: 0,
+        data: []
+      });
+    }
+
+    const docs = await TipInteraction.find({
+      userId: context.userId,
+      householdId: context.householdId
+    })
       .populate('tipId')
       .sort({ updatedAt: -1 });
 
@@ -76,30 +134,43 @@ exports.getMyInteractions = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
 /**
  * POST /api/v1/tips/:tipId/bookmark
  */
 exports.bookmarkTip = async (req, res) => {
   try {
     const { tipId } = req.params;
-    const userId = toObjectId(req.user?.id);
-    const householdId = toObjectId(req.user?.householdId);
+    const context = await getUserContext(req);
 
-    if (!userId || !householdId) {
-      return res.status(401).json({ success: false, message: 'Authentication required' });
+    if (!context.userId || !context.householdId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please create a household profile before bookmarking tips.'
+      });
     }
 
-    const tipExists = await EnergyTip.exists({ _id: tipId, isActive: true });
-    if (!tipExists) {
+    const tip = await ensureActiveTip(tipId);
+    if (!tip) {
       return res.status(404).json({ success: false, message: 'Tip not found' });
     }
 
     const doc = await TipInteraction.findOneAndUpdate(
-      { userId, householdId, tipId },
-      { $set: { bookmarked: true } },
-      { new: true, upsert: true }
+      {
+        userId: toObjectId(context.userId),
+        householdId: toObjectId(context.householdId),
+        tipId: toObjectId(tipId)
+      },
+      {
+        $set: { bookmarked: true }
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+        runValidators: true
+      }
     );
+
     res.status(200).json({ success: true, message: 'Bookmarked', data: doc });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -112,20 +183,42 @@ exports.bookmarkTip = async (req, res) => {
 exports.unbookmarkTip = async (req, res) => {
   try {
     const { tipId } = req.params;
-    const userId = toObjectId(req.user?.id);
-    const householdId = toObjectId(req.user?.householdId);
+    const context = await getUserContext(req);
+
+    if (!context.userId || !context.householdId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please create a household profile before updating tip bookmarks.'
+      });
+    }
+
+    const tip = await ensureActiveTip(tipId);
+    if (!tip) {
+      return res.status(404).json({ success: false, message: 'Tip not found' });
+    }
 
     const doc = await TipInteraction.findOneAndUpdate(
-      { userId, householdId, tipId },
-      { $set: { bookmarked: false } },
-      { new: true }
+      {
+        userId: toObjectId(context.userId),
+        householdId: toObjectId(context.householdId),
+        tipId: toObjectId(tipId)
+      },
+      {
+        $set: { bookmarked: false }
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+        runValidators: true
+      }
     );
+
     res.status(200).json({ success: true, message: 'Unbookmarked', data: doc });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
 /**
  * POST /api/v1/tips/:tipId/implement
  * Body: { lat, lon, incomeTag } (optional; used to snapshot weather and savings)
@@ -133,34 +226,39 @@ exports.unbookmarkTip = async (req, res) => {
 exports.implementTip = async (req, res) => {
   try {
     const { tipId } = req.params;
-    const userId = req.user?.id;
-    const householdId = req.user?.householdId;
-    const location = req.user?.location;
+    const context = await getUserContext(req);
 
-    if (!userId || !householdId) {
-      return res.status(401).json({ success: false, message: 'Authentication required' });
-    }
-
-    const tip = await EnergyTip.findById(tipId);
-    if (!tip || !tip.isActive) {
-      return res.status(404).json({ success: false, message: 'Tip not found' });
-    }
-
-    const incomeTag = 'LOW';
-    const lat = location?.lat;
-    const lon = location?.lon;
-
-    if (!Number.isFinite(Number(lat)) || !Number.isFinite(Number(lon))) {
+    if (!context.userId || !context.householdId) {
       return res.status(400).json({
         success: false,
-        message: 'User location is not set. Update your profile with { lat, lon } before implementing a tip.'
+        message: 'Please create a household profile before implementing tips.'
       });
     }
 
-    // Recompute estimates now and store snapshot at implementation time.
-    const weather = await getWeatherState({ lat, lon });
-    const rec = await recommendTips({ userId, householdId, incomeTag, weather, limit: 50 });
-    const match = rec.recommendations.find(r => String(r.tip._id) === String(tipId));
+    if (!Number.isFinite(context.lat) || !Number.isFinite(context.lon)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Household location is missing. Please update the household with latitude and longitude.'
+      });
+    }
+
+    const tip = await ensureActiveTip(tipId);
+    if (!tip) {
+      return res.status(404).json({ success: false, message: 'Tip not found' });
+    }
+
+    const weather = await getWeatherState({ lat: context.lat, lon: context.lon });
+    const rec = await recommendTips({
+      userId: context.userId,
+      householdId: context.householdId,
+      incomeTag: context.incomeTag,
+      weather,
+      limit: 50
+    });
+
+    const match = rec.recommendations.find(
+      (item) => String(item.tip._id) === String(tipId)
+    );
 
     const savingsSnapshot = match
       ? {
@@ -168,15 +266,20 @@ exports.implementTip = async (req, res) => {
           lkrMonthly: match.estimatedSavings.lkrMonthly,
           baselineKwhMonthly: match.baseline.kwhMonthly,
           baselineBillLkr: match.baseline.billLkr,
-          newBillLkr: match.baseline.billLkr != null && match.estimatedSavings.lkrMonthly != null
-            ? Number((match.baseline.billLkr - match.estimatedSavings.lkrMonthly).toFixed(2))
-            : null,
+          newBillLkr:
+            match.baseline.billLkr != null && match.estimatedSavings.lkrMonthly != null
+              ? Number((match.baseline.billLkr - match.estimatedSavings.lkrMonthly).toFixed(2))
+              : null,
           tariffPlanId: null
         }
       : undefined;
 
     const doc = await TipInteraction.findOneAndUpdate(
-      { userId, householdId, tipId },
+      {
+        userId: toObjectId(context.userId),
+        householdId: toObjectId(context.householdId),
+        tipId: toObjectId(tipId)
+      },
       {
         $set: {
           implemented: true,
@@ -184,7 +287,12 @@ exports.implementTip = async (req, res) => {
           savingsSnapshot
         }
       },
-      { new: true, upsert: true }
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+        runValidators: true
+      }
     );
 
     res.status(200).json({ success: true, message: 'Marked as implemented', data: doc });
@@ -200,14 +308,26 @@ exports.implementTip = async (req, res) => {
 exports.feedbackTip = async (req, res) => {
   try {
     const { tipId } = req.params;
-    const userId = toObjectId(req.user?.id);
-    const householdId = toObjectId(req.user?.householdId);
-    if (!userId || !householdId) {
-      return res.status(401).json({ success: false, message: 'Authentication required' });
+    const context = await getUserContext(req);
+
+    if (!context.userId || !context.householdId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please create a household profile before giving feedback.'
+      });
+    }
+
+    const tip = await ensureActiveTip(tipId);
+    if (!tip) {
+      return res.status(404).json({ success: false, message: 'Tip not found' });
     }
 
     const doc = await TipInteraction.findOneAndUpdate(
-      { userId, householdId, tipId },
+      {
+        userId: toObjectId(context.userId),
+        householdId: toObjectId(context.householdId),
+        tipId: toObjectId(tipId)
+      },
       {
         $set: {
           feedback: {
@@ -217,14 +337,19 @@ exports.feedbackTip = async (req, res) => {
           }
         }
       },
-      { new: true, upsert: true }
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+        runValidators: true
+      }
     );
+
     res.status(200).json({ success: true, message: 'Feedback saved', data: doc });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
 /**
  * POST /api/v1/tips/:tipId/dismiss
  * Body: { days }
@@ -232,18 +357,44 @@ exports.feedbackTip = async (req, res) => {
 exports.dismissTip = async (req, res) => {
   try {
     const { tipId } = req.params;
-    const userId = toObjectId(req.user?.id);
-    const householdId = toObjectId(req.user?.householdId);
+    const context = await getUserContext(req);
     const days = Number(req.body?.days || 14);
     const dismissedUntil = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
 
+    if (!context.userId || !context.householdId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please create a household profile before dismissing tips.'
+      });
+    }
+
+    const tip = await ensureActiveTip(tipId);
+    if (!tip) {
+      return res.status(404).json({ success: false, message: 'Tip not found' });
+    }
+
     const doc = await TipInteraction.findOneAndUpdate(
-      { userId, householdId, tipId },
-      { $set: { dismissedUntil } },
-      { new: true, upsert: true }
+      {
+        userId: toObjectId(context.userId),
+        householdId: toObjectId(context.householdId),
+        tipId: toObjectId(tipId)
+      },
+      {
+        $set: { dismissedUntil }
+      },
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+        runValidators: true
+      }
     );
 
-    res.status(200).json({ success: true, message: `Dismissed for ${days} day(s)`, data: doc });
+    res.status(200).json({
+      success: true,
+      message: `Dismissed for ${days} day(s)`,
+      data: doc
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

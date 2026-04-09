@@ -38,7 +38,7 @@ const tariffRoutes = require('./routes/tariffRoutes');
 app.use('/api/v1/tariffs', tariffRoutes);
 
 // Budget Module Routes
-const budgetRoutes = require('./routes/BudgetRoutes');
+const budgetRoutes = require('./routes/budgetRoutes');
 app.use('/api/v1/budgets', budgetRoutes);
 
 // Consumption Module Routes
