@@ -34,6 +34,56 @@ router.get('/recommendations', protect, tipsController.getRecommendations);
 
 /**
  * @swagger
+ * /api/v1/tips/all:
+ *   get:
+ *     summary: Get all active tips for users excluding currently dismissed tips
+ *     tags: [Tips]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All active user tips retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 count:
+ *                   type: integer
+ *                   example: 8
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       tip:
+ *                         $ref: '#/components/schemas/EnergyTip'
+ *                       interaction:
+ *                         type: object
+ *                         properties:
+ *                           bookmarked:
+ *                             type: boolean
+ *                             example: false
+ *                           implemented:
+ *                             type: boolean
+ *                             example: false
+ *                           feedback:
+ *                             type: string
+ *                             nullable: true
+ *                             enum: [HELPFUL, NEUTRAL, NOT_HELPFUL, null]
+ *                             example: null
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+router.get('/all', protect, tipsController.getAllVisibleTips);
+
+/**
+ * @swagger
  * /api/v1/tips/interactions:
  *   get:
  *     summary: Get my tip interactions

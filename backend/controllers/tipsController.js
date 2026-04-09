@@ -106,6 +106,85 @@ exports.getRecommendations = async (req, res) => {
   }
 };
 
+/**
+ * GET /api/v1/tips/all
+ * Returns all active tips for the logged in user excluding currently dismissed tips.
+ */
+exports.getAllVisibleTips = async (req, res) => {
+  try {
+    const userId = req.user?._id;
+    const householdId = req.user?.household;
+
+    const filter = { isActive: true };
+    if (req.query.category) {
+      filter.category = req.query.category;
+    }
+    if (req.query.q && String(req.query.q).trim()) {
+      filter.$or = [
+        { title: { $regex: String(req.query.q).trim(), $options: 'i' } },
+        { description: { $regex: String(req.query.q).trim(), $options: 'i' } }
+      ];
+    }
+
+    const allTips = await EnergyTip.find(filter).sort({ updatedAt: -1, createdAt: -1 }).lean();
+
+    if (!userId || !householdId) {
+      return res.status(200).json({
+        success: true,
+        count: allTips.length,
+        data: allTips.map((tip) => ({
+          tip,
+          interaction: {
+            bookmarked: false,
+            implemented: false,
+            feedback: null,
+            dismissedUntil: null,
+            implementedAt: null,
+            savingsSnapshot: null
+          }
+        }))
+      });
+    }
+
+    const now = new Date();
+    const interactions = await TipInteraction.find({
+      userId: toObjectId(userId),
+      householdId: toObjectId(householdId)
+    }).lean();
+
+    const interactionMap = new Map(
+      interactions.map((item) => [String(item.tipId), item])
+    );
+
+    const visibleTips = allTips
+      .filter((tip) => {
+        const interaction = interactionMap.get(String(tip._id));
+        return !(interaction?.dismissedUntil && new Date(interaction.dismissedUntil) > now);
+      })
+      .map((tip) => {
+        const interaction = interactionMap.get(String(tip._id));
+        return {
+          tip,
+          interaction: {
+            bookmarked: !!interaction?.bookmarked,
+            implemented: !!interaction?.implemented,
+            feedback: interaction?.feedback?.rating || null,
+            dismissedUntil: interaction?.dismissedUntil || null,
+            implementedAt: interaction?.implementedAt || null,
+            savingsSnapshot: interaction?.savingsSnapshot || null
+          }
+        };
+      });
+
+    return res.status(200).json({
+      success: true,
+      count: visibleTips.length,
+      data: visibleTips
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 /**
  * GET /api/v1/tips/interactions
