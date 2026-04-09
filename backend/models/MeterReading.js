@@ -56,27 +56,27 @@ meterReadingSchema.index({ submittedBy: 1, readingDate: -1 });
 meterReadingSchema.index({ householdId: 1, readingDate: -1 });
 
 // Pre-save hook: auto-calculate consumption if previous reading exists
-meterReadingSchema.pre('save', function (next) {
+meterReadingSchema.pre('save', async function () {
     if (this.isNew) {
-        // Use this.constructor to access the model without circular dependency issues
-        this.constructor.findOne({
-            householdId: this.householdId,
-            readingDate: { $lt: this.readingDate }
-        })
-            .sort({ readingDate: -1 })
-            .then(lastReading => {
-                if (lastReading) {
-                    this.previousReading = lastReading.readingValue;
-                    this.consumption = this.readingValue - lastReading.readingValue;
-                }
-                next();
-            })
-            .catch(err => {
-                // Ignore errors in pre-save, proceed with save
-                next(err);
-            });
-    } else {
-        next(err);
+        try {
+            // Find the most recent reading before this one's date
+            const lastReading = await this.constructor.findOne({
+                householdId: this.householdId,
+                readingDate: { $lte: this.readingDate },
+                _id: { $ne: this._id } // Exclude current if it somehow exists
+            }).sort({ readingDate: -1, createdAt: -1 });
+
+            if (lastReading) {
+                this.previousReading = lastReading.readingValue;
+                this.consumption = Math.max(0, this.readingValue - lastReading.readingValue);
+            } else {
+                this.previousReading = 0;
+                this.consumption = this.readingValue;
+            }
+        } catch (err) {
+            console.error('Error in MeterReading pre-save hook:', err);
+            // We don't throw here to allow the save to proceed even if calculation fails
+        }
     }
 });
 
