@@ -147,7 +147,7 @@ const Navbar = () => {
         ) : (
           <div className="flex items-center space-x-8">
             <Link to="/login" className="text-slate-500 hover:text-white font-black text-[10px] uppercase tracking-[0.3em] transition-all italic pr-2">
-                Init Session
+                Sign In
             </Link>
             <Button 
                 onClick={() => navigate('/register')} 
@@ -155,7 +155,7 @@ const Navbar = () => {
             >
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 <span className="relative flex items-center gap-4">
-                    Deploy Node <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform duration-500" />
+                    Sign Up <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform duration-500" />
                 </span>
             </Button>
           </div>

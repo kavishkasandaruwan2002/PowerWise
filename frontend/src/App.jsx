@@ -9,6 +9,9 @@ import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminRegister from './pages/Admin/AdminRegister';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import ResetPassword from './pages/Auth/ResetPassword';
+
 import Analytics from './pages/Analytics';
 import Appliances from './pages/Appliances';
 import Landing from './pages/Landing';
@@ -92,7 +95,8 @@ const ScrollToTop = () => {
 const AppContent = () => {
   const { user } = useAuth();
   const { pathname } = useLocation();
-  const isAuthPage = ['/login', '/register', '/admin/register'].includes(pathname);
+  const isAuthPage = ['/login', '/register', '/admin/register', '/forgot-password'].includes(pathname) || pathname.startsWith('/reset-password');
+
   const isLandingPage = pathname === '/';
   const isAdminRoute = pathname.startsWith('/admin');
 
@@ -119,6 +123,9 @@ const AppContent = () => {
             <Route path="/login" element={!user ? <Login /> : <Navigate to={userDashboard} />} />
             <Route path="/register" element={!user ? <Register /> : <Navigate to={userDashboard} />} />
             <Route path="/admin/register" element={!user ? <AdminRegister /> : <Navigate to={userDashboard} />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+
 
             {/* User Routes */}
             <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
