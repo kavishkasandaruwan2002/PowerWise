@@ -2,6 +2,7 @@ const MeterReading = require('../models/MeterReading');
 const ConsumptionRecord = require('../models/consumptionRecord');
 const Appliance = require('../models/Appliance');
 const CalculationService = require('../services/CalculationService');
+const consumptionService = require('../services/consumptionService');
 
 // @desc    Submit a new meter reading
 // @route   POST /api/readings
@@ -31,12 +32,11 @@ exports.submitReading = async (req, res) => {
 
         const reading = await MeterReading.create(req.body);
 
-        // Also create a ConsumptionRecord for bill prediction
+        // Also record via consumptionService to trigger alerts
         if (reading.consumption != null && reading.consumption > 0) {
             try {
-                await ConsumptionRecord.create({
+                await consumptionService.recordConsumption({
                     householdId: reading.householdId,
-                    userId: req.user.id,
                     consumption: reading.consumption,
                     readingDate: reading.readingDate,
                     period: 'daily',
@@ -44,11 +44,10 @@ exports.submitReading = async (req, res) => {
                     previousMeterReading: reading.previousReading,
                     isManualEntry: true,
                     status: 'recorded',
-                    sourceSystem: 'manualEntry',
-                    createdBy: req.user.id
-                });
+                    sourceSystem: 'manualEntry'
+                }, req.user.id);
             } catch (crErr) {
-                console.error('Failed to create ConsumptionRecord:', crErr.message);
+                console.error('Failed to trigger alert workflows:', crErr.message);
             }
         }
 

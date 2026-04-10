@@ -1,4 +1,5 @@
 const alertService = require('../services/alertService');
+const ConsumptionRecord = require('../models/consumptionRecord');
 
 class AlertController {
   
@@ -250,6 +251,90 @@ class AlertController {
       });
     } catch (error) {
       res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  async reScan(req, res) {
+    try {
+      const householdId = req.user.household || req.user.householdId;
+      if (!householdId) {
+        throw new Error('No household associated with user');
+      }
+
+      // 1. Check budget
+      const budgetService = require('../services/budgetService');
+      const activeBudget = await budgetService.getActiveBudget(householdId).catch(() => null);
+      if (activeBudget) {
+          const consumptionService = require('../services/consumptionService');
+          const now = new Date();
+          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          const consumptions = await consumptionService.getConsumptionInRange(householdId, startOfMonth, endOfMonth);
+          const totalMonthly = consumptions.reduce((sum, rec) => sum + rec.consumption, 0);
+          await budgetService.updateConsumption(activeBudget._id, totalMonthly);
+      }
+
+      // 2. Check spike
+      const usageSpikeService = require('../services/usageSpikeService');
+      const latestConsumption = await ConsumptionRecord.findOne({ householdId }).sort({ readingDate: -1 });
+      if (latestConsumption) {
+          await usageSpikeService.checkSpike(householdId, req.user._id, latestConsumption.consumption);
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Re-scan completed'
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  async createTestAlert(req, res) {
+    try {
+      const householdId = req.user.household || req.user.householdId;
+      if (!householdId) {
+        throw new Error('No household associated with user');
+      }
+
+      const testAlert = await alertService.createAlert({
+        householdId,
+        userId: req.user._id,
+        type: 'usage_spike',
+        title: '🧪 TEST ALERT: Device Spike Detected',
+        message: 'This is a manually triggered test alert. It confirms that the alert system is correctly communicating with your account.',
+        severity: 'warning',
+        sourceModule: 'spike_detection'
+      });
+
+      res.status(201).json({
+        success: true,
+        message: 'Test alert created successfully',
+        data: testAlert
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  async deleteAll(req, res) {
+    try {
+      await Alert.deleteMany({ userId: req.user._id });
+      res.status(200).json({
+        success: true,
+        message: 'All alerts cleared'
+      });
+    } catch (error) {
+      res.status(500).json({
         success: false,
         message: error.message
       });
