@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const alertController = require('../controllers/alertController');
 const { protect: authMiddleware } = require('../middleware/auth');
+const alertService = require('../services/alertService'); // add this
 
 router.get('/',
   authMiddleware,
@@ -43,14 +44,14 @@ router.get('/:id',
   alertController.getAlertById
 );
 
-router.put('/:id/read',
-  authMiddleware,
-  alertController.markAsRead
-);
-
 router.put('/mark-all-read',
   authMiddleware,
   alertController.markAllAsRead
+);
+
+router.put('/:id/read',
+  authMiddleware,
+  alertController.markAsRead
 );
 
 router.put('/:id/dismiss',
@@ -68,4 +69,26 @@ router.delete('/:id',
   alertController.deleteAlert
 );
 
+/*
+// TEMPORARY TEST ROUTE - remove after testing
+router.post('/test-seed',
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const alert = await alertService.createAlert({
+        householdId: req.body.householdId,
+        userId: req.user._id,
+        type: 'budget_threshold',
+        severity: 'warning',
+        sourceModule: 'budget',
+        title: 'Test Budget Alert',
+        message: 'You have used 85% of your monthly budget.'
+      });
+      res.status(201).json({ success: true, data: alert });
+    } catch (err) {
+      res.status(400).json({ success: false, message: err.message });
+    }
+  }
+);
+*/
 module.exports = router;

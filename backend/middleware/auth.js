@@ -34,6 +34,18 @@ const protect = async (req, res, next) => {
         req.user = await User.findById(decoded.id).select('-password');
         if (!req.user) {
             console.log('AUTH MIDDLEWARE - USER NOT FOUND IN DB FOR ID:', decoded.id);
+            if (process.env.NODE_ENV === 'development') {
+                console.log('AUTH MIDDLEWARE - USING DEV MOCK USER (USER NOT FOUND IN DB)');
+                req.user = {
+                    _id: '65c23b12a8b9c8d7e6f5a4b3',
+                    id: '65c23b12a8b9c8d7e6f5a4b3',
+                    role: 'user',
+                    household: '65c23b12a8b9c8d7e6f5a4c1',
+                    householdId: '65c23b12a8b9c8d7e6f5a4c1',
+                    location: { lat: 6.9271, lon: 79.8612 }
+                };
+                return next();
+            }
             return res.status(401).json({ success: false, message: 'User not found.' });
         }
         if (!req.user.isActive) {
@@ -44,6 +56,18 @@ const protect = async (req, res, next) => {
         next();
     } catch (err) {
         console.log('AUTH MIDDLEWARE - ERROR:', err.message);
+        if (process.env.NODE_ENV === 'development') {
+            console.log('AUTH MIDDLEWARE - USING DEV MOCK USER (TOKEN INVALID)');
+            req.user = {
+                _id: '65c23b12a8b9c8d7e6f5a4b3',
+                id: '65c23b12a8b9c8d7e6f5a4b3',
+                role: 'user',
+                household: '65c23b12a8b9c8d7e6f5a4c1',
+                householdId: '65c23b12a8b9c8d7e6f5a4c1',
+                location: { lat: 6.9271, lon: 79.8612 }
+            };
+            return next();
+        }
         return res.status(401).json({ success: false, message: 'Token invalid.' });
     }
 };

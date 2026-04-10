@@ -195,7 +195,11 @@ class budgetService {
         await alertService.createBudgetAlert(budget.householdId, budget.userId, {
             currentBill: budget.currentBill,
             monthlyBudget: budget.monthlyLimit
-        }).catch(e => console.error('Failed to dispatch budget alert globally:', e.message));
+        }).catch(e => {
+            console.error('Failed to dispatch budget alert globally:', e);
+            // We log the full error instead of swallowing it silently, but we don't 
+            // throw to avoid crashing the budget update flow if alerting fails.
+        });
       }
 
       // Calculate projected bill

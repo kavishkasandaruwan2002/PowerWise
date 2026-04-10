@@ -64,6 +64,7 @@ const createBudgetSchema = Joi.object({
   notes: Joi.string()
     .trim()
     .max(500)
+    .allow("")
     .optional()
     .messages({
       'string.max': 'Notes cannot exceed 500 characters'
