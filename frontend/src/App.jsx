@@ -16,7 +16,6 @@ import Analytics from './pages/Analytics';
 import Appliances from './pages/Appliances';
 import Landing from './pages/Landing';
 import Tips from './pages/Tips';
-import AdminDashboard from './pages/AdminDashboard';
 import AdminTips from './pages/AdminTips';
 import Alerts from './pages/Alerts';
 import Household from './pages/Household';
