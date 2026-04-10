@@ -74,7 +74,7 @@ const Dashboard = () => {
       const hasHousehold = !!user?.household;
       if (hasHousehold) {
         const householdId = user.household._id || user.household;
-        endpoints.push(api.post(`/v1/predictions/${householdId}/forecast`).catch(() => null));
+        endpoints.push(api.post(`/v1/predictions/latest/${householdId}/forecast`).catch(() => null));
         endpoints.push(api.get("/v1/tips/recommendations").catch(() => null));
       }
 
@@ -156,7 +156,7 @@ const Dashboard = () => {
           <Menu size={24} />
         </button>
         <div className="flex items-center space-x-6">
-          <button className="relative p-2 text-slate-500 hover:text-white transition-colors">
+          <button onClick={() => navigate('/alerts')} className="relative p-2 text-slate-500 hover:text-white transition-colors">
             <Bell size={24} />
             <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
           </button>

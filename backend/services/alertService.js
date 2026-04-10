@@ -236,7 +236,8 @@ class AlertService {
 
       const percentage =
         (budgetData.currentBill / budgetData.monthlyBudget) * 100;
-      if (percentage <= 80) return null; 
+
+      if (percentage <= 80) return null;
 
       if (percentage > 100) {
         severity = "critical";
@@ -298,6 +299,16 @@ class AlertService {
 
   async createPredictionAlert(householdId, userId, predictionData) {
     try {
+      const existing = await Alert.findOne({
+        householdId,
+        userId,
+        type: "bill_prediction",
+        isResolved: false,
+        isDismissed: false,
+        createdAt: { $gte: new Date(new Date().setDate(1)) },
+      });
+      if (existing) return existing;
+
       const willExceed =
         predictionData.predictedBill > predictionData.monthlyBudget;
       const severity = willExceed ? "critical" : "warning";
