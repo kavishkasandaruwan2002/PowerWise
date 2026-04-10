@@ -75,7 +75,7 @@ const Landing = () => {
                                 onClick={() => navigate('/register')}
                                 className="px-12 py-8 bg-blue-600 hover:bg-blue-500 text-white font-black text-lg h-20 w-full sm:w-auto shadow-2xl shadow-blue-600/20 rounded-[1.5rem] uppercase tracking-widest border-none transition-all group"
                             >
-                                Integrate Now
+                                Sign Up Now
                                 <ArrowRight size={22} className="ml-4 group-hover:translate-x-2 transition-transform" />
                             </Button>
                             <Button
@@ -83,7 +83,7 @@ const Landing = () => {
                                 onClick={() => navigate('/login')}
                                 className="px-12 py-8 text-slate-400 hover:text-white font-black text-lg h-20 w-full sm:w-auto border border-slate-800 bg-[#161b2a]/50 rounded-[1.5rem] uppercase tracking-widest transition-all"
                             >
-                                Access Terminal
+                                Sign In
                             </Button>
                         </div>
                     </motion.div>

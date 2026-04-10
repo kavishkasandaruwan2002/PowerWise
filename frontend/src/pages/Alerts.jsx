@@ -22,39 +22,13 @@ const Alerts = () => {
     const fetchAlerts = async () => {
         try {
             const res = await api.get('/v1/alerts');
+            console.log('Alert response:', res.data);
             setAlerts(res.data.data || []);
         } catch (err) {
             console.error('Error fetching alerts:', err);
-            // High-fidelity Mock data
-            setAlerts([
-                {
-                    _id: '1',
-                    type: 'usage_spike',
-                    title: 'Abnormal Consumption Spike',
-                    message: 'A 45% increase in energy demand was detected in the Office zone at 14:30. Possible appliance malfunction or thermal leakage.',
-                    severity: 'critical',
-                    isRead: false,
-                    createdAt: new Date().toISOString()
-                },
-                {
-                    _id: '2',
-                    type: 'budget_threshold',
-                    title: 'Budget Allocation Alert',
-                    message: 'Your current consumption has reached 80% of your $250.00 monthly budget limit. 12 days remaining in billing cycle.',
-                    severity: 'warning',
-                    isRead: false,
-                    createdAt: new Date(Date.now() - 3600000).toISOString()
-                },
-                {
-                    _id: '3',
-                    type: 'bill_prediction',
-                    title: 'Economic Forecast Update',
-                    message: 'Based on current trends, your projected bill is $15.00 lower than last month. Energy intelligence measures are working.',
-                    severity: 'info',
-                    isRead: true,
-                    createdAt: new Date(Date.now() - 86400000).toISOString()
-                }
-            ]);
+            // Handled completely without high-fidelity mock data fallback.
+            // setAlerts([...]); // Mock data removed
+            alert('Failed to fetch alerts. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -66,6 +40,7 @@ const Alerts = () => {
             setAlerts(prev => prev.map(a => a._id === id ? { ...a, isRead: true } : a));
         } catch (err) {
             console.error('Failed to mark read:', err);
+            alert('Failed to mark alert as read. Please try again.');
         }
     };
 
@@ -75,6 +50,7 @@ const Alerts = () => {
             setAlerts(prev => prev.filter(a => a._id !== id));
         } catch (err) {
             console.error('Delete failed:', err);
+            alert('Failed to delete alert. Please try again.');
         }
     };
 
