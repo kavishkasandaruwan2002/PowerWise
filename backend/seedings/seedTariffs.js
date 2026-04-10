@@ -10,7 +10,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const TariffPlan = require('./models/tariffPlan');
+const TariffPlan = require('../models/TariffPlan');
 
 const domesticTariffs = [
   {
@@ -135,7 +135,7 @@ const domesticTariffs = [
 
 async function seedDatabase() {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/budget-app';
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/powerwise';
     
     await mongoose.connect(mongoUri);
     console.log('✓ Connected to MongoDB');

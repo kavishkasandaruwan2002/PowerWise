@@ -235,6 +235,547 @@ The key is provided separately by the system administrator.
                     },
                 },
 
+                SavingsModel: {
+                    type: 'object',
+                    properties: {
+                        type: {
+                        type: 'string',
+                        enum: ['PERCENT_OF_CATEGORY', 'FIXED_KWH', 'REDUCE_HOURS', 'STANDBY_OFF'],
+                        example: 'PERCENT_OF_CATEGORY',
+                        },
+                        percent: {
+                        type: 'number',
+                        example: 8,
+                        },
+                        fixedKWhMonthly: {
+                        type: 'number',
+                        example: 15,
+                        },
+                        reduceHoursPerDay: {
+                        type: 'number',
+                        example: 2,
+                        },
+                        applianceKeyword: {
+                        type: 'string',
+                        example: 'fan',
+                        },
+                    },
+                    },
+
+                    EnergyTip: {
+                    type: 'object',
+                    properties: {
+                        _id: {
+                        type: 'string',
+                        example: '67f1234567890abcdef12345',
+                        },
+                        title: {
+                        type: 'string',
+                        example: 'Set your AC to 26°C',
+                        },
+                        description: {
+                        type: 'string',
+                        example: 'Increasing AC temperature slightly can reduce cooling electricity use.',
+                        },
+                        category: {
+                        type: 'string',
+                        example: 'Cooling',
+                        },
+                        requiredApplianceKeywords: {
+                        type: 'array',
+                        items: {
+                            type: 'string',
+                        },
+                        example: ['ac', 'air conditioner'],
+                        },
+                        requiredCategories: {
+                        type: 'array',
+                        items: {
+                            type: 'string',
+                        },
+                        example: ['Cooling'],
+                        },
+                        incomeTags: {
+                        type: 'array',
+                        items: {
+                            type: 'string',
+                        },
+                        example: ['LOW', 'MID', 'HIGH', 'ALL'],
+                        },
+                        weatherTags: {
+                        type: 'array',
+                        items: {
+                            type: 'string',
+                        },
+                        example: ['HOT', 'ALL'],
+                        },
+                        timeTags: {
+                        type: 'array',
+                        items: {
+                            type: 'string',
+                        },
+                        example: ['ALL'],
+                        },
+                        effortLevel: {
+                        type: 'string',
+                        enum: ['ZERO_COST', 'LOW_COST', 'INVESTMENT'],
+                        example: 'ZERO_COST',
+                        },
+                        savingsModel: {
+                        $ref: '#/components/schemas/SavingsModel',
+                        },
+                        isActive: {
+                        type: 'boolean',
+                        example: true,
+                        },
+                        createdBy: {
+                        type: 'string',
+                        example: '67f1234567890abcdef11111',
+                        },
+                        updatedBy: {
+                        type: 'string',
+                        example: '67f1234567890abcdef11111',
+                        },
+                        createdAt: {
+                        type: 'string',
+                        format: 'date-time',
+                        },
+                        updatedAt: {
+                        type: 'string',
+                        format: 'date-time',
+                        },
+                    },
+                    },
+
+                    TipInteraction: {
+                    type: 'object',
+                    properties: {
+                        _id: {
+                        type: 'string',
+                        example: '67f1234567890abcdef99999',
+                        },
+                        userId: {
+                        type: 'string',
+                        example: '67f1234567890abcdef11111',
+                        },
+                        householdId: {
+                        type: 'string',
+                        example: '67f1234567890abcdef22222',
+                        },
+                        tipId: {
+                        oneOf: [
+                            {
+                            type: 'string',
+                            example: '67f1234567890abcdef33333',
+                            },
+                            {
+                            $ref: '#/components/schemas/EnergyTip',
+                            },
+                        ],
+                        },
+                        bookmarked: {
+                        type: 'boolean',
+                        example: true,
+                        },
+                        implemented: {
+                        type: 'boolean',
+                        example: false,
+                        },
+                        implementedAt: {
+                        type: 'string',
+                        format: 'date-time',
+                        nullable: true,
+                        },
+                        feedback: {
+                        type: 'object',
+                        properties: {
+                            rating: {
+                            type: 'string',
+                            enum: ['HELPFUL', 'NEUTRAL', 'NOT_HELPFUL'],
+                            example: 'HELPFUL',
+                            },
+                            comment: {
+                            type: 'string',
+                            example: 'This tip helped reduce our bill',
+                            },
+                            updatedAt: {
+                            type: 'string',
+                            format: 'date-time',
+                            },
+                        },
+                        },
+                        dismissedUntil: {
+                        type: 'string',
+                        format: 'date-time',
+                        nullable: true,
+                        },
+                        savingsSnapshot: {
+                        type: 'object',
+                        nullable: true,
+                        properties: {
+                            kwhMonthly: {
+                            type: 'number',
+                            example: 24.5,
+                            },
+                            lkrMonthly: {
+                            type: 'number',
+                            example: 780,
+                            },
+                            baselineKwhMonthly: {
+                            type: 'number',
+                            example: 210,
+                            },
+                            baselineBillLkr: {
+                            type: 'number',
+                            example: 6200,
+                            },
+                            newBillLkr: {
+                            type: 'number',
+                            example: 5420,
+                            },
+                            tariffPlanId: {
+                            type: 'string',
+                            nullable: true,
+                            example: null,
+                            },
+                        },
+                        },
+                        createdAt: {
+                        type: 'string',
+                        format: 'date-time',
+                        },
+                        updatedAt: {
+                        type: 'string',
+                        format: 'date-time',
+                        },
+                    },
+                    },
+
+                    TipRecommendationItem: {
+                    type: 'object',
+                    properties: {
+                        tip: {
+                        $ref: '#/components/schemas/EnergyTip',
+                        },
+                        relevanceScore: {
+                        type: 'number',
+                        example: 88,
+                        },
+                        estimatedSavings: {
+                        type: 'object',
+                        properties: {
+                            kwhMonthly: {
+                            type: 'number',
+                            example: 24.5,
+                            },
+                            lkrMonthly: {
+                            type: 'number',
+                            nullable: true,
+                            example: 780,
+                            },
+                        },
+                        },
+                        baseline: {
+                        type: 'object',
+                        properties: {
+                            kwhMonthly: {
+                            type: 'number',
+                            example: 210,
+                            },
+                            billLkr: {
+                            type: 'number',
+                            nullable: true,
+                            example: 6200,
+                            },
+                        },
+                        },
+                        explanation: {
+                        type: 'string',
+                        example: 'Your highest estimated monthly usage is Cooling. Current weather is hot, so this tip is more relevant now.',
+                        },
+                        interaction: {
+                        type: 'object',
+                        properties: {
+                            bookmarked: {
+                            type: 'boolean',
+                            example: false,
+                            },
+                            implemented: {
+                            type: 'boolean',
+                            example: false,
+                            },
+                            feedback: {
+                            type: 'string',
+                            nullable: true,
+                            enum: ['HELPFUL', 'NEUTRAL', 'NOT_HELPFUL', null],
+                            example: null,
+                            },
+                        },
+                        },
+                    },
+                    },
+
+                    TipRecommendationsResponse: {
+                    type: 'object',
+                    properties: {
+                        success: {
+                        type: 'boolean',
+                        example: true,
+                        },
+                        data: {
+                        type: 'object',
+                        properties: {
+                            meta: {
+                            type: 'object',
+                            nullable: true,
+                            properties: {
+                                householdId: {
+                                type: 'string',
+                                example: '67f1234567890abcdef22222',
+                                },
+                                totalEstimatedKwhMonthly: {
+                                type: 'number',
+                                example: 210,
+                                },
+                                topCategories: {
+                                type: 'array',
+                                items: {
+                                    type: 'object',
+                                    properties: {
+                                    category: {
+                                        type: 'string',
+                                        example: 'Cooling',
+                                    },
+                                    kwh: {
+                                        type: 'number',
+                                        example: 120,
+                                    },
+                                    },
+                                },
+                                },
+                                weather: {
+                                type: 'object',
+                                properties: {
+                                    weatherState: {
+                                    type: 'string',
+                                    example: 'HOT',
+                                    },
+                                    temperature: {
+                                    type: 'number',
+                                    example: 31,
+                                    },
+                                    humidity: {
+                                    type: 'number',
+                                    example: 72,
+                                    },
+                                },
+                                },
+                            },
+                            },
+                            recommendations: {
+                            type: 'array',
+                            items: {
+                                $ref: '#/components/schemas/TipRecommendationItem',
+                            },
+                            },
+                            message: {
+                            type: 'string',
+                            nullable: true,
+                            example: 'Please create a household profile first to get personalized tips.',
+                            },
+                        },
+                        },
+                    },
+                    },
+
+                    TipInteractionListResponse: {
+                    type: 'object',
+                    properties: {
+                        success: {
+                        type: 'boolean',
+                        example: true,
+                        },
+                        count: {
+                        type: 'integer',
+                        example: 2,
+                        },
+                        data: {
+                        type: 'array',
+                        items: {
+                            $ref: '#/components/schemas/TipInteraction',
+                        },
+                        },
+                    },
+                    },
+
+                    TipActionResponse: {
+                    type: 'object',
+                    properties: {
+                        success: {
+                        type: 'boolean',
+                        example: true,
+                        },
+                        message: {
+                        type: 'string',
+                        example: 'Tip bookmarked successfully',
+                        },
+                        data: {
+                        $ref: '#/components/schemas/TipInteraction',
+                        },
+                    },
+                    },
+
+                    TipFeedbackRequest: {
+                    type: 'object',
+                    required: ['rating'],
+                    properties: {
+                        rating: {
+                        type: 'string',
+                        enum: ['HELPFUL', 'NEUTRAL', 'NOT_HELPFUL'],
+                        example: 'HELPFUL',
+                        },
+                        comment: {
+                        type: 'string',
+                        example: 'This recommendation is useful for my home',
+                        },
+                    },
+                    },
+
+                    TipDismissRequest: {
+                    type: 'object',
+                    properties: {
+                        days: {
+                        type: 'integer',
+                        example: 14,
+                        },
+                    },
+                    },
+
+                    CreateEnergyTipRequest: {
+                    type: 'object',
+                    required: ['title', 'description', 'category', 'effortLevel', 'savingsModel'],
+                    properties: {
+                        title: {
+                        type: 'string',
+                        example: 'Set AC temperature to 26°C',
+                        },
+                        description: {
+                        type: 'string',
+                        example: 'A slightly higher AC temperature can reduce cooling electricity use.',
+                        },
+                        category: {
+                        type: 'string',
+                        example: 'Cooling',
+                        },
+                        requiredApplianceKeywords: {
+                        type: 'array',
+                        items: {
+                            type: 'string',
+                        },
+                        example: ['ac', 'air conditioner'],
+                        },
+                        requiredCategories: {
+                        type: 'array',
+                        items: {
+                            type: 'string',
+                        },
+                        example: ['Cooling'],
+                        },
+                        incomeTags: {
+                        type: 'array',
+                        items: {
+                            type: 'string',
+                        },
+                        example: ['LOW', 'MID', 'HIGH', 'ALL'],
+                        },
+                        weatherTags: {
+                        type: 'array',
+                        items: {
+                            type: 'string',
+                        },
+                        example: ['HOT', 'ALL'],
+                        },
+                        timeTags: {
+                        type: 'array',
+                        items: {
+                            type: 'string',
+                        },
+                        example: ['ALL'],
+                        },
+                        effortLevel: {
+                        type: 'string',
+                        enum: ['ZERO_COST', 'LOW_COST', 'INVESTMENT'],
+                        example: 'ZERO_COST',
+                        },
+                        savingsModel: {
+                        $ref: '#/components/schemas/SavingsModel',
+                        },
+                        isActive: {
+                        type: 'boolean',
+                        example: true,
+                        },
+                    },
+                    },
+
+                    AdminTipListResponse: {
+                    type: 'object',
+                    properties: {
+                        success: {
+                        type: 'boolean',
+                        example: true,
+                        },
+                        count: {
+                        type: 'integer',
+                        example: 10,
+                        },
+                        pagination: {
+                        type: 'object',
+                        properties: {
+                            page: {
+                            type: 'integer',
+                            example: 1,
+                            },
+                            limit: {
+                            type: 'integer',
+                            example: 10,
+                            },
+                            total: {
+                            type: 'integer',
+                            example: 24,
+                            },
+                            totalPages: {
+                            type: 'integer',
+                            example: 3,
+                            },
+                        },
+                        },
+                        filters: {
+                        type: 'object',
+                        properties: {
+                            q: {
+                            type: 'string',
+                            example: 'ac',
+                            },
+                            category: {
+                            type: 'string',
+                            nullable: true,
+                            example: 'Cooling',
+                            },
+                            isActive: {
+                            type: 'boolean',
+                            nullable: true,
+                            example: true,
+                            },
+                        },
+                        },
+                        data: {
+                        type: 'array',
+                        items: {
+                            $ref: '#/components/schemas/EnergyTip',
+                        },
+                        },
+                    },
+                    },
                 // ── Error Schema ──────────────────────────────────────────────────
                 ErrorResponse: {
                     type: 'object',
@@ -251,7 +792,9 @@ The key is provided separately by the system administrator.
             { name: '👥 Members', description: 'Shared Household Member Management' },
             { name: '💰 Budget', description: 'Monthly Electricity Budget Setting & History' },
             { name: '👑 Admin', description: 'Admin-Only Dashboard & User Management' },
-            { name: '🌤️ Weather & Prediction', description: 'Weather data and consumption prediction' }
+            { name: '🌤️ Weather & Prediction', description: 'Weather data and consumption prediction' },
+            { name: 'Tips', description: 'Personalized energy tips' },
+            { name: 'Admin Tips', description: 'Tip library management (admin)' }
         ],
     },
     apis: ['./routes/*.js'],
