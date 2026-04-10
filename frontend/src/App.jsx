@@ -7,12 +7,13 @@ import Sidebar from './components/layout/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
-import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminRegister from './pages/Admin/AdminRegister';
 import Analytics from './pages/Analytics';
 import Appliances from './pages/Appliances';
 import Landing from './pages/Landing';
 import Tips from './pages/Tips';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminTips from './pages/AdminTips';
 import Alerts from './pages/Alerts';
 import Household from './pages/Household';
 import Readings from './pages/Readings';
@@ -132,6 +133,7 @@ const AppContent = () => {
 
             {/* Admin Routes */}
             <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+            <Route path="/admin/tips" element={<AdminRoute><AdminTips /></AdminRoute>} />
 
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
