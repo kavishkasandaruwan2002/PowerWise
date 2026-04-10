@@ -14,6 +14,12 @@ jobs:
       run:
         working-directory: backend
 
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+
     steps:
       - uses: actions/checkout@v4
 
@@ -31,8 +37,7 @@ jobs:
         run: npm test
         env:
           NODE_ENV: test
-          # Add other env vars if tests require them, 
-          # but usually mock them in tests
+          MONGO_TEST_URI: mongodb://localhost:27017/powerwise_test
 
   frontend-build:
     name: Frontend CI
