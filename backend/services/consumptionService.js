@@ -40,6 +40,35 @@ class ConsumptionService {
       const record = new ConsumptionRecord(consumptionData);
       await record.save();
 
+      // Trigger related async workflows for threshold and spike alerts
+      setImmediate(async () => {
+        try {
+          // 1. Check for spikes & trigger alert
+          const usageSpikeService = require('./usageSpikeService');
+          await usageSpikeService.checkSpike(
+            consumptionData.householdId,
+            userId,
+            consumptionData.consumption
+          ).catch(e => console.log('Spike check skipped:', e.message));
+
+          // 2. Update active budget & trigger budget alerts
+          const budgetService = require('./budgetService');
+          const activeBudget = await budgetService.getActiveBudget(consumptionData.householdId);
+          if (activeBudget) {
+            // Since updateConsumption expects cumulative consumption, we need to get updated month consumption
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            const consumptions = await this.getConsumptionInRange(consumptionData.householdId, startOfMonth, endOfMonth);
+            const totalMonthly = consumptions.reduce((sum, rec) => sum + rec.consumption, 0);
+            
+            await budgetService.updateConsumption(activeBudget._id, totalMonthly);
+          }
+        } catch (error) {
+          console.error('Workflow trigger failed after recording consumption:', error);
+        }
+      });
+
       return record;
     } catch (error) {
       throw new Error(`Failed to record consumption: ${error.message}`);

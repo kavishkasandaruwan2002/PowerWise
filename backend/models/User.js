@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
+
 
 const UserSchema = new mongoose.Schema(
     {
@@ -42,21 +44,61 @@ const UserSchema = new mongoose.Schema(
             type: Boolean,
             default: true,
         },
+        location: {
+            lat: { type: Number, default: 6.9271 }, // Colombo Default
+            lon: { type: Number, default: 79.8612 },
+        },
+        resetPasswordToken: String,
+        resetPasswordExpire: Date,
     },
-    { timestamps: true }
+
+    { 
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+    }
 );
 
+// Virtual for householdId compatibility
+UserSchema.virtual('householdId').get(function() {
+    return this.household;
+});
+
 // Hash password before saving
-UserSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
-    const salt = await bcrypt.genSalt(10);
+UserSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
+    
+    console.log('HASHING PASSWORD FOR:', this.email);
+    const saltRounds = process.env.SALT_ROUNDS ? parseInt(process.env.SALT_ROUNDS) : 10;
+    const salt = await bcrypt.genSalt(saltRounds);
     this.password = await bcrypt.hash(this.password, salt);
+<<<<<<< HEAD
     // next();
+=======
+    console.log('PASSWORD HASHED SUCCESSFULY');
+>>>>>>> householder-frontend
 });
 
 // Method to compare passwords
 UserSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Generate and hash password token
+UserSchema.methods.getResetPasswordToken = function () {
+    // Generate token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+
+    // Hash token and set to resetPasswordToken field
+    this.resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+    // Set expire (10 mins)
+    this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+
+    return resetToken;
 };
 
 module.exports = mongoose.model('User', UserSchema);

@@ -74,14 +74,40 @@ class BillPredictionService {
       // Detect anomalies
       const anomalies = currentConsumptions.filter(c => c.isAnomaly);
 
+      // Weather Adjustment Integration
+      let weatherNote = '';
+      let weatherFactor = 1.0;
+      try {
+        const HouseholdObj = require('../models/Household');
+        const { getWeatherState } = require('./weatherService');
+        
+        const householdNode = await HouseholdObj.findById(householdId).populate('owner');
+        const lat = householdNode?.location?.latitude || householdNode?.owner?.location?.lat || 6.9271;
+        const lon = householdNode?.location?.longitude || householdNode?.owner?.location?.lon || 79.8612;
+        
+        const weather = await getWeatherState({ lat, lon });
+        
+        if (weather.weatherState === 'HOT') {
+            weatherFactor = 1.08;
+            weatherNote = ' (+8% for Hot Weather Cooling)';
+        } else if (weather.weatherState === 'RAINY') {
+            weatherFactor = 1.03;
+            weatherNote = ' (+3% for Rainy Weather Lighting)';
+        }
+      } catch (weatherErr) {
+        console.error('Failed to fetch weather state for prediction:', weatherErr.message);
+      }
+
       // Make predictions using multiple methods
-      const projectedConsumption = this.projectConsumption(
+      const projectedConsumptionBase = this.projectConsumption(
         avgDailyConsumption,
         daysElapsed,
         daysInMonth,
         trend,
         trendPercentage
       );
+
+      const projectedConsumption = projectedConsumptionBase * weatherFactor;
 
       const projectedBill = tariff.calculateBill(projectedConsumption);
 
@@ -121,7 +147,7 @@ class BillPredictionService {
             value: Number(projectedConsumption.toFixed(2)),
             confidence: this.calculateConfidence(daysElapsed, daysInMonth, anomalies.length),
             method: 'trend-based-linear-projection',
-            description: `Based on ${daysElapsed} days of data with ${trend} trend`
+            description: `Based on ${daysElapsed} days of data with ${trend} trend${weatherNote}`
           },
 
           billPrediction: {
@@ -152,6 +178,19 @@ class BillPredictionService {
           willExceed: projectedBill.total > budget.monthlyLimit,
           warningLevel: this.getWarningLevel((projectedBill.total / budget.monthlyLimit) * 100)
         };
+
+        // Dispatch global alert if budget prediction threshold passed
+        const percentage = predictionData.budgetComparison.percentageOfBudget;
+        if (percentage >= 80) {
+            setImmediate(async () => {
+                try {
+                    const alertService = require('./alertService');
+                    await alertService.createPredictionAlert(householdId, predictionData.userId || budget.userId, predictionData.budgetComparison);
+                } catch (err) {
+                    console.error('Failed to dispatch prediction alert globally:', err.message);
+                }
+            });
+        }
 
         predictionData.recommendations = this.generateRecommendations(
           projectedBill.total,

@@ -1,9 +1,18 @@
 import React from 'react';
+<<<<<<< HEAD
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard, Zap, TrendingUp, Lightbulb,
   AlertCircle, Home, LogOut, Settings, Activity, ShieldCheck
+=======
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import {
+  LayoutDashboard, Zap, TrendingUp, Lightbulb,
+  AlertCircle, Home, LogOut, Settings, Activity,
+  ShieldCheck, Users
+>>>>>>> householder-frontend
 } from 'lucide-react';
 import { cn } from '../ui';
 import { motion } from 'framer-motion';
@@ -11,15 +20,26 @@ import { motion } from 'framer-motion';
 const Sidebar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+<<<<<<< HEAD
+=======
+  const location = useLocation();
+  const isAdmin = user?.role === 'admin';
+>>>>>>> householder-frontend
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+<<<<<<< HEAD
   const isAdmin = String(user?.role || '').toLowerCase() === 'admin';
 
   const userNavItems = [
+=======
+  const navItems = isAdmin ? [
+    { name: 'Admin Dashboard', path: '/admin/dashboard', icon: <ShieldCheck size={20} /> },
+  ] : [
+>>>>>>> householder-frontend
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
     { name: 'Meter Readings', path: '/readings', icon: <Activity size={20} /> },
     { name: 'Appliances', path: '/appliances', icon: <Zap size={20} /> },
@@ -29,6 +49,7 @@ const Sidebar = () => {
     { name: 'Households', path: '/households', icon: <Home size={20} /> },
   ];
 
+<<<<<<< HEAD
   const adminNavItems = [
     { name: 'Admin Dashboard', path: '/admin/dashboard', icon: <ShieldCheck size={20} /> },
     { name: 'Tip Management', path: '/admin/tips', icon: <Lightbulb size={20} /> },
@@ -39,6 +60,12 @@ const Sidebar = () => {
   return (
     <div className="w-72 h-screen fixed left-0 top-0 bg-[#0b0e14] border-r border-slate-800/40 flex flex-col z-[100] transition-all duration-500">
       <div className="p-10 flex items-center space-x-3 group cursor-pointer" onClick={() => navigate(isAdmin ? '/admin/dashboard' : '/') }>
+=======
+  return (
+    <div className="w-72 h-screen fixed left-0 top-0 bg-[#0b0e14] border-r border-slate-800/40 flex flex-col z-[100] transition-all duration-500">
+      {/* Sidebar Logo */}
+      <div className="p-10 flex items-center space-x-3 group cursor-pointer" onClick={() => navigate('/')}>
+>>>>>>> householder-frontend
         <div className="bg-blue-600 p-2.5 rounded-2xl group-hover:rotate-[-5deg] transition-all duration-300 shadow-xl shadow-blue-500/10">
           <Zap className="text-white fill-white" size={24} />
         </div>
@@ -47,27 +74,46 @@ const Sidebar = () => {
         </span>
       </div>
 
+<<<<<<< HEAD
+=======
+      {/* Navigation Items */}
+>>>>>>> householder-frontend
       <nav className="flex-1 px-6 space-y-2 mt-4">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) => cn(
+<<<<<<< HEAD
               'flex items-center space-x-4 px-6 py-4 rounded-2xl transition-all duration-300 font-bold text-sm tracking-tight relative group',
               isActive
                 ? 'text-white bg-[#161b2a] shadow-inner'
                 : 'text-slate-500 hover:text-slate-300 hover:bg-slate-900/50'
+=======
+              "flex items-center space-x-4 px-6 py-4 rounded-2xl transition-all duration-300 font-bold text-sm tracking-tight relative group",
+              isActive 
+                ? "text-white bg-[#161b2a] shadow-inner" 
+                : "text-slate-500 hover:text-slate-300 hover:bg-slate-900/50"
+>>>>>>> householder-frontend
             )}
           >
             {({ isActive }) => (
               <>
                 {isActive && (
+<<<<<<< HEAD
                   <motion.div
+=======
+                  <motion.div 
+>>>>>>> householder-frontend
                     layoutId="sidebar-active"
                     className="absolute left-0 top-3 bottom-3 w-1.5 bg-blue-500 rounded-r-full"
                   />
                 )}
+<<<<<<< HEAD
                 <div className={cn('transition-colors', isActive ? 'text-blue-500' : 'text-slate-500 group-hover:text-slate-300')}>
+=======
+                <div className={cn("transition-colors", isActive ? "text-blue-500" : "text-slate-500 group-hover:text-slate-300")}>
+>>>>>>> householder-frontend
                   {item.icon}
                 </div>
                 <span>{item.name}</span>
@@ -77,7 +123,21 @@ const Sidebar = () => {
         ))}
       </nav>
 
+<<<<<<< HEAD
       <div className="p-8 border-t border-slate-800/30 space-y-4">
+=======
+      {/* Bottom Actions */}
+      <div className="p-8 border-t border-slate-800/30 space-y-4">
+        {isAdmin && (
+          <div className="mb-4 p-4 bg-purple-500/10 border border-purple-500/20 rounded-2xl">
+            <div className="flex items-center gap-3 mb-2">
+              <ShieldCheck size={16} className="text-purple-500" />
+              <span className="text-[9px] font-black text-purple-500 uppercase tracking-widest">Admin Mode</span>
+            </div>
+            <p className="text-[9px] text-slate-500 font-bold">{user?.email}</p>
+          </div>
+        )}
+>>>>>>> householder-frontend
         <button
           onClick={() => navigate('/settings')}
           className="flex items-center space-x-4 px-6 py-3 rounded-xl text-slate-500 hover:text-white transition-all w-full text-sm font-bold"

@@ -1,6 +1,7 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { register, registerAdmin, login, logout, getMe, updatePassword, updateProfile } = require('../controllers/authController');
+const { register, registerAdmin, login, logout, getMe, updatePassword, updateProfile, forgotPassword, resetPassword } = require('../controllers/authController');
+
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
@@ -257,5 +258,67 @@ router.put('/update-password', protect, updatePassword);
  *         description: Email already in use
  */
 router.put('/me', protect, updateProfile);
+
+/**
+ * @swagger
+ * /api/auth/forgotpassword:
+ *   post:
+ *     tags: [🔐 Auth]
+ *     summary: Request password reset
+ *     description: Sends a reset link to the user's email if it exists.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: Reset email sent
+ *       404:
+ *         description: User not found
+ */
+router.post('/forgotpassword', forgotPassword);
+
+/**
+ * @swagger
+ * /api/auth/resetpassword/{resettoken}:
+ *   put:
+ *     tags: [🔐 Auth]
+ *     summary: Reset password with token
+ *     description: Provide the reset token and a new password to reset account access.
+ *     parameters:
+ *       - in: path
+ *         name: resettoken
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 minLength: 6
+ *                 example: newpassword123
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *       400:
+ *         description: Invalid or expired token
+ */
+router.put('/resetpassword/:resettoken', resetPassword);
 
 module.exports = router;

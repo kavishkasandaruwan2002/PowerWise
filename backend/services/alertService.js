@@ -1,12 +1,11 @@
-const Alert = require('../models/alertSchema');
+const Alert = require("../models/alertSchema");
 
 class AlertService {
-  
-    //new alert C
+  //new alert C
   async createAlert(alertData) {
     try {
       if (!alertData.householdId || !alertData.userId || !alertData.type) {
-        throw new Error('Household ID, User ID, and alert type are required');
+        throw new Error("Household ID, User ID, and alert type are required");
       }
 
       // Auto-set title and message if not provided
@@ -15,7 +14,10 @@ class AlertService {
       }
 
       if (!alertData.message && alertData.relatedData) {
-        alertData.message = this.getAlertMessage(alertData.type, alertData.relatedData);
+        alertData.message = this.getAlertMessage(
+          alertData.type,
+          alertData.relatedData,
+        );
       }
 
       // Set default severity if not provided
@@ -54,8 +56,8 @@ class AlertService {
           total,
           limit,
           skip,
-          pages: Math.ceil(total / limit)
-        }
+          pages: Math.ceil(total / limit),
+        },
       };
     } catch (error) {
       throw new Error(`Failed to get alerts: ${error.message}`);
@@ -67,7 +69,7 @@ class AlertService {
     try {
       const alerts = await Alert.find({
         householdId,
-        isDismissed: false
+        isDismissed: false,
       })
         .sort({ severity: -1, createdAt: -1 })
         .limit(limit)
@@ -75,12 +77,12 @@ class AlertService {
 
       const total = await Alert.countDocuments({
         householdId,
-        isDismissed: false
+        isDismissed: false,
       });
 
       return {
         data: alerts,
-        pagination: { total, limit, skip, pages: Math.ceil(total / limit) }
+        pagination: { total, limit, skip, pages: Math.ceil(total / limit) },
       };
     } catch (error) {
       throw new Error(`Failed to get household alerts: ${error.message}`);
@@ -105,7 +107,6 @@ class AlertService {
     }
   }
 
-
   async countUnreadAlerts(userId) {
     try {
       return await Alert.countUnread(userId);
@@ -114,13 +115,12 @@ class AlertService {
     }
   }
 
-
   async markAsRead(alertId) {
     try {
       const alert = await Alert.findById(alertId);
 
       if (!alert) {
-        throw new Error('Alert not found');
+        throw new Error("Alert not found");
       }
 
       return await alert.markAsRead();
@@ -129,37 +129,35 @@ class AlertService {
     }
   }
 
-
   async markAllAsRead(userId) {
     try {
       const result = await Alert.updateMany(
         {
           userId,
           isRead: false,
-          isDismissed: false
+          isDismissed: false,
         },
         {
           isRead: true,
-          readAt: new Date()
-        }
+          readAt: new Date(),
+        },
       );
 
       return {
         modified: result.modifiedCount,
-        message: `${result.modifiedCount} alerts marked as read`
+        message: `${result.modifiedCount} alerts marked as read`,
       };
     } catch (error) {
       throw new Error(`Failed to mark all as read: ${error.message}`);
     }
   }
 
- 
   async dismissAlert(alertId) {
     try {
       const alert = await Alert.findById(alertId);
 
       if (!alert) {
-        throw new Error('Alert not found');
+        throw new Error("Alert not found");
       }
 
       return await alert.dismiss();
@@ -168,13 +166,12 @@ class AlertService {
     }
   }
 
-  
-  async resolveAlert(alertId, notes = '') {
+  async resolveAlert(alertId, notes = "") {
     try {
       const alert = await Alert.findById(alertId);
 
       if (!alert) {
-        throw new Error('Alert not found');
+        throw new Error("Alert not found");
       }
 
       return await alert.markAsResolved(notes);
@@ -183,13 +180,12 @@ class AlertService {
     }
   }
 
-
   async getAlertById(alertId) {
     try {
       const alert = await Alert.findById(alertId);
 
       if (!alert) {
-        throw new Error('Alert not found');
+        throw new Error("Alert not found");
       }
 
       return alert;
@@ -200,13 +196,13 @@ class AlertService {
 
   async deleteAlert(alertId) {
     try {
-      const alert = await Alert.findById(alertId);
+      const alert = await Alert.findByIdAndDelete(alertId);
 
       if (!alert) {
-        throw new Error('Alert not found');
+        throw new Error("Alert not found");
       }
 
-      return await alert.dismiss();
+      return alert;
     } catch (error) {
       throw new Error(`Failed to delete alert: ${error.message}`);
     }
@@ -222,7 +218,11 @@ class AlertService {
 
   async getAlertsInRange(userId, startDate, endDate) {
     try {
-      return await Alert.getAlertsInRange(userId, new Date(startDate), new Date(endDate));
+      return await Alert.getAlertsInRange(
+        userId,
+        new Date(startDate),
+        new Date(endDate),
+      );
     } catch (error) {
       throw new Error(`Failed to get alerts in range: ${error.message}`);
     }
@@ -230,35 +230,48 @@ class AlertService {
 
   async createBudgetAlert(householdId, userId, budgetData) {
     try {
-      let severity = 'warning';
-      let title = 'Budget Alert';
-      let message = '';
+      let severity = "warning";
+      let title = "Budget Alert";
+      let message = "";
 
-      const percentage = (budgetData.currentBill / budgetData.monthlyBudget) * 100;
+      const percentage =
+        (budgetData.currentBill / budgetData.monthlyBudget) * 100;
+
+      if (percentage <= 80) return null;
 
       if (percentage > 100) {
-        severity = 'critical';
-        title = '🚨 Budget EXCEEDED';
+        severity = "critical";
+        title = "🚨 Budget EXCEEDED";
         message = `Your spending (Rs. ${budgetData.currentBill}) has exceeded your budget of Rs. ${budgetData.monthlyBudget}. Please reduce consumption.`;
       } else if (percentage > 90) {
-        severity = 'critical';
-        title = '⚠️ Critical: Budget Nearly Exceeded';
+        severity = "critical";
+        title = "⚠️ Critical: Budget Nearly Exceeded";
         message = `You are at ${percentage.toFixed(1)}% of your budget. Careful! You have only Rs. ${(budgetData.monthlyBudget - budgetData.currentBill).toFixed(2)} remaining.`;
       } else if (percentage > 80) {
-        severity = 'warning';
-        title = '⚠️ Budget Threshold Reached';
+        severity = "warning";
+        title = "⚠️ Budget Threshold Reached";
         message = `You have used Rs. ${budgetData.currentBill} of your Rs. ${budgetData.monthlyBudget} budget (${percentage.toFixed(1)}%).`;
       }
+      const existing = await Alert.findOne({
+        householdId,
+        userId,
+        type: percentage > 100 ? "budget_exceeded" : "budget_threshold",
+        isResolved: false,
+        isDismissed: false,
+        createdAt: { $gte: new Date(new Date().setDate(1)) }, // this month only
+      });
+
+      if (existing) return existing;
 
       return await this.createAlert({
         householdId,
         userId,
-        type: percentage > 100 ? 'budget_exceeded' : 'budget_threshold',
+        type: percentage > 100 ? "budget_exceeded" : "budget_threshold",
         title,
         message,
         severity,
-        sourceModule: 'budget',
-        relatedData: budgetData
+        sourceModule: "budget",
+        relatedData: budgetData,
       });
     } catch (error) {
       throw new Error(`Failed to create budget alert: ${error.message}`);
@@ -267,17 +280,17 @@ class AlertService {
 
   async createSpikeAlert(householdId, userId, spikeData) {
     try {
-      const severity = spikeData.percentageChange > 50 ? 'critical' : 'warning';
+      const severity = spikeData.percentageChange > 50 ? "critical" : "warning";
 
       return await this.createAlert({
         householdId,
         userId,
-        type: 'usage_spike',
-        title: '⚡ Unusual Consumption Spike Detected',
+        type: "usage_spike",
+        title: "⚡ Unusual Consumption Spike Detected",
         message: `Your consumption is ${spikeData.percentageChange.toFixed(1)}% higher than normal (${spikeData.consumption} kWh vs ${spikeData.averageConsumption.toFixed(2)} kWh average).`,
         severity,
-        sourceModule: 'spike_detection',
-        relatedData: spikeData
+        sourceModule: "spike_detection",
+        relatedData: spikeData,
       });
     } catch (error) {
       throw new Error(`Failed to create spike alert: ${error.message}`);
@@ -286,20 +299,33 @@ class AlertService {
 
   async createPredictionAlert(householdId, userId, predictionData) {
     try {
-      const willExceed = predictionData.predictedBill > predictionData.monthlyBudget;
-      const severity = willExceed ? 'critical' : 'warning';
+      const existing = await Alert.findOne({
+        householdId,
+        userId,
+        type: "bill_prediction",
+        isResolved: false,
+        isDismissed: false,
+        createdAt: { $gte: new Date(new Date().setDate(1)) },
+      });
+      if (existing) return existing;
+
+      const willExceed =
+        predictionData.predictedBill > predictionData.monthlyBudget;
+      const severity = willExceed ? "critical" : "warning";
 
       return await this.createAlert({
         householdId,
         userId,
-        type: 'bill_prediction',
-        title: willExceed ? '🚨 Bill Will Exceed Budget' : '📊 Bill Prediction Alert',
+        type: "bill_prediction",
+        title: willExceed
+          ? "🚨 Bill Will Exceed Budget"
+          : "📊 Bill Prediction Alert",
         message: willExceed
           ? `Your projected month-end bill is Rs. ${predictionData.predictedBill}, which exceeds your budget of Rs. ${predictionData.monthlyBudget}.`
           : `Your projected month-end bill is Rs. ${predictionData.predictedBill}, which is ${((predictionData.predictedBill / predictionData.monthlyBudget) * 100).toFixed(1)}% of your budget.`,
         severity,
-        sourceModule: 'prediction',
-        relatedData: predictionData
+        sourceModule: "prediction",
+        relatedData: predictionData,
       });
     } catch (error) {
       throw new Error(`Failed to create prediction alert: ${error.message}`);
@@ -308,38 +334,38 @@ class AlertService {
 
   getAlertTitle(type) {
     const titles = {
-      budget_threshold: '📊 Budget Threshold Alert',
-      budget_exceeded: '🚨 Budget Exceeded',
-      usage_spike: '⚡ Unusual Spike Detected',
-      bill_prediction: '📈 Bill Prediction',
-      anomaly: '⚠️ Anomaly Detected',
-      tariff_change: '💡 Tariff Change'
+      budget_threshold: "📊 Budget Threshold Alert",
+      budget_exceeded: "🚨 Budget Exceeded",
+      usage_spike: "⚡ Unusual Spike Detected",
+      bill_prediction: "📈 Bill Prediction",
+      anomaly: "⚠️ Anomaly Detected",
+      tariff_change: "💡 Tariff Change",
     };
-    return titles[type] || 'Alert';
+    return titles[type] || "Alert";
   }
 
   getAlertMessage(type, data) {
     const messages = {
-      budget_threshold: 'You have reached your budget threshold',
-      budget_exceeded: 'Your spending has exceeded your budget',
-      usage_spike: 'Unusual consumption spike detected',
-      bill_prediction: 'Your projected bill prediction',
-      anomaly: 'Anomalous usage pattern detected',
-      tariff_change: 'Tariff rates have been updated'
+      budget_threshold: "You have reached your budget threshold",
+      budget_exceeded: "Your spending has exceeded your budget",
+      usage_spike: "Unusual consumption spike detected",
+      bill_prediction: "Your projected bill prediction",
+      anomaly: "Anomalous usage pattern detected",
+      tariff_change: "Tariff rates have been updated",
     };
-    return messages[type] || 'New alert';
+    return messages[type] || "New alert";
   }
 
   getSeverity(type) {
     const severities = {
-      budget_exceeded: 'critical',
-      usage_spike: 'warning',
-      bill_prediction: 'warning',
-      budget_threshold: 'warning',
-      anomaly: 'warning',
-      tariff_change: 'info'
+      budget_exceeded: "critical",
+      usage_spike: "warning",
+      bill_prediction: "warning",
+      budget_threshold: "warning",
+      anomaly: "warning",
+      tariff_change: "info",
     };
-    return severities[type] || 'warning';
+    return severities[type] || "warning";
   }
 
   async cleanupOldAlerts(daysToKeep = 30) {
@@ -349,12 +375,12 @@ class AlertService {
 
       const result = await Alert.deleteMany({
         isDismissed: true,
-        dismissedAt: { $lt: cutoffDate }
+        dismissedAt: { $lt: cutoffDate },
       });
 
       return {
         deleted: result.deletedCount,
-        message: `Deleted ${result.deletedCount} old dismissed alerts`
+        message: `Deleted ${result.deletedCount} old dismissed alerts`,
       };
     } catch (error) {
       throw new Error(`Failed to cleanup alerts: ${error.message}`);
