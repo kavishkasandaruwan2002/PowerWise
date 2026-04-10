@@ -68,4 +68,19 @@ router.delete('/:id',
   alertController.deleteAlert
 );
 
+router.post('/re-scan',
+  authMiddleware,
+  alertController.reScan
+);
+
+router.post('/test-alert',
+  authMiddleware,
+  alertController.createTestAlert
+);
+
+router.delete('/',
+  authMiddleware,
+  alertController.deleteAll
+);
+
 module.exports = router;
