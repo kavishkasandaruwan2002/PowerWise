@@ -55,6 +55,7 @@ const Dashboard = () => {
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [loading, setLoading] = useState(true);
   const [alerts, setAlerts] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [tips, setTips] = useState([]);
   const [appliances, setAppliances] = useState([]);
 
@@ -69,6 +70,7 @@ const Dashboard = () => {
         api.get("/readings/compare").catch(() => null),
         api.get("/appliances").catch(() => null),
         api.get("/v1/alerts").catch(() => null),
+        api.get("/v1/alerts/unread-count").catch(() => null),
       ];
 
       const hasHousehold = !!user?.household;
@@ -83,6 +85,7 @@ const Dashboard = () => {
         compareRes,
         appliancesRes,
         alertsRes,
+        unreadCountRes,
         predictionRes,
         tipsRes;
 
@@ -92,11 +95,12 @@ const Dashboard = () => {
           compareRes,
           appliancesRes,
           alertsRes,
+          unreadCountRes,
           predictionRes,
           tipsRes,
         ] = results;
       } else {
-        [readingsRes, compareRes, appliancesRes, alertsRes] = results;
+        [readingsRes, compareRes, appliancesRes, alertsRes, unreadCountRes] = results;
       }
 
       if (readingsRes?.data?.data && readingsRes.data.data.length > 0) {
@@ -116,6 +120,7 @@ const Dashboard = () => {
       if (compareRes) setSummary(compareRes.data.data);
       if (appliancesRes) setAppliances(appliancesRes.data.data || []);
       if (alertsRes) setAlerts((alertsRes.data.data || []).slice(0, 3));
+      if (unreadCountRes) setUnreadCount(unreadCountRes.data?.unreadCount || 0);
       if (tipsRes)
         setTips((tipsRes.data.data?.recommendations || []).slice(0, 2));
       if (predictionRes) setPrediction(predictionRes.data.data);
@@ -158,7 +163,11 @@ const Dashboard = () => {
         <div className="flex items-center space-x-6">
           <button className="relative p-2 text-slate-500 hover:text-white transition-colors" onClick={() => navigate("/alerts")}>
             <Bell size={24} />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 min-w-[18px] h-[18px] bg-red-500 rounded-full text-[9px] font-black text-white flex items-center justify-center px-1 shadow-lg">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
           </button>
           <div className="flex items-center space-x-2 md:space-x-4">
             <div className="text-right hidden sm:block">

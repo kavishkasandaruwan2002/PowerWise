@@ -7,7 +7,7 @@ class BillPredictionService {
   /**
    * Create bill prediction for a household
    */
-  async predictBill(householdId, budgetId = null) {
+  async predictBill(householdId, budgetId = null, userId = null) {
     try {
       // Get current tariff
       const tariff = await TariffPlan.getActiveTariff();
@@ -185,7 +185,7 @@ class BillPredictionService {
             setImmediate(async () => {
                 try {
                     const alertService = require('./alertService');
-                    await alertService.createPredictionAlert(householdId, predictionData.userId || budget.userId, predictionData.budgetComparison);
+                    await alertService.createPredictionAlert(householdId, userId || budget.userId, predictionData.budgetComparison);
                 } catch (err) {
                     console.error('Failed to dispatch prediction alert globally:', err.message);
                 }

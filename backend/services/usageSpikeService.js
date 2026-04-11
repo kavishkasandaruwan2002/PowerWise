@@ -17,15 +17,26 @@ class UsageSpikeService {
       );
 
       if (records.length === 0) {
-        throw new Error('No consumption history available');
+        console.log('Spike check skipped: No consumption history available');
+        return null;
       }
 
       // Calculate daily average
       const totalConsumption = records.reduce((sum, record) => sum + record.consumption, 0);
       const dailyAverage = totalConsumption / records.length;
 
+      if (!dailyAverage || dailyAverage <= 0) {
+        console.log('Spike check skipped: Invalid daily average', dailyAverage);
+        return null;
+      }
+
       // Calculate percentage change
       const percentageChange = ((currentConsumption - dailyAverage) / dailyAverage) * 100;
+
+      if (isNaN(percentageChange)) {
+        console.log('Spike check skipped: NaN percentage change');
+        return null;
+      }
 
       // Determine if spike
       const isSpike = Math.abs(percentageChange) > threshold;
@@ -50,7 +61,8 @@ class UsageSpikeService {
 
       return spikeData;
     } catch (error) {
-      throw new Error(`Failed to check spike: ${error.message}`);
+      console.log('Spike check error:', error.message);
+      return null;
     }
   }
 

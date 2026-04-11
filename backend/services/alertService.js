@@ -9,6 +9,24 @@ class AlertService {
         throw new Error('Household ID, User ID, and alert type are required');
       }
 
+      // Check for duplicate alert within the last hour
+      const oneHourAgo = new Date();
+      oneHourAgo.setHours(oneHourAgo.getHours() - 1);
+
+      const existingAlert = await Alert.findOne({
+        householdId: alertData.householdId,
+        userId: alertData.userId,
+        type: alertData.type,
+        severity: alertData.severity || 'warning',
+        createdAt: { $gte: oneHourAgo },
+        isDismissed: false
+      });
+
+      if (existingAlert) {
+        console.log('Alert deduplication: skipping duplicate alert', existingAlert._id);
+        return existingAlert;
+      }
+
       // Auto-set title and message if not provided
       if (!alertData.title) {
         alertData.title = this.getAlertTitle(alertData.type);

@@ -175,7 +175,33 @@ class budgetService {
         : await TariffPlan.getActiveTariff();
 
       if (!tariff) {
-        throw new Error('No tariff found to calculate bill');
+        console.warn('No tariff found - using default rate Rs.10/kWh for budget calculation');
+        // Use a default rate if no tariff exists
+        budget.actualConsumption = consumption;
+        budget.currentBill = consumption * 10; // Default Rs.10/kWh
+
+        // Check if alert should be triggered
+        if (budget.shouldTriggerAlert()) {
+          const percentage = budget.getBudgetPercentage();
+          budget.addAlert(
+            'threshold',
+            `Budget usage at ${percentage}% of monthly limit`,
+            percentage > 100 ? 'high' : percentage > 90 ? 'medium' : 'low'
+          );
+
+          // Also push to the global Alert system for UI rendering
+          const alertService = require('./alertService');
+          await alertService.createBudgetAlert(budget.householdId, budget.userId, {
+              currentBill: budget.currentBill,
+              monthlyBudget: budget.monthlyLimit
+          }).then(alert => {
+              console.log('Budget alert created:', alert._id, 'at', percentage.toFixed(1) + '%');
+          }).catch(e => console.error('Failed to dispatch budget alert globally:', e.message));
+        }
+
+        budget.calculateProjectedBill(tariff);
+        await budget.save();
+        return budget;
       }
 
       // Update consumption and bill
@@ -195,6 +221,8 @@ class budgetService {
         await alertService.createBudgetAlert(budget.householdId, budget.userId, {
             currentBill: budget.currentBill,
             monthlyBudget: budget.monthlyLimit
+        }).then(alert => {
+            console.log('Budget alert created:', alert._id, 'at', percentage.toFixed(1) + '%');
         }).catch(e => console.error('Failed to dispatch budget alert globally:', e.message));
       }
 
