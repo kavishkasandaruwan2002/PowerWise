@@ -1,9 +1,10 @@
+require('dotenv').config({ override: false })
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const { swaggerUi, specs } = require('./config/swagger');
 
-require('dotenv').config();
+
 
 const app = express();
 
