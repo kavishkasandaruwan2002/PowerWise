@@ -292,7 +292,7 @@ class AlertService {
         userId,
         type: 'usage_spike',
         title: '⚡ Unusual Consumption Spike Detected',
-        message: `Your consumption is ${spikeData.percentageChange.toFixed(1)}% higher than normal (${spikeData.consumption} kWh vs ${spikeData.averageConsumption.toFixed(2)} kWh average).`,
+        message: `Your consumption is ${spikeData.percentageChange.toFixed(1)}% higher than normal (${spikeData.consumption} kWh vs ${(spikeData.dailyAverage ?? spikeData.averageDaily ?? 0).toFixed(2)} kWh average).`,
         severity,
         sourceModule: 'spike_detection',
         relatedData: spikeData
