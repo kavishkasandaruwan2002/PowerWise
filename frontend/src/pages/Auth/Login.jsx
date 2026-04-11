@@ -86,8 +86,13 @@
       setError("");
       setLoading(true);
       try {
-        await login(email, password);
-        navigate('/dashboard');
+        const loggedInUser = await login(email, password);
+        const role = String(loggedInUser?.role || '').toLowerCase();
+        if (role === 'admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/dashboard');
+        }
       } catch (err) {
         setError(err.response?.data?.message || "Invalid credentials. Please try again.");
       } finally {
