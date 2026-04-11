@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "../../lib/utils";
-import { useRef, useEffect, useCallback, useState } from "react";
+import { useRef, useEffect, useCallback } from "react";
 
 const DEFAULT_MARKERS = [
   { lat: 37.78, lng: -122.42, label: "San Francisco" },
@@ -89,7 +89,8 @@ export function Component({
     dotsRef.current = dots;
   }, []);
 
-  const draw = useCallback(() => {
+  useEffect(() => {
+    const draw = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -226,12 +227,11 @@ export function Component({
     }
 
     animRef.current = requestAnimationFrame(draw);
-  }, [dotColor, arcColor, markerColor, autoRotateSpeed, connections, markers]);
+    };
 
-  useEffect(() => {
     animRef.current = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(animRef.current);
-  }, [draw]);
+  }, [dotColor, arcColor, markerColor, autoRotateSpeed, connections, markers]);
 
   const onPointerDown = useCallback((e) => {
     dragRef.current = {

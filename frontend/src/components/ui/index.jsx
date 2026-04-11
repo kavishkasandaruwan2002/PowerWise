@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- barrel exports `cn` alongside UI components */
 import React from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -32,6 +33,7 @@ export const Button = React.forwardRef(({ className, variant = 'primary', size =
     />
   );
 });
+Button.displayName = 'Button';
 
 export const Card = ({ children, className, hover = false }) => (
   <div className={cn(
@@ -42,6 +44,7 @@ export const Card = ({ children, className, hover = false }) => (
     {children}
   </div>
 );
+Card.displayName = 'Card';
 
 export const Input = React.forwardRef(({ label, error, className, icon: Icon, ...props }, ref) => (
   <div className="space-y-2 w-full group/input">
@@ -74,6 +77,7 @@ export const Input = React.forwardRef(({ label, error, className, icon: Icon, ..
     )}
   </div>
 ));
+Input.displayName = 'Input';
 
 export const Badge = ({ children, variant = 'info', className }) => {
   const variants = {

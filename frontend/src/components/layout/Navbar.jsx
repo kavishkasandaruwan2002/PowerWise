@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { 
-  LayoutDashboard, Zap, BarChart3, LogOut, User, 
-  Settings, Bell, Search, Menu, X, ArrowRight
+  LayoutDashboard, Zap, BarChart3, LogOut,
+ Bell, Menu, X, ArrowRight
 } from 'lucide-react';
 import { Button, cn } from '../ui';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Navbar = () => {
+const NavbarInner = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,10 +22,6 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -217,6 +213,11 @@ const Navbar = () => {
       </AnimatePresence>
     </nav>
   );
+};
+
+const Navbar = () => {
+  const { pathname } = useLocation();
+  return <NavbarInner key={pathname} />;
 };
 
 export default Navbar;

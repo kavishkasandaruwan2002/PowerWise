@@ -3,8 +3,8 @@
     import { useAuth } from '../../context/AuthContext';
     import { motion } from 'framer-motion';
     import {
-    User, Mail, Lock, UserPlus,
-    Zap, ShieldCheck, ArrowRight, Key
+    User, Mail, Lock,
+    ShieldCheck, ArrowRight, Key
     } from 'lucide-react';
 
     const AnimatedBlob = ({ color, position, delay = "" }) => (

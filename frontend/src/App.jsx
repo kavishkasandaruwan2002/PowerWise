@@ -99,7 +99,6 @@ const AppContent = () => {
   const isAuthPage = ['/login', '/register', '/admin/register', '/forgot-password'].includes(pathname) || pathname.startsWith('/reset-password');
 
   const isLandingPage = pathname === '/';
-  const isAdminRoute = pathname.startsWith('/admin');
 
   // Landing page and operational dashboard logic
   const showSidebar = user && !isLandingPage && !isAuthPage;

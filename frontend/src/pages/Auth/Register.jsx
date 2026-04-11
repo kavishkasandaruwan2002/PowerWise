@@ -4,7 +4,7 @@
     import { motion } from 'framer-motion';
     import { 
     User, Mail, Lock, UserPlus, 
-    Zap, CheckCircle2, ArrowRight,
+    CheckCircle2, ArrowRight,
     ShieldCheck, Activity
     } from 'lucide-react';
 

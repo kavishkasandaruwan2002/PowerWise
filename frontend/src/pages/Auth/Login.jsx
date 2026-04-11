@@ -4,8 +4,7 @@
   import { motion } from 'framer-motion';
   import { 
     Eye, EyeOff, Mail, Lock, 
-    ArrowRight, ShieldCheck, Zap,
-    Search, CheckCircle2
+    ArrowRight, ShieldCheck, Zap
   } from 'lucide-react';
 
   // --- Internal Helper Components (As requested in user template) ---
@@ -193,7 +192,7 @@
 
             <div className="pt-8 border-t border-slate-900">
               <p className="text-center text-[10px] font-black text-slate-600 uppercase tracking-widest">
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <Link to="/register" className="text-blue-600 hover:text-blue-400 transition-colors ml-2 underline decoration-2 underline-offset-4">
                   Sign Up
                 </Link>

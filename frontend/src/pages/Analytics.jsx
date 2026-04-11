@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-    LineChart, Line, Legend, ComposedChart, Area, Cell
-} from 'recharts';
+
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart, Area, Cell } from 'recharts';
 import {
     TrendingDown, Target, Zap,
-    Info, RefreshCcw, TrendingUp, Calendar, Filter, ChevronRight
+    Info, RefreshCcw, TrendingUp, Filter, ChevronRight
 } from 'lucide-react';
 import { Card, Button, Badge } from '../components/ui';
 import { cn } from '../components/ui';
@@ -18,15 +16,11 @@ const Analytics = () => {
     const [view, setView] = useState('monthly');
     const [historicalData, setHistoricalData] = useState([]);
     const [hourlyData, setHourlyData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [_loading, setLoading] = useState(true);
     const [comparison, setComparison] = useState(null);
     const [prediction, setPrediction] = useState(null);
 
-    useEffect(() => {
-        fetchData();
-    }, [user]);
-
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             const hasHousehold = !!user?.household;
             const householdId = user?.household?._id || user?.household;
@@ -79,7 +73,11 @@ const Analytics = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     return (
         <div className="min-h-screen bg-[#0b0e14] p-4 md:p-8 pb-32">
