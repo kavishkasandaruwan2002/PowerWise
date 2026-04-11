@@ -39,6 +39,7 @@ jobs:
           NODE_ENV: test
           MONGO_TEST_URI: mongodb://localhost:27017/powerwise_test
           JWT_ACCESS_SECRET: ${{ secrets.JWT_ACCESS_SECRET }}
+          JWT_ACCESS_EXPIRE: 7d
 
   frontend-build:
     name: Frontend CI
