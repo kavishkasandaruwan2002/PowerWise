@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  AlertTriangle, Bell, CheckCircle2, Info, X, 
-  Trash2, ShieldAlert, Zap, TrendingUp, AlertCircle, 
-  Eye, Calendar, Filter
+import {
+  AlertTriangle, Bell, CheckCircle2, Info, X,
+  Trash2, ShieldAlert, Zap, TrendingUp, AlertCircle,
+  Eye, Calendar, Filter, Lightbulb, Activity
 } from 'lucide-react';
 import { Card, Button, Badge } from '../components/ui';
 import { cn } from '../components/ui';
@@ -59,6 +59,16 @@ const Alerts = () => {
             setAlerts(prev => prev.filter(a => a._id !== id));
         } catch (err) {
             console.error('Delete failed:', err);
+        }
+    };
+
+    const markAllRead = async () => {
+        try {
+            await api.put('/v1/alerts/mark-all-read');
+            setAlerts(prev => prev.map(a => ({ ...a, isRead: true })));
+            setUnreadCount(0);
+        } catch (err) {
+            console.error('Mark all read failed:', err);
         }
     };
 
@@ -222,10 +232,10 @@ const Alerts = () => {
                 </AnimatePresence>
 
                 {!loading && filteredAlerts.length === 0 && (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="py-40 text-center"
+                        className="py-20 text-center"
                     >
                          <div className="w-24 h-24 bg-[#161b2a] border border-slate-800 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-2xl relative">
                             <CheckCircle2 size={40} className="text-emerald-500" />
@@ -233,8 +243,58 @@ const Alerts = () => {
                         </div>
                         <h4 className="text-xl font-black text-slate-500 italic uppercase">All Clear</h4>
                         <p className="text-slate-600 font-bold mt-2">Zero critical events detected in your current session.</p>
+
+                        {/* How Alerts Are Generated */}
+                        <div className="mt-12 max-w-2xl mx-auto text-left">
+                            <h5 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">How Alerts Are Generated</h5>
+                            <div className="grid md:grid-cols-3 gap-4">
+                                <div className="p-4 bg-[#161b2a] border border-slate-800 rounded-2xl">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <div className="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center">
+                                            <TrendingUp size={16} className="text-amber-500" />
+                                        </div>
+                                        <span className="text-xs font-black text-white">Budget Alert</span>
+                                    </div>
+                                    <p className="text-[10px] text-slate-500 leading-relaxed">
+                                        Triggers when your bill reaches <strong className="text-amber-500">80%</strong>, <strong className="text-amber-500">90%</strong>, or exceeds <strong className="text-amber-500">100%</strong> of your monthly budget.
+                                    </p>
+                                </div>
+
+                                <div className="p-4 bg-[#161b2a] border border-slate-800 rounded-2xl">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center">
+                                            <Zap size={16} className="text-red-500" />
+                                        </div>
+                                        <span className="text-xs font-black text-white">Usage Spike</span>
+                                    </div>
+                                    <p className="text-[10px] text-slate-500 leading-relaxed">
+                                        Triggers when daily consumption is <strong className="text-red-500">&gt;50% higher</strong> than your 30-day average.
+                                    </p>
+                                </div>
+
+                                <div className="p-4 bg-[#161b2a] border border-slate-800 rounded-2xl">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                                            <Activity size={16} className="text-blue-500" />
+                                        </div>
+                                        <span className="text-xs font-black text-white">Prediction</span>
+                                    </div>
+                                    <p className="text-[10px] text-slate-500 leading-relaxed">
+                                        Triggers when predicted month-end bill will exceed <strong className="text-blue-500">80%</strong> of budget.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                                <p className="text-[10px] text-blue-400 font-bold">
+                                    <Lightbulb size={12} className="inline mr-2 mb-0.5" />
+                                    <strong>Tip:</strong> Log your meter readings regularly at <a href="/readings" className="underline hover:text-blue-300">Meter Readings</a> to keep alerts accurate and up-to-date.
+                                </p>
+                            </div>
+                        </div>
+
                         <Button onClick={fetchAlerts} className="mt-8 bg-[#161b2a] hover:bg-[#1f263a] text-blue-500 font-black px-8 h-14 rounded-2xl text-[9px] uppercase tracking-widest border border-slate-800 shadow-2xl">
-                           Execute Re-scan
+                           Refresh Alerts
                         </Button>
                     </motion.div>
                 )}
