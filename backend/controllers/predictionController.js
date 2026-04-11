@@ -39,9 +39,44 @@ const predictConsumption = async (req, res) => {
             .sort((a, b) => a.year !== b.year ? a.year - b.year : a.month - b.month);
 
         if (budgets.length < 3) {
-            return res.status(400).json({
-                success: false,
-                message: 'Need at least 3 months of historical budgets to make a prediction.'
+            // Fallback: Use appliance-based estimation if not enough budgets
+            const Appliance = require('../models/Appliance');
+            const CalculationService = require('../services/CalculationService');
+            const appliances = await Appliance.find({ createdBy: req.user.id });
+            const breakdown = CalculationService.calculateCategoryBreakdown(appliances);
+            let predicted = breakdown.totalUsage || 200; // default 200kWh if no appliances
+
+            // Apply weather adjustment even to the fallback
+            let avgTemp = 28;
+            if (household.location?.latitude && household.location?.longitude) {
+                try {
+                    const { getWeatherByCoords } = require('../utils/weather');
+                    const weatherData = await getWeatherByCoords(household.location.latitude, household.location.longitude);
+                    const temps = weatherData.list.slice(0, 5).map(item => item.main.temp);
+                    avgTemp = temps.reduce((a, b) => a + b, 0) / temps.length;
+                    
+                    const baselineTemp = 28;
+                    if (avgTemp > baselineTemp) {
+                        predicted *= 1 + (avgTemp - baselineTemp) * 0.02;
+                    } else if (avgTemp < baselineTemp) {
+                        predicted *= 1 - (baselineTemp - avgTemp) * 0.01;
+                    }
+                } catch (err) {
+                    console.warn('Weather fallback failed in prediction.');
+                }
+            }
+
+            return res.status(200).json({
+                success: true,
+                prediction: {
+                    month: targetMonth,
+                    year: targetYear,
+                    estimatedAmount: Math.round(predicted),
+                    estimatedBillRs: CalculationService.calculateMonthlyBill(predicted),
+                    basedOnMonths: 0,
+                    averageTemperature: avgTemp.toFixed(1),
+                    notes: 'Prediction based on appliance configuration and real-time weather flux (Insufficient historical data for linear model).'
+                }
             });
         }
 

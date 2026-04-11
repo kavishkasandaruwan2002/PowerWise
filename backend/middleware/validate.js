@@ -88,7 +88,7 @@ const schemas = {
                 'number.min': 'Reading value cannot be negative'
             }),
         readingType: Joi.string()
-            .valid('Monthly', 'Weekly', 'Custom')
+            .valid('Monthly', 'Weekly', 'Custom', 'Actual', 'actual')
             .default('Monthly'),
         readingDate: Joi.date().max('now').default(Date.now)
             .messages({ 'date.max': 'Reading date cannot be in the future' }),

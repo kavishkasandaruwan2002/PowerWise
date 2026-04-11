@@ -6,7 +6,7 @@ const {
     compareUsage,
     detectAnomalies,
     deleteReading
-} = require('../controllers/MeterController');
+} = require('../controllers/Metercontroller');
 const { validate, schemas } = require('../middleware/validate');
 const { protect } = require('../middleware/auth');
 
