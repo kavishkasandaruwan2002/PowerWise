@@ -156,7 +156,7 @@ const Dashboard = () => {
           <Menu size={24} />
         </button>
         <div className="flex items-center space-x-6">
-          <button className="relative p-2 text-slate-500 hover:text-white transition-colors">
+          <button className="relative p-2 text-slate-500 hover:text-white transition-colors" onClick={() => navigate("/alerts")}>
             <Bell size={24} />
             <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
           </button>
@@ -294,7 +294,7 @@ const Dashboard = () => {
                           prediction.budgetComparison.monthlyBudget
                           ? "bg-red-500 shadow-red-500/50"
                           : prediction.current.bill >
-                              prediction.budgetComparison.monthlyBudget * 0.8
+                            prediction.budgetComparison.monthlyBudget * 0.8
                             ? "bg-amber-500 shadow-amber-500/50"
                             : "bg-emerald-500 shadow-emerald-500/50",
                       )}
@@ -382,50 +382,50 @@ const Dashboard = () => {
             {data && data.length > 0 ? (
               <ResponsiveContainer width="100%" height={400} minWidth={0}>
                 <AreaChart data={data}>
-                <defs>
-                  <linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="#1e293b"
-                  opacity={0.2}
-                />
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#475569", fontSize: 11, fontWeight: 700 }}
-                  dy={15}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#475569", fontSize: 11, fontWeight: 700 }}
-                />
-                <Tooltip
-                  cursor={{ stroke: "#3b82f6", strokeWidth: 1 }}
-                  contentStyle={{
-                    backgroundColor: "#0b0e14",
-                    border: "1px solid #1e293b",
-                    borderRadius: "24px",
-                    padding: "20px",
-                    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="consumption"
-                  stroke="#3b82f6"
-                  strokeWidth={6}
-                  fillOpacity={1}
-                  fill="url(#colorBlue)"
-                  animationDuration={2500}
-                  animationEasing="ease-in-out"
-                />
+                  <defs>
+                    <linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#1e293b"
+                    opacity={0.2}
+                  />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#475569", fontSize: 11, fontWeight: 700 }}
+                    dy={15}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#475569", fontSize: 11, fontWeight: 700 }}
+                  />
+                  <Tooltip
+                    cursor={{ stroke: "#3b82f6", strokeWidth: 1 }}
+                    contentStyle={{
+                      backgroundColor: "#0b0e14",
+                      border: "1px solid #1e293b",
+                      borderRadius: "24px",
+                      padding: "20px",
+                      boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="consumption"
+                    stroke="#3b82f6"
+                    strokeWidth={6}
+                    fillOpacity={1}
+                    fill="url(#colorBlue)"
+                    animationDuration={2500}
+                    animationEasing="ease-in-out"
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
