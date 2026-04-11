@@ -1,10 +1,10 @@
 import React from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard, Zap, TrendingUp, Lightbulb,
   AlertCircle, Home, LogOut, Settings, Activity,
-  ShieldCheck, Users
+  ShieldCheck
 } from 'lucide-react';
 import { cn } from '../ui';
 import { motion } from 'framer-motion';
@@ -12,7 +12,6 @@ import { motion } from 'framer-motion';
 const Sidebar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleLogout = () => {
     logout();

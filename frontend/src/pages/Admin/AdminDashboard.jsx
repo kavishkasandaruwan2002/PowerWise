@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
   Users, Home, ShieldCheck, TrendingUp,
-  Banknote, Zap, Activity, AlertTriangle,
-  Search, Filter, ChevronRight, Eye, ToggleLeft,
-  UserCheck, UserX, BarChart3, PieChart, Calendar
+  Banknote,
+  Search, Eye, ToggleLeft,
+  UserCheck, UserX, BarChart3, PieChart
 } from 'lucide-react';
-import { Card, Button, Badge } from '../../components/ui';
+import { Card, Badge } from '../../components/ui';
 import { cn } from '../../components/ui';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import {
-  AreaChart, Area, XAxis, YAxis, ResponsiveContainer,
-  PieChart as RePieChart, Pie, Cell, BarChart, Bar
+  ResponsiveContainer,
+  PieChart as RePieChart, Pie, Cell, BarChart, Bar, XAxis
 } from 'recharts';
 
 const AdminDashboard = () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   AreaChart,
@@ -8,39 +8,23 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
-  Cell,
-  PieChart,
-  Pie,
 } from "recharts";
 import {
   Zap,
   Banknote,
   Activity,
-  Leaf,
   ArrowUpRight,
   ArrowDownRight,
-  AlertTriangle,
   Lightbulb,
   TrendingUp,
-  Calendar,
   ChevronRight,
-  Share2,
-  Download,
   Bell,
-  Settings,
-  History,
-  Info,
-  Clock,
   ShieldCheck,
-  CheckCircle2,
   XCircle,
-  Power,
   Menu,
   BarChart3,
 } from "lucide-react";
-import { Card, Button, Badge } from "../components/ui";
+import { Button, Badge } from "../components/ui";
 import { cn } from "../components/ui";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -54,16 +38,12 @@ const Dashboard = () => {
   const [prediction, setPrediction] = useState(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [alerts, setAlerts] = useState([]);
+  const [_alerts, setAlerts] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [tips, setTips] = useState([]);
+  const [_tips, setTips] = useState([]);
   const [appliances, setAppliances] = useState([]);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, [user]);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       const endpoints = [
         api.get("/readings").catch(() => null),
@@ -129,7 +109,11 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   const distributionData = [
     { name: "AC", value: 400, color: "#3b82f6", max: 500 },

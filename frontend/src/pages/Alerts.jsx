@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  AlertTriangle, Bell, CheckCircle2, Info, X,
-  Trash2, ShieldAlert, Zap, TrendingUp, AlertCircle,
-  Eye, Calendar, Filter, Lightbulb, Activity
+  AlertTriangle, Bell, CheckCircle2, Info,
+  Trash2, ShieldAlert, Zap, TrendingUp,
+  Calendar, Lightbulb, Activity
 } from 'lucide-react';
 import { Card, Button, Badge } from '../components/ui';
 import { cn } from '../components/ui';
@@ -59,16 +59,6 @@ const Alerts = () => {
             setAlerts(prev => prev.filter(a => a._id !== id));
         } catch (err) {
             console.error('Delete failed:', err);
-        }
-    };
-
-    const markAllRead = async () => {
-        try {
-            await api.put('/v1/alerts/mark-all-read');
-            setAlerts(prev => prev.map(a => ({ ...a, isRead: true })));
-            setUnreadCount(0);
-        } catch (err) {
-            console.error('Mark all read failed:', err);
         }
     };
 

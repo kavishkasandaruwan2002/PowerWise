@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Button } from '../ui';
 
 const CATEGORY_OPTIONS = ['Cooling', 'Lighting', 'Cooking', 'Standby', 'Entertainment', 'Other', 'General'];
@@ -29,33 +29,26 @@ const getInitialForm = () => ({
   isActive: true,
 });
 
+const tipToForm = (selectedTip) => ({
+  title: selectedTip.title || '',
+  description: selectedTip.description || '',
+  category: selectedTip.category || 'General',
+  requiredApplianceKeywords: toCsv(selectedTip.requiredApplianceKeywords || []),
+  requiredCategories: toCsv(selectedTip.requiredCategories || []),
+  incomeTags: toCsv(selectedTip.incomeTags || ['ALL']),
+  weatherTags: toCsv(selectedTip.weatherTags || ['ALL']),
+  timeTags: toCsv(selectedTip.timeTags || ['ALL']),
+  effortLevel: selectedTip.effortLevel || 'ZERO_COST',
+  savingsModelType: selectedTip.savingsModel?.type || 'PERCENT_OF_CATEGORY',
+  percent: selectedTip.savingsModel?.percent ?? 5,
+  fixedKWhMonthly: selectedTip.savingsModel?.fixedKWhMonthly ?? '',
+  reduceHoursPerDay: selectedTip.savingsModel?.reduceHoursPerDay ?? '',
+  applianceKeyword: selectedTip.savingsModel?.applianceKeyword || '',
+  isActive: selectedTip.isActive ?? true,
+});
+
 const AdminTipForm = ({ selectedTip, onSubmit, onCancel, submitting }) => {
-  const [form, setForm] = useState(getInitialForm());
-
-  useEffect(() => {
-    if (!selectedTip) {
-      setForm(getInitialForm());
-      return;
-    }
-
-    setForm({
-      title: selectedTip.title || '',
-      description: selectedTip.description || '',
-      category: selectedTip.category || 'General',
-      requiredApplianceKeywords: toCsv(selectedTip.requiredApplianceKeywords || []),
-      requiredCategories: toCsv(selectedTip.requiredCategories || []),
-      incomeTags: toCsv(selectedTip.incomeTags || ['ALL']),
-      weatherTags: toCsv(selectedTip.weatherTags || ['ALL']),
-      timeTags: toCsv(selectedTip.timeTags || ['ALL']),
-      effortLevel: selectedTip.effortLevel || 'ZERO_COST',
-      savingsModelType: selectedTip.savingsModel?.type || 'PERCENT_OF_CATEGORY',
-      percent: selectedTip.savingsModel?.percent ?? 5,
-      fixedKWhMonthly: selectedTip.savingsModel?.fixedKWhMonthly ?? '',
-      reduceHoursPerDay: selectedTip.savingsModel?.reduceHoursPerDay ?? '',
-      applianceKeyword: selectedTip.savingsModel?.applianceKeyword || '',
-      isActive: selectedTip.isActive ?? true,
-    });
-  }, [selectedTip]);
+  const [form, setForm] = useState(() => (selectedTip ? tipToForm(selectedTip) : getInitialForm()));
 
   const titleLabel = useMemo(() => (selectedTip ? 'Edit Energy Tip' : 'Create Energy Tip'), [selectedTip]);
 

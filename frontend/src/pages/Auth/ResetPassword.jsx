@@ -1,7 +1,7 @@
     import React, { useState } from 'react';
     import { motion } from 'framer-motion';
     import { Lock, ArrowRight, Zap, ShieldCheck, CheckCircle2 } from 'lucide-react';
-    import { useParams, useNavigate, Link } from 'react-router-dom';
+    import { useParams, useNavigate } from 'react-router-dom';
     import api from '../../services/api';
 
     const AnimatedBlob = ({ color, position, delay = "" }) => (

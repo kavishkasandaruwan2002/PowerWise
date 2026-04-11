@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Activity, Plus, Trash2, Calendar,
-  Zap, Save, Info, History, ShieldCheck,
+  Zap, History,
   TrendingDown, TrendingUp, BarChart3, Pencil
 } from 'lucide-react';
-import { Card, Button, Badge } from '../components/ui';
+import { Card, Button } from '../components/ui';
 import api from '../services/api';
-import { cn } from '../components/ui';
 
 const Readings = () => {
   const [readings, setReadings] = useState([]);

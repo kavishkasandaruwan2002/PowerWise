@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  AlertTriangle, Bell, CheckCircle2, Info, X, 
-  Trash2, ShieldAlert, Zap, TrendingUp, AlertCircle, 
-  Eye, Calendar, Filter
+  AlertTriangle, CheckCircle2, Info,
+  Trash2, ShieldAlert,
+  Calendar
 } from 'lucide-react';
-import { Card, Button, Badge } from '../components/ui';
+import { Card, Button } from '../components/ui';
 import { cn } from '../components/ui';
 import api from '../services/api';
 

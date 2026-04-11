@@ -1,20 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Home,
-  MapPin,
   DollarSign,
-  Users,
   Settings,
   Save,
-  ShieldCheck,
-  Info,
   Compass,
-  ChevronRight,
   Map,
-  Globe,
   Navigation,
-  Search,
   CheckCircle2,
   XCircle,
   AlertTriangle,
@@ -29,7 +21,7 @@ import { useAuth } from "../context/AuthContext";
 const Household = () => {
   const { checkAuth } = useAuth();
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [feedback, setFeedback] = useState({ type: "", message: "" });
   const [formData, setFormData] = useState({
@@ -54,17 +46,7 @@ const Household = () => {
   // null = create mode, budget object = edit mode
   const [editingBudget, setEditingBudget] = useState(null);
 
-  useEffect(() => {
-    if (profile && profile._id !== "new") {
-      fetchBudgets();
-    }
-  }, [profile?._id]);
-
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const res = await api.get("/households/my");
       const household = res.data.household;
@@ -89,9 +71,9 @@ const Household = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchBudgets = async () => {
+  const fetchBudgets = useCallback(async () => {
     try {
       if (!profile?._id || profile._id === "new") return;
       const res = await api.get(`/v1/budgets?householdId=${profile._id}`);
@@ -102,7 +84,17 @@ const Household = () => {
     } catch (err) {
       console.error("Error fetching budgets:", err.response?.data || err.message);
     }
-  };
+  }, [profile?._id]);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
+
+  useEffect(() => {
+    if (profile && profile._id !== "new") {
+      fetchBudgets();
+    }
+  }, [profile, fetchBudgets]);
 
   // Populate form with budget data and enter edit mode
   const handleEditBudget = (budget) => {
