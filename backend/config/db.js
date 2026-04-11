@@ -1,9 +1,18 @@
 const mongoose = require('mongoose');
 
+function resolveMongoUri() {
+    if (process.env.NODE_ENV === 'test') {
+        return (
+            process.env.MONGO_TEST_URI ||
+            'mongodb://localhost:27017/powerwise_test'
+        );
+    }
+    return process.env.MONGODB_URI || 'mongodb://localhost:27017/powerwise';
+}
+
 const connectDB = async () => {
     try {
-        const mongoURI =
-            process.env.MONGODB_URI || 'mongodb://localhost:27017/powerwise';
+        const mongoURI = resolveMongoUri();
 
         const conn = await mongoose.connect(mongoURI);
 

@@ -16,8 +16,8 @@ class BillPredictionController {
         });
       }
 
-      const prediction = await billPredictionService.predictBill(householdId, budgetId);
-      
+      const prediction = await billPredictionService.predictBill(householdId, budgetId, req.user._id);
+
       // Set user info
       prediction.userId = req.user._id;
       prediction.createdBy = req.user._id;
@@ -271,7 +271,8 @@ class BillPredictionController {
 
       const prediction = await billPredictionService.predictBill(
         householdId,
-        budgetId || null
+        budgetId || null,
+        req.user._id
       );
 
       res.status(200).json({
@@ -300,7 +301,9 @@ class BillPredictionController {
       });
     } catch (error) {
       console.error('Forecast Error:', error.message);
-      if (error.message.includes('No consumption data') || error.message.includes('No active tariff')) {
+      if (error.message.includes('No consumption data') ||
+          error.message.includes('No active tariff') ||
+          error.message.includes('No budget found')) {
         return res.status(200).json({
           success: true,
           message: 'Telemetry synchronization pending',

@@ -121,3 +121,11 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Artillery / load test artifacts (not source: use artillery.config.yml + scripts in repo)
+results.json
+artillery-report*.json
+artillery-report*.html
+report.html
+report.json
+report.md

@@ -8,7 +8,11 @@
     "dev": "nodemon server.js",
     "test": "jest",
     "seed:tariffs": "node seedings/seedTariffs.js",
-    "seed:tips": "node seedings/seedEnergyTips.js"
+    "seed:tips": "node seedings/seedEnergyTips.js",
+    "seed:loadtest-user": "node scripts/ensureLoadTestUser.js",
+    "token:loadtest": "node scripts/printLoadTestJwt.js",
+    "loadtest": "node scripts/runArtilleryLoadTest.js",
+    "loadtest:login": "npx artillery run artillery.login.yml"
   },
   "keywords": [],
   "author": "",

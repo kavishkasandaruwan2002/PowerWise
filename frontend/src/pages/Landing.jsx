@@ -2,11 +2,10 @@ import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Zap, TrendingUp, Leaf, 
-  ArrowRight, Play, CheckCircle2,
-  Cpu, Activity
+  Zap,
+  ArrowRight, Play, CheckCircle2
 } from 'lucide-react';
-import { Button, Card, Badge } from '../components/ui';
+import { Button } from '../components/ui';
 import { Component as InteractiveGlobe } from '../components/ui/interactive-globe';
 
 const Landing = () => {
@@ -14,30 +13,6 @@ const Landing = () => {
     const { scrollYProgress } = useScroll();
     const y1 = useTransform(scrollYProgress, [0, 1], [0, -200]);
     const y2 = useTransform(scrollYProgress, [0, 1], [0, 200]);
-
-    const features = [
-        {
-            title: "Neural Grid Analysis",
-            desc: "Predictive analysis models that understand your consumption habits with deep learning accuracy.",
-            icon: Cpu,
-            color: "text-blue-500",
-            bg: "bg-blue-500/10"
-        },
-        {
-            title: "Real-time Telemetry",
-            desc: "Watch every watt in real-time across your entire household fleet with millisecond precision.",
-            icon: Activity,
-            color: "text-blue-600",
-            bg: "bg-blue-600/10"
-        },
-        {
-            title: "Economic Forecasting",
-            desc: "Accurate monthly revenue and cost predictions based on live load and grid tariff data.",
-            icon: TrendingUp,
-            color: "text-blue-400",
-            bg: "bg-blue-400/10"
-        }
-    ];
 
     return (
         <div className="relative bg-[#0b0e14] overflow-hidden selection:bg-blue-600/30">
@@ -67,7 +42,7 @@ const Landing = () => {
                         </h1>
 
                         <p className="text-lg md:text-xl text-slate-500 font-bold italic leading-relaxed mb-12 max-w-xl mx-auto lg:mx-0">
-                            The world's most advanced energy monitoring ecosystem. Experience real-time grid telemetry and AI-driven efficiency at global scale.
+                            The world&apos;s most advanced energy monitoring ecosystem. Experience real-time grid telemetry and AI-driven efficiency at global scale.
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6">

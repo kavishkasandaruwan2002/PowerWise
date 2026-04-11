@@ -1,12 +1,12 @@
     import React, { useState } from 'react';
     import { motion, AnimatePresence  } from 'framer-motion';
     import { 
-    User, Mail, Lock, Shield, 
-    Save, LogOut, Bell, Eye,
+    User, Shield, 
+    LogOut,
     CheckCircle2, AlertTriangle, Key,
     ChevronRight, ArrowLeft
     } from 'lucide-react';
-    import { Card, Button, Badge } from '../components/ui';
+    import { Card, Button } from '../components/ui';
     import api from '../services/api';
     import { useAuth } from '../context/AuthContext';
     import { cn } from '../components/ui';

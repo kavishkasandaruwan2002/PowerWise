@@ -1,0 +1,32 @@
+# Optional: stress POST /api/auth/login only (bcrypt). Expect many failures at high arrival rates.
+# Run: npx artillery run artillery.login.yml
+#
+config:
+  target: "http://localhost:5000"
+  http:
+    timeout: 120
+  phases:
+    - duration: 30
+      arrivalRate: 2
+      name: "Login warm-up"
+    - duration: 60
+      arrivalRate: 5
+      name: "Login sustained"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+
+scenarios:
+  - name: "Login only"
+    weight: 100
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "loadtest@powerwise.test"
+            password: "LoadTest123!"
+          capture:
+            - json: "$.token"
+              as: "token"
+          expect:
+            - statusCode: 200

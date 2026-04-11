@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  AlertTriangle, Bell, CheckCircle2, Info,
-  Trash2, ShieldAlert, Zap, TrendingUp,
-  Calendar, Lightbulb, Activity
+import { 
+  AlertTriangle, CheckCircle2, Info,
+  Trash2, ShieldAlert,
+  Calendar
 } from 'lucide-react';
-import { Card, Button, Badge } from '../components/ui';
+import { Card, Button } from '../components/ui';
 import { cn } from '../components/ui';
 import api from '../services/api';
 
@@ -13,32 +13,47 @@ const Alerts = () => {
     const [alerts, setAlerts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
-    const [unreadCount, setUnreadCount] = useState(0);
-    const [apiError, setApiError] = useState(null);
 
     useEffect(() => {
         fetchAlerts();
-        fetchUnreadCount();
     }, []);
-
-    const fetchUnreadCount = async () => {
-        try {
-            const res = await api.get('/v1/alerts/unread-count');
-            setUnreadCount(res.data?.unreadCount || 0);
-        } catch (err) {
-            console.error('Failed to fetch unread count:', err);
-        }
-    };
 
     const fetchAlerts = async () => {
         try {
-            setApiError(null);
             const res = await api.get('/v1/alerts');
             setAlerts(res.data.data || []);
         } catch (err) {
             console.error('Error fetching alerts:', err);
-            setApiError('Unable to load alerts from server. Showing sample data.');
-            setAlerts([]);
+            // High-fidelity Mock data
+            setAlerts([
+                {
+                    _id: '1',
+                    type: 'usage_spike',
+                    title: 'Abnormal Consumption Spike',
+                    message: 'A 45% increase in energy demand was detected in the Office zone at 14:30. Possible appliance malfunction or thermal leakage.',
+                    severity: 'critical',
+                    isRead: false,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    _id: '2',
+                    type: 'budget_threshold',
+                    title: 'Budget Allocation Alert',
+                    message: 'Your current consumption has reached 80% of your $250.00 monthly budget limit. 12 days remaining in billing cycle.',
+                    severity: 'warning',
+                    isRead: false,
+                    createdAt: new Date(Date.now() - 3600000).toISOString()
+                },
+                {
+                    _id: '3',
+                    type: 'bill_prediction',
+                    title: 'Economic Forecast Update',
+                    message: 'Based on current trends, your projected bill is $15.00 lower than last month. Energy intelligence measures are working.',
+                    severity: 'info',
+                    isRead: true,
+                    createdAt: new Date(Date.now() - 86400000).toISOString()
+                }
+            ]);
         } finally {
             setLoading(false);
         }
@@ -76,13 +91,6 @@ const Alerts = () => {
 
     const filteredAlerts = alerts.filter(a => filter === 'all' ? true : a.severity === filter);
 
-    const alertStats = {
-        total: alerts.length,
-        unread: alerts.filter(a => !a.isRead).length,
-        critical: alerts.filter(a => a.severity === 'critical' && !a.isRead).length,
-        warning: alerts.filter(a => a.severity === 'warning' && !a.isRead).length
-    };
-
     return (
         <div className="min-h-screen bg-[#0b0e14] p-8 pb-32">
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
@@ -93,27 +101,11 @@ const Alerts = () => {
                     <h1 className="text-4xl font-black text-white tracking-tight mb-2 uppercase italic">Crisis <span className="text-blue-500">Center</span></h1>
                     <p className="text-slate-500 font-bold tracking-tight italic">Real-time anomaly detection and critical grid notifications.</p>
                 </motion.div>
-
-                <div className="flex items-center gap-4 flex-wrap">
-                    {/* Alert Stats Summary */}
-                    <div className="flex gap-2">
-                        <Badge className={cn("px-4 py-2 rounded-xl border", unreadCount > 0 ? "bg-red-500/10 border-red-500/30 text-red-500" : "bg-slate-800 border-slate-700 text-slate-500")}>
-                            <Bell size={14} className="mr-2" />
-                            {unreadCount} Unread
-                        </Badge>
-                        <Badge className="px-4 py-2 rounded-xl border bg-amber-500/10 border-amber-500/30 text-amber-500">
-                            <AlertTriangle size={14} className="mr-2" />
-                            {alertStats.warning} Warning
-                        </Badge>
-                        <Badge className="px-4 py-2 rounded-xl border bg-red-500/10 border-red-500/30 text-red-500">
-                            <ShieldAlert size={14} className="mr-2" />
-                            {alertStats.critical} Critical
-                        </Badge>
-                    </div>
-
+                
+                <div className="flex items-center space-x-4">
                    <div className="flex bg-[#161b2a] border border-slate-800 rounded-2xl p-1.5 shadow-2xl">
                        {['all', 'critical', 'warning', 'info'].map(f => (
-                           <button
+                           <button 
                                 key={f}
                                 onClick={() => setFilter(f)}
                                 className={cn(
@@ -125,23 +117,11 @@ const Alerts = () => {
                            </button>
                        ))}
                    </div>
+                   <Button variant="ghost" className="h-12 px-6 bg-[#161b2a] border border-slate-800 rounded-2xl text-slate-400 text-[9px] font-black uppercase tracking-widest hover:text-white transition-all shadow-2xl">
+                      Clear Logs
+                   </Button>
                 </div>
             </header>
-
-            {/* API Error Banner */}
-            {apiError && (
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center gap-4"
-                >
-                    <AlertTriangle className="text-amber-500" size={24} />
-                    <div>
-                        <p className="text-amber-500 font-bold text-sm">{apiError}</p>
-                        <p className="text-amber-500/70 text-xs mt-1">Check that the backend server is running and you have a household assigned.</p>
-                    </div>
-                </motion.div>
-            )}
 
             <div className="grid grid-cols-1 gap-6 max-w-5xl mx-auto">
                 <AnimatePresence mode="popLayout">
@@ -222,10 +202,10 @@ const Alerts = () => {
                 </AnimatePresence>
 
                 {!loading && filteredAlerts.length === 0 && (
-                    <motion.div
+                    <motion.div 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="py-20 text-center"
+                        className="py-40 text-center"
                     >
                          <div className="w-24 h-24 bg-[#161b2a] border border-slate-800 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-2xl relative">
                             <CheckCircle2 size={40} className="text-emerald-500" />
@@ -233,58 +213,8 @@ const Alerts = () => {
                         </div>
                         <h4 className="text-xl font-black text-slate-500 italic uppercase">All Clear</h4>
                         <p className="text-slate-600 font-bold mt-2">Zero critical events detected in your current session.</p>
-
-                        {/* How Alerts Are Generated */}
-                        <div className="mt-12 max-w-2xl mx-auto text-left">
-                            <h5 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">How Alerts Are Generated</h5>
-                            <div className="grid md:grid-cols-3 gap-4">
-                                <div className="p-4 bg-[#161b2a] border border-slate-800 rounded-2xl">
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <div className="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center">
-                                            <TrendingUp size={16} className="text-amber-500" />
-                                        </div>
-                                        <span className="text-xs font-black text-white">Budget Alert</span>
-                                    </div>
-                                    <p className="text-[10px] text-slate-500 leading-relaxed">
-                                        Triggers when your bill reaches <strong className="text-amber-500">80%</strong>, <strong className="text-amber-500">90%</strong>, or exceeds <strong className="text-amber-500">100%</strong> of your monthly budget.
-                                    </p>
-                                </div>
-
-                                <div className="p-4 bg-[#161b2a] border border-slate-800 rounded-2xl">
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center">
-                                            <Zap size={16} className="text-red-500" />
-                                        </div>
-                                        <span className="text-xs font-black text-white">Usage Spike</span>
-                                    </div>
-                                    <p className="text-[10px] text-slate-500 leading-relaxed">
-                                        Triggers when daily consumption is <strong className="text-red-500">&gt;50% higher</strong> than your 30-day average.
-                                    </p>
-                                </div>
-
-                                <div className="p-4 bg-[#161b2a] border border-slate-800 rounded-2xl">
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                                            <Activity size={16} className="text-blue-500" />
-                                        </div>
-                                        <span className="text-xs font-black text-white">Prediction</span>
-                                    </div>
-                                    <p className="text-[10px] text-slate-500 leading-relaxed">
-                                        Triggers when predicted month-end bill will exceed <strong className="text-blue-500">80%</strong> of budget.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
-                                <p className="text-[10px] text-blue-400 font-bold">
-                                    <Lightbulb size={12} className="inline mr-2 mb-0.5" />
-                                    <strong>Tip:</strong> Log your meter readings regularly at <a href="/readings" className="underline hover:text-blue-300">Meter Readings</a> to keep alerts accurate and up-to-date.
-                                </p>
-                            </div>
-                        </div>
-
                         <Button onClick={fetchAlerts} className="mt-8 bg-[#161b2a] hover:bg-[#1f263a] text-blue-500 font-black px-8 h-14 rounded-2xl text-[9px] uppercase tracking-widest border border-slate-800 shadow-2xl">
-                           Refresh Alerts
+                           Execute Re-scan
                         </Button>
                     </motion.div>
                 )}

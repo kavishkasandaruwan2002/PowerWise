@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Zap, Plus, Trash2, Edit3,
-  Tv, Wind, Refrigerator, Laptop, Lamp, Coffee,
-  Settings, Power, Info, Search, Filter, ShieldCheck,
-  AlertCircle, LayoutGrid, List, MapPin
+  Tv, Wind, Coffee,
+  Info, Search, ShieldCheck,
+  MapPin
 } from 'lucide-react';
-import { Card, Button, Input, Badge } from '../components/ui';
+import { Card, Button, Badge } from '../components/ui';
 import api from '../services/api';
 import { cn } from '../components/ui';
 

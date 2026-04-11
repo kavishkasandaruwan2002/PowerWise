@@ -135,7 +135,7 @@ const domesticTariffs = [
 
 async function seedDatabase() {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/powerwise';
+    const mongoUri = process.env.MONGODB_URI;
     
     await mongoose.connect(mongoUri);
     console.log('✓ Connected to MongoDB');

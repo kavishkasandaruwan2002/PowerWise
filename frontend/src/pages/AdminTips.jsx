@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, Settings2, X } from 'lucide-react';
 import { Button } from '../components/ui';
@@ -17,7 +17,7 @@ const AdminTips = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [filters, setFilters] = useState({ q: '', category: 'all', isActive: 'all' });
 
-  const fetchTips = async () => {
+  const fetchTips = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -34,11 +34,11 @@ const AdminTips = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters.q, filters.category, filters.isActive]);
 
   useEffect(() => {
     fetchTips();
-  }, [filters.q, filters.category, filters.isActive]);
+  }, [fetchTips]);
 
   const categoryOptions = useMemo(() => Array.from(new Set(tips.map((tip) => tip.category).filter(Boolean))), [tips]);
 
@@ -192,6 +192,7 @@ const AdminTips = () => {
                 </button>
               </div>
               <AdminTipForm
+                key={selectedTip?._id || selectedTip?.id || 'new'}
                 selectedTip={selectedTip}
                 onSubmit={handleSubmit}
                 onCancel={closeModal}

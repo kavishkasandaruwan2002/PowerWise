@@ -2,67 +2,67 @@ const express = require('express');
 const router = express.Router();
 const billPredictionController = require('../controllers/billPredictionController');
 
-//middleware
-const { authMiddleware } = require('../middleware/auth');
+const { protect } = require('../middleware/auth');
 const { adminOnly } = require('../middleware/adminOnly');
 
 router.post('/',
-  // authMiddleware,
+  protect,
   billPredictionController.createPrediction
 );
 
 router.get('/latest/:householdId',
-  // authMiddleware,
+  protect,
   billPredictionController.getLatestPrediction
 );
 
 router.get('/:householdId/month-end',
-  // authMiddleware,
+  protect,
   billPredictionController.getMonthEndForecast
 );
 
 router.post('/:householdId/forecast',
-  // authMiddleware,
+  protect,
   billPredictionController.getDetailedForecast
 );
 
 router.get('/period/:householdId',
-  // authMiddleware,
+  protect,
   billPredictionController.getPredictionByPeriod
 );
 
 router.get('/history/:householdId',
-  // authMiddleware,
+  protect,
   billPredictionController.getPredictionHistory
 );
 
-
 router.get('/:id',
-  // authMiddleware,
+  protect,
   billPredictionController.getPredictionById
 );
 
-
 router.get('/:id/summary',
+  protect,
   billPredictionController.getPredictionSummary
 );
 
-
 router.post('/:id/compare',
+  protect,
   billPredictionController.comparePredictionWithActual
 );
 
 router.put('/:id/status',
+  protect,
   billPredictionController.updatePredictionStatus
 );
 
-
 router.delete('/:householdId/old',
+  protect,
   billPredictionController.deleteOldPredictions
 );
 
-// ===== ADMIN ROUTES =====
 router.get('/admin/at-risk',
+  protect,
+  adminOnly,
   billPredictionController.getAtRiskPredictions
 );
 
