@@ -72,12 +72,20 @@ exports.addAppliance = async (req, res) => {
         // Add user to body
         req.body.createdBy = req.user.id;
 
-        // Use householdId from authenticated user if not provided in body
+        // Use household from authenticated user if not provided in body
+        // Note: req.user.household is the field name in the model
         if (!req.body.householdId) {
-            req.body.householdId = req.user.householdId;
+            req.body.householdId = req.user.household;
         }
 
-        console.log('Processed body for DB:', req.body || 'Empty Body');
+        if (!req.body.householdId) {
+            return res.status(400).json({ 
+                success: false, 
+                error: ['Household configuration required. Please set up your household node in settings first.'] 
+            });
+        }
+
+        console.log('Processed body for DB:', req.body);
 
         const appliance = await Appliance.create(req.body);
 

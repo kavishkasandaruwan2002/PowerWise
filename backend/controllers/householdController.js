@@ -20,17 +20,39 @@ const createHousehold = async (req, res) => {
     }
 };
 
-const getMyHousehold = async (req, res) => {
+const getMyHousehold = async (req, res) => {//bug solved: if user is member but not owner, it will return 404. Now it will return the household info for members as well.
     try {
-        const household = await Household.findOne({
-            $or: [{ owner: req.user._id }, { members: req.user._id }],
+        let household = await Household.findOne({
+            $or: [
+                { owner: req.user._id },
+                { members: req.user._id }
+            ]
         })
-            .populate('owner', 'name email incomeBracket')
-            .populate('members', 'name email role');
-        if (!household) return res.status(404).json({ success: false, message: 'No household found.' });
-        return res.status(200).json({ success: true, household });
+        .populate('owner', 'name email incomeBracket')
+        .populate('members', 'name email role');
+
+        //no household? → return empty state (is NOT an error)
+        if (!household) {
+            return res.status(200).json({
+                success: true,
+                household: null,
+                message: 'No household found for this user.'
+            });
+        }
+
+        //normal case
+        return res.status(200).json({
+            success: true,
+            household
+        });
+
     } catch (err) {
-        return res.status(500).json({ success: false, message: err.message });
+        console.error('getMyHousehold error:', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while fetching household.'
+        });
     }
 };
 

@@ -11,9 +11,14 @@ const generateToken = (userId) =>
 // ── User Registration ───────────────────────────────────────────────────────
 const register = async (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
+    if (!errors.isEmpty()) {
+        const errorMsg = errors.array().map(err => err.msg).join(', ');
+        return res.status(400).json({ success: false, message: errorMsg, errors: errors.array() });
+    }
     try {
-        const { name, email, password, incomeBracket } = req.body;
+        let { name, email, password, incomeBracket } = req.body;
+        email = email.toLowerCase().trim();
+        
         if (await User.findOne({ email })) {
             return res.status(409).json({ success: false, message: 'Email already registered.' });
         }
@@ -28,6 +33,7 @@ const register = async (req, res) => {
             user: { id: user._id, name: user.name, email: user.email, role: user.role, incomeBracket: user.incomeBracket },
         });
     } catch (err) {
+        console.error('REGISTRATION ERROR:', err);
         return res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -37,9 +43,14 @@ const registerAdmin = async (req, res) => {
         console.log('ENV CHECK:', process.env.JWT_ACCESS_SECRET, process.env.ADMIN_SECRET_KEY);
 
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
+    if (!errors.isEmpty()) {
+        const errorMsg = errors.array().map(err => err.msg).join(', ');
+        return res.status(400).json({ success: false, message: errorMsg, errors: errors.array() });
+    }
     try {
-        const { name, email, password, incomeBracket, adminKey } = req.body;
+        let { name, email, password, incomeBracket, adminKey } = req.body;
+        email = email.toLowerCase().trim();
+
         if (!adminKey || adminKey !== process.env.ADMIN_SECRET_KEY) {
             return res.status(403).json({ success: false, message: 'Invalid or missing admin key.' });
         }
@@ -64,11 +75,24 @@ const registerAdmin = async (req, res) => {
 // ── Login ──────────────────────────────────────────────────────────────────
 const login = async (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
+    if (!errors.isEmpty()) {
+        const errorMsg = errors.array().map(err => err.msg).join(', ');
+        return res.status(400).json({ success: false, message: errorMsg, errors: errors.array() });
+    }
     try {
-        const { email, password } = req.body;
+        let { email, password } = req.body;
+        email = email.toLowerCase().trim();
+        
         const user = await User.findOne({ email }).select('+password');
-        if (!user || !(await user.matchPassword(password))) {
+        console.log('LOGIN ATTEMPT BY:', email);
+        if (user) {
+            const isMatch = await user.matchPassword(password);
+            console.log('PASSWORD MATCH STATUS:', isMatch);
+            if (!isMatch) {
+                return res.status(401).json({ success: false, message: 'Invalid email or password.' });
+            }
+        } else {
+            console.log('USER NOT FOUND:', email);
             return res.status(401).json({ success: false, message: 'Invalid email or password.' });
         }
         if (!user.isActive) {
@@ -84,6 +108,7 @@ const login = async (req, res) => {
             user: { id: user._id, name: user.name, email: user.email, role: user.role, incomeBracket: user.incomeBracket, household },
         });
     } catch (err) {
+        console.error('LOGIN ERROR:', err);
         return res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -122,7 +147,7 @@ const updatePassword = async (req, res) => {
 const updateProfile = async (req, res) => {
     try {
         const { name, email, incomeBracket } = req.body;
-        const user = await User.findById(req.user._id);
+        const user = await User.findById(req.user._id).select('+password');
 
         if (name) user.name = name;
         if (email) {
