@@ -57,13 +57,13 @@ meterReadingSchema.index({ householdId: 1, readingDate: -1 });
 
 // Pre-save hook: auto-calculate consumption if previous reading exists
 meterReadingSchema.pre('save', async function () {
-    if (this.isNew) {
+    if (this.isNew || this.isModified('readingValue') || this.isModified('readingDate')) {
         try {
             // Find the most recent reading before this one's date
             const lastReading = await this.constructor.findOne({
                 householdId: this.householdId,
                 readingDate: { $lte: this.readingDate },
-                _id: { $ne: this._id } // Exclude current if it somehow exists
+                _id: { $ne: this._id } // Exclude current
             }).sort({ readingDate: -1, createdAt: -1 });
 
             if (lastReading) {
@@ -73,9 +73,11 @@ meterReadingSchema.pre('save', async function () {
                 this.previousReading = 0;
                 this.consumption = this.readingValue;
             }
+            
+            // Note: In a production app, we might also want to trigger updates for the next reading in chronological order
+            // if this reading's value/date changed, but for this task we'll focus on the current record.
         } catch (err) {
             console.error('Error in MeterReading pre-save hook:', err);
-            // We don't throw here to allow the save to proceed even if calculation fails
         }
     }
 });

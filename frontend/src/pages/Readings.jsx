@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Activity, Plus, Trash2, Calendar,
   Zap, Save, Info, History, ShieldCheck,
-  TrendingDown, TrendingUp, BarChart3
+  TrendingDown, TrendingUp, BarChart3, Pencil
 } from 'lucide-react';
 import { Card, Button, Badge } from '../components/ui';
 import api from '../services/api';
@@ -13,6 +13,8 @@ const Readings = () => {
   const [readings, setReadings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState(null);
   const [newReading, setNewReading] = useState({
     readingValue: '',
@@ -40,12 +42,22 @@ const Readings = () => {
     e.preventDefault();
     try {
       setError(null);
-      const res = await api.post('/readings', {
+      const payload = {
         ...newReading,
         readingValue: Number(newReading.readingValue)
-      });
-      setReadings([res.data.data, ...readings]);
+      };
+
+      if (isEditing && editingId) {
+        const res = await api.put(`/readings/${editingId}`, payload);
+        setReadings(readings.map(r => (r._id || r.id) === editingId ? res.data.data : r));
+      } else {
+        const res = await api.post('/readings', payload);
+        setReadings([res.data.data, ...readings]);
+      }
+
       setIsAdding(false);
+      setIsEditing(false);
+      setEditingId(null);
       setNewReading({
         readingValue: '',
         readingDate: new Date().toISOString().split('T')[0],
@@ -53,14 +65,28 @@ const Readings = () => {
         notes: ''
       });
     } catch (err) {
-      console.error('Error adding reading:', err);
+      console.error('Error saving reading:', err);
       const msg = err.response?.data?.error || err.message;
       setError(Array.isArray(msg) ? msg[0] : msg);
     }
   };
 
+  const handleEdit = (reading) => {
+    setNewReading({
+      readingValue: reading.readingValue,
+      readingDate: new Date(reading.readingDate).toISOString().split('T')[0],
+      readingType: reading.readingType || 'actual',
+      notes: reading.notes || ''
+    });
+    setEditingId(reading._id || reading.id);
+    setIsEditing(true);
+    setIsAdding(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const deleteReading = async (id) => {
     if (!id) return;
+    if (!window.confirm("Are you sure you want to delete this telemetry point?")) return;
     try {
       setError(null);
       await api.delete(`/readings/${id}`);
@@ -80,13 +106,23 @@ const Readings = () => {
           <p className="text-slate-500 font-bold tracking-tight italic">Synchronizing physical consumption with digital twin datasets.</p>
         </motion.div>
 
-        <Button onClick={() => setIsAdding(true)} className="bg-blue-600 hover:bg-blue-500 text-white font-black px-8 h-[52px] rounded-2xl text-[10px] uppercase tracking-widest flex items-center shadow-lg shadow-blue-500/10 border-none transition-all">
+        <Button onClick={() => {
+          setIsAdding(true);
+          setIsEditing(false);
+          setEditingId(null);
+          setNewReading({
+            readingValue: '',
+            readingDate: new Date().toISOString().split('T')[0],
+            readingType: 'actual',
+            notes: ''
+          });
+        }} className="bg-blue-600 hover:bg-blue-500 text-white font-black px-8 h-[52px] rounded-2xl text-[10px] uppercase tracking-widest flex items-center shadow-lg shadow-blue-500/10 border-none transition-all">
           <Plus size={18} className="mr-3" />
           Submit Reading
         </Button>
       </header>
 
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {isAdding && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -97,9 +133,11 @@ const Readings = () => {
             <Card className="bg-[#161b2a] border border-blue-500/30 p-12 rounded-[3rem] shadow-2xl relative overflow-hidden">
               <div className="flex items-center space-x-4 mb-10">
                 <div className="p-3 bg-blue-500/10 text-blue-500 rounded-2xl">
-                  <Activity size={24} />
+                  {isEditing ? <Pencil size={24} /> : <Activity size={24} />}
                 </div>
-                <h3 className="text-2xl font-black text-white italic tracking-tight uppercase">Upload Data Point</h3>
+                <h3 className="text-2xl font-black text-white italic tracking-tight uppercase">
+                  {isEditing ? 'Update Telemetry Point' : 'Upload Data Point'}
+                </h3>
               </div>
 
               <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -140,8 +178,14 @@ const Readings = () => {
                   />
                 </div>
                 <div className="md:col-span-3 flex justify-end gap-4 pt-4">
-                  <Button type="button" onClick={() => setIsAdding(false)} variant="ghost" className="h-14 px-8 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-500 hover:text-white">Abort</Button>
-                  <Button type="submit" className="h-14 px-12 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-blue-600/20 border-none">Commit Byte</Button>
+                  <Button type="button" onClick={() => {
+                    setIsAdding(false);
+                    setIsEditing(false);
+                    setEditingId(null);
+                  }} variant="ghost" className="h-14 px-8 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-500 hover:text-white">Abort</Button>
+                  <Button type="submit" className="h-14 px-12 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-blue-600/20 border-none">
+                    {isEditing ? 'Sync Changes' : 'Commit Byte'}
+                  </Button>
                 </div>
               </form>
             </Card>
@@ -181,8 +225,8 @@ const Readings = () => {
                   </div>
                </div>
 
-               <div className="flex items-center gap-12">
-                  <div className="hidden md:flex flex-col items-end">
+               <div className="flex items-center gap-6">
+                  <div className="hidden md:flex flex-col items-end mr-6">
                      <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1 italic">Consumption Shift</span>
                      <div className="flex items-center gap-2">
                         {r.consumption > 0 ? <TrendingUp size={14} className="text-red-500" /> : <TrendingDown size={14} className="text-emerald-500" />}
@@ -190,13 +234,22 @@ const Readings = () => {
                      </div>
                   </div>
                   
-                  <Button 
-                    onClick={() => deleteReading(r._id || r.id)}
-                    variant="ghost" 
-                    className="w-12 h-12 rounded-2xl bg-red-500/5 text-red-500 border border-red-500/10 hover:bg-red-500 hover:text-white transition-all p-0"
-                  >
-                     <Trash2 size={18} />
-                  </Button>
+                  <div className="flex items-center gap-3">
+                    <Button 
+                      onClick={() => handleEdit(r)}
+                      variant="ghost" 
+                      className="w-12 h-12 rounded-2xl bg-blue-500/5 text-blue-500 border border-blue-500/10 hover:bg-blue-500 hover:text-white transition-all p-0"
+                    >
+                       <Pencil size={18} />
+                    </Button>
+                    <Button 
+                      onClick={() => deleteReading(r._id || r.id)}
+                      variant="ghost" 
+                      className="w-12 h-12 rounded-2xl bg-red-500/5 text-red-500 border border-red-500/10 hover:bg-red-500 hover:text-white transition-all p-0"
+                    >
+                       <Trash2 size={18} />
+                    </Button>
+                  </div>
                </div>
             </Card>
           </motion.div>

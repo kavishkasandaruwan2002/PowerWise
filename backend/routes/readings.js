@@ -5,9 +5,10 @@ const {
     getReadings,
     compareUsage,
     detectAnomalies,
-    deleteReading
+    deleteReading,
+    updateReading
 } = require('../controllers/Metercontroller');
-const { validate, schemas } = require('../middleware/validate');
+const { validate, validateUpdate, schemas } = require('../middleware/validate');
 const { protect } = require('../middleware/auth');
 
 router.use(protect);
@@ -132,5 +133,43 @@ router.get('/anomalies', detectAnomalies);
  *         description: Reading not found
  */
 router.delete('/:id', deleteReading);
+
+/**
+ * @swagger
+ * /api/readings/{id}:
+ *   put:
+ *     summary: Update a meter reading
+ *     tags: [MeterReadings]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               readingValue:
+ *                 type: number
+ *               readingDate:
+ *                 type: string
+ *                 format: date
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Reading updated
+ *       400:
+ *         description: Validation error
+ *       404:
+ *         description: Reading not found
+ */
+router.put('/:id', validateUpdate(schemas.reading), updateReading);
 
 module.exports = router;

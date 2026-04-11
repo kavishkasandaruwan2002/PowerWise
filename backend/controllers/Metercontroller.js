@@ -234,3 +234,49 @@ exports.deleteReading = async (req, res) => {
         res.status(500).json({ success: false, error: 'Server Error' });
     }
 };
+
+// @desc    Update a meter reading
+// @route   PUT /api/readings/:id
+// @access  Private
+exports.updateReading = async (req, res) => {
+    try {
+        let reading = await MeterReading.findById(req.params.id);
+
+        if (!reading) {
+            return res.status(404).json({ success: false, error: 'Reading not found' });
+        }
+
+        // Verify ownership
+        const userId = req.user.id || req.user._id.toString();
+        if (reading.submittedBy.toString() !== userId) {
+            return res.status(403).json({ success: false, error: 'Not authorized to update this reading' });
+        }
+
+        // Processing body
+        if (req.body.readingType && req.body.readingType.toLowerCase() === 'actual') {
+            req.body.readingType = 'Actual';
+        }
+
+        // Update fields
+        const fieldsToUpdate = ['readingValue', 'readingDate', 'readingType', 'notes'];
+        fieldsToUpdate.forEach(field => {
+            if (req.body[field] !== undefined) {
+                reading[field] = req.body[field];
+            }
+        });
+
+        await reading.save();
+
+        res.json({
+            success: true,
+            data: reading
+        });
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            const messages = Object.values(err.errors).map(val => val.message);
+            return res.status(400).json({ success: false, error: messages });
+        }
+        console.error('updateReading error:', err);
+        res.status(500).json({ success: false, error: 'Server Error' });
+    }
+};
