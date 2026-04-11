@@ -72,6 +72,11 @@ app.use('/api/v1/usage', usageSpikeRoutes);
 app.use('/api/v1/tips', require('./routes/tips'));
 app.use('/api/v1/admin-tips', require('./routes/adminTips'));
 
+// Liveness for load balancers / Artillery "Public Health Check" scenario
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ ok: true, service: 'powerwise-api' });
+});
+
 // Root route
 app.get('/', (req, res) => {
     res.json({

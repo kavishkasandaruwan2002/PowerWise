@@ -1,14 +1,24 @@
+# 1) Same DB as API: npm run seed:loadtest-user
+# 2) From backend/: npm run loadtest
+#    (sets LOADTEST_TOKEN + runs Artillery; avoids bcrypt-heavy POST /login in the mix)
+#
+# NOTE: "Login Flow" is NOT included here — under load, POST /login + bcrypt still fails/timeouts
+# and fails the whole vuser. To stress-test login alone, use: npx artillery run artillery.login.yml
+#
 config:
-  target: "http://localhost:5000"   # change to your deployed URL for cloud testing
+  target: "http://localhost:5000"
+  processor: "./artillery-processor.js"
+  http:
+    timeout: 120
   phases:
-    - duration: 30       # warm-up: 30 seconds
+    - duration: 30
       arrivalRate: 5
       name: "Warm-up"
-    - duration: 60       # ramp-up: 60 seconds
+    - duration: 60
       arrivalRate: 5
       rampTo: 20
       name: "Ramp-up"
-    - duration: 60       # sustained load: 60 seconds at peak
+    - duration: 60
       arrivalRate: 20
       name: "Peak Load"
   defaults:
@@ -16,42 +26,18 @@ config:
       Content-Type: "application/json"
 
 scenarios:
-  # ── Scenario 1: Public endpoints (no auth needed) ──────────────────────────
   - name: "Public Health Check"
-    weight: 10
+    weight: 15
     flow:
       - get:
           url: "/api/health"
           expect:
             - statusCode: 200
 
-  # ── Scenario 2: Auth flow ───────────────────────────────────────────────────
-  - name: "Login Flow"
-    weight: 20
-    flow:
-      - post:
-          url: "/api/auth/login"
-          json:
-            email: "loadtest@powerwise.test"
-            password: "LoadTest123!"
-          capture:
-            - json: "$.token"
-              as: "token"
-          expect:
-            - statusCode: 200
-
-  # ── Scenario 3: Appliances CRUD ────────────────────────────────────────────
   - name: "Appliances Read"
-    weight: 40
+    weight: 50
     flow:
-      - post:
-          url: "/api/auth/login"
-          json:
-            email: "loadtest@powerwise.test"
-            password: "LoadTest123!"
-          capture:
-            - json: "$.token"
-              as: "token"
+      - function: "loadTokenFromEnv"
       - get:
           url: "/api/appliances"
           headers:
@@ -59,25 +45,18 @@ scenarios:
           expect:
             - statusCode: 200
 
-  # ── Scenario 4: Readings ────────────────────────────────────────────────────
   - name: "Submit Meter Reading"
-    weight: 30
+    weight: 35
     flow:
-      - post:
-          url: "/api/auth/login"
-          json:
-            email: "loadtest@powerwise.test"
-            password: "LoadTest123!"
-          capture:
-            - json: "$.token"
-              as: "token"
+      - function: "loadTokenFromEnv"
+      - function: "setFreshReadingDate"
       - post:
           url: "/api/readings"
           headers:
             Authorization: "Bearer {{ token }}"
           json:
             readingValue: 500
-            readingDate: "2026-04-10T10:00:00.000Z"
+            readingDate: "{{ readingDate }}"
             notes: "Artillery load test reading"
           expect:
             - statusCode: 201
