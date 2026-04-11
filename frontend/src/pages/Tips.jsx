@@ -9,6 +9,7 @@ import {
   bookmarkTip,
   dismissTip,
   feedbackTip,
+  getAllTips,
   getInteractions,
   getRecommendations,
   implementTip,
@@ -19,9 +20,11 @@ import { Button } from '../components/ui';
 const Tips = () => {
   const [activeTab, setActiveTab] = useState('recommended');
   const [recommendations, setRecommendations] = useState([]);
+  const [allTips, setAllTips] = useState([]);
   const [interactions, setInteractions] = useState([]);
   const [loadingRecommendations, setLoadingRecommendations] = useState(true);
   const [loadingInteractions, setLoadingInteractions] = useState(true);
+  const [loadingAllTips, setLoadingAllTips] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [busyAction, setBusyAction] = useState('');
@@ -44,6 +47,35 @@ const Tips = () => {
     }
   };
 
+  const fetchAllTips = async () => {
+  try {
+    setLoadingAllTips(true);
+    setError('');
+
+    const res = await getAllTips();
+
+    const normalizedTips = (res?.data || []).map((item) => ({
+      ...item,
+      explanation: 'All active tips available for your account. Dismissed tips are hidden.',
+      relevanceScore: 0,
+      estimatedSavings: {
+        kwhMonthly: item?.interaction?.savingsSnapshot?.kwhMonthly ?? 0,
+        lkrMonthly: item?.interaction?.savingsSnapshot?.lkrMonthly ?? null,
+      },
+      baseline: {
+        kwhMonthly: item?.interaction?.savingsSnapshot?.baselineKwhMonthly ?? null,
+        billLkr: item?.interaction?.savingsSnapshot?.baselineBillLkr ?? null,
+      },
+    }));
+
+    setAllTips(normalizedTips);
+  } catch (err) {
+    setError(err.response?.data?.message || 'Failed to load all active tips.');
+  } finally {
+    setLoadingAllTips(false);
+  }
+  };
+
   const fetchInteractions = async () => {
     try {
       setLoadingInteractions(true);
@@ -58,16 +90,25 @@ const Tips = () => {
 
   useEffect(() => {
     fetchRecommendations();
+    fetchAllTips();
     fetchInteractions();
   }, []);
 
   const categoryOptions = useMemo(() => {
-    const source = activeTab === 'recommended'
-      ? recommendations.map((item) => item?.tip?.category)
-      : interactions.map((item) => (typeof item?.tipId === 'object' ? item.tipId?.category : null));
+    let source = [];
+
+    if (activeTab === 'recommended') {
+      source = recommendations.map((item) => item?.tip?.category);
+    } else if (activeTab === 'all-tips') {
+      source = allTips.map((item) => item?.tip?.category);
+    } else {
+      source = interactions.map((item) =>
+        typeof item?.tipId === 'object' ? item.tipId?.category : null
+      );
+    }
 
     return Array.from(new Set(source.filter(Boolean)));
-  }, [activeTab, recommendations, interactions]);
+  }, [activeTab, recommendations, allTips, interactions]);
 
   const filteredRecommendations = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -107,6 +148,51 @@ const Tips = () => {
 
     return items;
   }, [recommendations, search, category, showBookmarkedOnly, showImplementedOnly, sortBy]);
+
+
+  const filteredAllTips = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    let items = [...allTips];
+
+    if (term) {
+      items = items.filter((item) => {
+        const title = item?.tip?.title?.toLowerCase() || '';
+        const description = item?.tip?.description?.toLowerCase() || '';
+        const cat = item?.tip?.category?.toLowerCase() || '';
+        const feedback = item?.interaction?.feedback?.toLowerCase?.() || '';
+        return (
+          title.includes(term) ||
+          description.includes(term) ||
+          cat.includes(term) ||
+          feedback.includes(term)
+        );
+      });
+    }
+
+    if (category !== 'all') {
+      items = items.filter((item) => item?.tip?.category === category);
+    }
+
+    if (showBookmarkedOnly) {
+      items = items.filter((item) => !!item?.interaction?.bookmarked);
+    }
+
+    if (showImplementedOnly) {
+      items = items.filter((item) => !!item?.interaction?.implemented);
+    }
+
+    items.sort((a, b) => {
+      if (sortBy === 'savings') {
+        return (b?.estimatedSavings?.kwhMonthly || 0) - (a?.estimatedSavings?.kwhMonthly || 0);
+      }
+      if (sortBy === 'title') {
+        return String(a?.tip?.title || '').localeCompare(String(b?.tip?.title || ''));
+      }
+      return String(a?.tip?.title || '').localeCompare(String(b?.tip?.title || ''));
+    });
+
+    return items;
+  }, [allTips, search, category, showBookmarkedOnly, showImplementedOnly, sortBy]);
 
   const filteredInteractions = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -149,7 +235,7 @@ const Tips = () => {
 
   const refreshAll = async () => {
     setMessage('');
-    await Promise.all([fetchRecommendations(), fetchInteractions()]);
+    await Promise.all([fetchRecommendations(), fetchAllTips(), fetchInteractions()]);
   };
 
   const handleBookmarkToggle = async (item) => {
@@ -230,8 +316,19 @@ const Tips = () => {
     }
   };
 
-  const isLoading = activeTab === 'recommended' ? loadingRecommendations : loadingInteractions;
-  const items = activeTab === 'recommended' ? filteredRecommendations : filteredInteractions;
+  const isLoading =
+    activeTab === 'recommended'
+      ? loadingRecommendations
+      : activeTab === 'all-tips'
+        ? loadingAllTips
+        : loadingInteractions;
+
+  const items =
+    activeTab === 'recommended'
+      ? filteredRecommendations
+      : activeTab === 'all-tips'
+        ? filteredAllTips
+        : filteredInteractions;
 
   return (
     <div className="min-h-screen bg-[#0b0e14] p-8 pb-24">
@@ -283,15 +380,34 @@ const Tips = () => {
               <Lightbulb size={36} className="text-slate-600" />
             </div>
             <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase mb-2">
-              {activeTab === 'recommended' ? 'No recommendations found' : 'No interacted tips yet'}
+              {activeTab === 'recommended'
+                ? 'No recommendations found'
+                : activeTab === 'all-tips'
+                  ? 'No active tips found'
+                  : 'No interacted tips yet'}
             </h3>
             <p className="text-slate-500 font-bold max-w-xl mx-auto">
               {activeTab === 'recommended'
                 ? 'Update your household location and appliance list to unlock better personalized recommendations.'
-                : 'Bookmark, implement, dismiss or leave feedback on recommendations to see them in your personal tip history.'}
+                : activeTab === 'all-tips'
+                  ? 'There are no active tips available for your account right now. Dismissed tips are hidden automatically.'
+                  : 'Bookmark, implement, dismiss or leave feedback on recommendations to see them in your personal tip history.'}
             </p>
           </div>
-        ) : activeTab === 'recommended' ? (
+       ) : activeTab === 'my-tips' ? (
+          <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8">
+            {items.map((item) => (
+              <MyTipCard
+                key={item?._id}
+                item={item}
+                onUnbookmark={handleUnbookmarkFromMyTips}
+                onImplement={handleImplement}
+                onRefresh={refreshAll}
+                busyAction={busyAction}
+              />
+            ))}
+          </div>
+        ) : (
           <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8">
             {items.map((item) => (
               <RecommendationTipCard
@@ -301,19 +417,6 @@ const Tips = () => {
                 onImplement={handleImplement}
                 onFeedback={handleFeedback}
                 onDismiss={handleDismiss}
-                busyAction={busyAction}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8">
-            {items.map((item) => (
-              <MyTipCard
-                key={item?._id}
-                item={item}
-                onUnbookmark={handleUnbookmarkFromMyTips}
-                onImplement={handleImplement}
-                onRefresh={refreshAll}
                 busyAction={busyAction}
               />
             ))}

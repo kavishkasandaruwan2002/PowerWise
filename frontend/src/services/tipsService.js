@@ -15,6 +15,11 @@ export const getRecommendations = async (params = {}) => {
   return res.data;
 };
 
+export const getAllTips = async (params = {}) => {
+  const res = await api.get('/v1/tips/all', { params: cleanParams(params) });
+  return res.data;
+};
+
 export const getInteractions = async () => {
   const res = await api.get('/v1/tips/interactions');
   return res.data;

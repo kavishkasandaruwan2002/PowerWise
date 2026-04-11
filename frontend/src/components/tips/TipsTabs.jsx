@@ -3,6 +3,7 @@ import { cn } from '../ui';
 
 const tabs = [
   { id: 'recommended', label: 'Recommended Tips' },
+  { id: 'all-tips', label: 'All Tips' },
   { id: 'my-tips', label: 'My Tips' },
 ];
 

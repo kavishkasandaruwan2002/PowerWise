@@ -140,7 +140,8 @@ const AppContent = () => {
 
             {/* Admin Routes */}
             <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-
+            <Route path="/admin/tips" element={<AdminRoute><AdminTips /></AdminRoute>} />
+            
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>
