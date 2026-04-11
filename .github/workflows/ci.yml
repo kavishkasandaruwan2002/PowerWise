@@ -39,7 +39,7 @@ jobs:
         env:
           NODE_ENV: test
           MONGO_TEST_URI: mongodb://localhost:27017/powerwise_test
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_ACCESS_SECRET }}
 
 
   frontend-build:
