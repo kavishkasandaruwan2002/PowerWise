@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Home, MapPin, DollarSign, Users, Settings,
+  Home, MapPin, Banknote, Users, Settings,
   Save, ShieldCheck, Info, Compass, ChevronRight,
   Map, Globe, Navigation, Search, CheckCircle2, XCircle,
   AlertTriangle
@@ -347,7 +347,7 @@ const Household = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10 max-w-7xl mx-auto mt-8 md:mt-10">
                     <Card className="lg:col-span-1 bg-[#161b2a] border border-slate-800 rounded-[2rem] md:rounded-[3rem] p-6 lg:p-10 overflow-hidden relative shadow-2xl h-fit">
                         <div className="p-6 bg-emerald-600 rounded-[1.5rem] w-fit mb-6 shadow-xl shadow-emerald-600/20">
-                            <DollarSign size={32} className="text-white" />
+                            <Banknote size={32} className="text-white" />
                         </div>
                         <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-4">Set Budget</h3>
                         <p className="text-slate-500 text-sm font-bold tracking-tight italic mb-8 leading-relaxed">
