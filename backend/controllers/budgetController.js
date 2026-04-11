@@ -34,16 +34,7 @@ class budgetController {
       const { householdId, userId, status } = req.query;
 
       const filters = {};
-      if (householdId) {
-        // Validate ObjectId format
-        if (!householdId.match(/^[0-9a-fA-F]{24}$/)) {
-          return res.status(400).json({
-            success: false,
-            message: 'Invalid householdId format. Must be a 24-character hex string.'
-          });
-        }
-        filters.householdId = householdId;
-      }
+      if (householdId) filters.householdId = householdId;
       if (userId) filters.userId = userId;
       if (status) filters.status = status;
 
@@ -55,7 +46,6 @@ class budgetController {
         count: budgets.length
       });
     } catch (error) {
-      console.error('getAllBudgets error:', error);
       res.status(500).json({
         success: false,
         message: error.message
