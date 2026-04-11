@@ -299,10 +299,11 @@ class BillPredictionController {
         }
       });
     } catch (error) {
-      if (error.message.includes('No consumption data available')) {
+      console.error('Forecast Error:', error.message);
+      if (error.message.includes('No consumption data') || error.message.includes('No active tariff')) {
         return res.status(200).json({
           success: true,
-          message: 'Not enough data for forecast',
+          message: 'Telemetry synchronization pending',
           data: null
         });
       }

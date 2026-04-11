@@ -380,7 +380,7 @@ const Dashboard = () => {
 
           <div className="w-full">
             {data && data.length > 0 ? (
-              <ResponsiveContainer width="100%" height={400} minWidth="0%">
+              <ResponsiveContainer width="100%" height={400} minWidth={0}>
                 <AreaChart data={data}>
                 <defs>
                   <linearGradient id="colorBlue" x1="0" y1="0" x2="0" y2="1">

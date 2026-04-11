@@ -121,24 +121,8 @@ const Household = () => {
         parseInt(budgetForm.month),
         0,
       );
-const payload = {
-  householdId: profile._id,
-  startDate: startDate.toISOString(),
-  endDate: endDate.toISOString(),
-  monthlyLimit: Number(budgetForm.targetAmount),
-  alertThresholds: {
-    percentageOfBudget: Number(budgetForm.percentageThreshold) || 80,
-    ...(budgetForm.billThreshold && {
-      billAmount: Number(budgetForm.billThreshold),
-    }),
-  },
-  ...(budgetForm.notes && { notes: budgetForm.notes }),
-};
-console.log("Sending payload:", JSON.stringify(payload, null, 2));
-await api.post(`/v1/budgets`, payload);
-
       await api.post(`/v1/budgets`, {
-        householdId: profile._id, 
+        householdId: profile._id,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
         monthlyLimit: Number(budgetForm.targetAmount),
