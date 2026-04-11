@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Users, Home, ShieldCheck, TrendingUp,
-  DollarSign, Zap, Activity, AlertTriangle,
+  Banknote, Zap, Activity, AlertTriangle,
   Search, Filter, ChevronRight, Eye, ToggleLeft,
   UserCheck, UserX, BarChart3, PieChart, Calendar
 } from 'lucide-react';
@@ -145,7 +145,7 @@ const AdminDashboard = () => {
         <Card className="bg-[#161b2a] border border-slate-800 rounded-[2.5rem] p-10 shadow-2xl">
           <div className="flex items-center justify-between mb-6">
             <div className="p-4 bg-amber-500/10 text-amber-500 rounded-2xl">
-              <DollarSign size={28} />
+              <Banknote size={28} />
             </div>
           </div>
           <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em] mb-2">Low Income</p>

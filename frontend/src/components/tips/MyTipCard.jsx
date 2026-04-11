@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bookmark, CheckCircle2, CalendarClock, DollarSign, TrendingDown, MessageSquareText } from 'lucide-react';
+import { Bookmark, CheckCircle2, CalendarClock, Banknote, TrendingDown, MessageSquareText } from 'lucide-react';
 import { Badge, Button, Card } from '../ui';
 
 const formatDate = (value) => {
@@ -65,7 +65,7 @@ const MyTipCard = ({ item, onUnbookmark, onImplement, onRefresh, busyAction }) =
           <div className="rounded-2xl border border-slate-800 bg-[#0b0e14] p-4">
             <p className="text-[10px] text-slate-500 uppercase tracking-[0.2em] font-black mb-2">Bill estimate</p>
             <div className="flex items-center gap-2 text-blue-400 font-black">
-              <DollarSign size={16} />
+              <Banknote size={16} />
               {item.savingsSnapshot.lkrMonthly != null ? `LKR ${Number(item.savingsSnapshot.lkrMonthly).toFixed(2)}` : 'LKR unavailable'}
             </div>
           </div>

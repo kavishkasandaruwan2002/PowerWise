@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lightbulb, TrendingDown, DollarSign, Bookmark, CheckCircle2, ThumbsUp, ThumbsDown, MinusCircle, Clock3 } from 'lucide-react';
+import { Lightbulb, TrendingDown, Banknote, Bookmark, CheckCircle2, ThumbsUp, ThumbsDown, MinusCircle, Clock3 } from 'lucide-react';
 import { Badge, Button, Card, cn } from '../ui';
 
 const formatEffort = (effortLevel) => {
@@ -56,7 +56,7 @@ const RecommendationTipCard = ({ item, onBookmarkToggle, onImplement, onFeedback
             {Number(item?.estimatedSavings?.kwhMonthly || 0).toFixed(2)} kWh/month
           </div>
           <div className="flex items-center gap-2 text-blue-400 font-black text-sm italic">
-            <DollarSign size={16} />
+            <Banknote size={16} />
             {item?.estimatedSavings?.lkrMonthly != null ? `LKR ${Number(item.estimatedSavings.lkrMonthly).toFixed(2)}` : 'LKR unavailable'}
           </div>
           <span className="text-[10px] text-slate-600 uppercase font-black tracking-widest">Relevance {Math.round(item?.relevanceScore || 0)}%</span>

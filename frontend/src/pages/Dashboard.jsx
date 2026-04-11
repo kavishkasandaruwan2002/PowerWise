@@ -16,7 +16,7 @@ import {
 } from "recharts";
 import {
   Zap,
-  DollarSign,
+  Banknote,
   Activity,
   Leaf,
   ArrowUpRight,
@@ -232,7 +232,7 @@ const Dashboard = () => {
         <div className="bg-[#161b2a] p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] border border-slate-800 relative transition-all hover:scale-[1.02] cursor-pointer shadow-2xl group overflow-hidden">
           <div className="flex items-center justify-between mb-10">
             <div className="p-4 bg-emerald-500/10 text-emerald-500 rounded-2xl shadow-inner">
-              <DollarSign size={28} />
+              <Banknote size={28} />
             </div>
             <div className="flex items-center text-emerald-400 bg-emerald-400/5 px-3 py-1.5 rounded-full border border-emerald-400/10 text-[10px] font-black tracking-widest uppercase">
               <ArrowDownRight size={14} className="mr-1" />
@@ -268,7 +268,7 @@ const Dashboard = () => {
                 ? `Rs.${prediction.forecast.projectedBill}`
                 : summary?.estimatedBillRs
                   ? `Rs.${summary.estimatedBillRs}`
-                  : "$142.50"}
+                  : "Rs. 142.50"}
             </h3>
 
             {/* Visual Budget Progress Bar */}
