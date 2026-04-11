@@ -121,47 +121,56 @@ function estimateKwhSavedForTip(tip, appliances, usage) {
   return 0;
 }
 
-function buildExplanation({ tip, usage, weather, incomeTag }) {
+function buildExplanation({ tip, usage, weather }) {
   const parts = [];
-  if (usage?.topCategories?.length) {
-    const top = usage.topCategories[0];
-    if (top?.category) {
-      parts.push(`Your highest estimated monthly usage is in **${top.category}** (~${top.kwh.toFixed(0)} kWh/month).`);
-    }
+  const top = usage?.topCategories?.[0];
+
+  if (top?.category) {
+    parts.push(`Your highest estimated monthly usage is ${top.category} (~${Number(top.kwh).toFixed(0)} kWh/month).`);
   }
+
   if (tip.category && tip.category !== 'General') {
-    parts.push(`This tip targets **${tip.category}** usage.`);
+    parts.push(`This tip targets ${tip.category} usage.`);
   }
-  if (weather?.weatherState) {
-    if (weather.weatherState === 'HOT') parts.push(`Today looks **hot**, so cooling-related reductions can save more.`);
-    if (weather.weatherState === 'RAINY') parts.push(`It’s **rainy**, so lighting and indoor usage patterns often increase.`);
+
+  if (weather?.weatherState === 'HOT') {
+    parts.push('Current weather is hot, so cooling-related savings are more relevant now.');
   }
+
+  if (weather?.weatherState === 'RAINY') {
+    parts.push('Current weather is rainy, so indoor and lighting usage may be higher now.');
+  }
+
   return parts.join(' ');
 }
 
-function scoreTip({ tip, usage, appliances, weather, interaction }) {
+function scoreTip({ tip, usage, appliances, weather, interaction, incomeTag }) {
   let score = 50;
 
-  // Strong match: required category aligns with top category.
   const topCategory = usage?.topCategories?.[0]?.category;
   if (topCategory && (tip.requiredCategories || []).includes(topCategory)) score += 20;
   if (topCategory && tip.category === topCategory) score += 10;
 
-  // Appliance keyword match
-  if (tip.requiredApplianceKeywords?.length && matchesAnyKeyword(appliances, tip.requiredApplianceKeywords)) score += 15;
+  if (
+    tip.requiredApplianceKeywords?.length &&
+    matchesAnyKeyword(appliances, tip.requiredApplianceKeywords)
+  ) {
+    score += 15;
+  }
 
-  // Weather match
   if (tip.weatherTags?.includes('ALL')) score += 2;
   else if (tip.weatherTags?.includes(weather?.weatherState)) score += 10;
 
-  // Effort
+  if (tip.incomeTags?.includes(incomeTag)) score += 6;
+
   if (tip.effortLevel === 'ZERO_COST') score += 6;
+  if (tip.effortLevel === 'LOW_COST') score += 2;
   if (tip.effortLevel === 'INVESTMENT') score -= 3;
 
-  // Interaction-based tuning
+  if (interaction?.feedback?.rating === 'HELPFUL') score += 8;
   if (interaction?.feedback?.rating === 'NOT_HELPFUL') score -= 20;
   if (interaction?.bookmarked) score += 5;
-  if (interaction?.implemented) score -= 8; // still can appear but lower
+  if (interaction?.implemented) score -= 15;
 
   return Math.max(0, Math.min(100, score));
 }
@@ -229,7 +238,14 @@ async function recommendTips(args) {
   const scored = [];
   for (const tip of eligible) {
     const interaction = interactionMap.get(String(tip._id));
-    const relevanceScore = scoreTip({ tip, usage, appliances, weather, interaction });
+    const relevanceScore = scoreTip({
+      tip,
+      usage,
+      appliances,
+      weather,
+      interaction,
+      incomeTag
+    });
     const kwhSavedMonthly = estimateKwhSavedForTip(tip, appliances, usage);
     const lkr = await calculateLkrSavings({ baselineKwhMonthly, kwhSaved: kwhSavedMonthly });
     const explanation = buildExplanation({ tip, usage, weather, incomeTag });
@@ -256,7 +272,12 @@ async function recommendTips(args) {
     });
   }
 
-  scored.sort((a, b) => b.relevanceScore - a.relevanceScore);
+  scored.sort((a, b) => {
+    if (b.relevanceScore !== a.relevanceScore) {
+      return b.relevanceScore - a.relevanceScore;
+    }
+    return b.estimatedSavings.kwhMonthly - a.estimatedSavings.kwhMonthly;
+  });
 
   return {
     meta: {
