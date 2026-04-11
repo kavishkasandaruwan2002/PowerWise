@@ -299,6 +299,13 @@ class BillPredictionController {
         }
       });
     } catch (error) {
+      if (error.message.includes('No consumption data available')) {
+        return res.status(200).json({
+          success: true,
+          message: 'Not enough data for forecast',
+          data: null
+        });
+      }
       res.status(400).json({
         success: false,
         message: error.message
