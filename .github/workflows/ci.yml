@@ -19,8 +19,7 @@ jobs:
         image: mongo:latest
         ports:
           - 27017:27017
-        options: --health-cmd "echo 'db.runCommand({ping:1})' | mongosh --quiet" --health-interval 10s --health-timeout 5s --health-retries 5
-
+        
     steps:
       - uses: actions/checkout@v4
 
@@ -39,8 +38,7 @@ jobs:
         env:
           NODE_ENV: test
           MONGO_TEST_URI: mongodb://localhost:27017/powerwise_test
-          JWT_SECRET: ${{ secrets.JWT_ACCESS_SECRET }}
-
+          JWT_ACCESS_SECRET: ${{ secrets.JWT_ACCESS_SECRET }}
 
   frontend-build:
     name: Frontend CI
