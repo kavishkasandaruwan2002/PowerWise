@@ -561,7 +561,7 @@ artillery report results.json
 
 > ⚠️ Actual secret values are not shown here. Set them directly in the Render dashboard.
 
-**Live Backend URL:** `https://YOUR-APP-NAME.onrender.com`
+**Live Backend URL:** `[https://powerwise.onrender.com]`
 
 ---
 
@@ -587,13 +587,17 @@ artillery report results.json
 | :--- | :--- |
 | `VITE_API_URL` | Deployed backend API base URL |
 
-**Live Frontend URL:** `https://YOUR-APP-NAME.vercel.app`
+**Live Frontend URL:** `power-wise-theta.vercel.app`
 
 ---
 
 ### Deployment Screenshots
 
-> *(Add screenshots of the Render and Vercel dashboards showing successful deployment here)*
+<img width="1600" height="815" alt="image" src="https://github.com/user-attachments/assets/1bd37318-0b7e-4b3a-bdcc-051b29e486c3" />
+
+<img width="1006" height="481" alt="image" src="https://github.com/user-attachments/assets/899ef9f4-4453-4ddb-8b14-92c3c1f98d64" />
+
+
 
 ---
 
