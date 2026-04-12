@@ -17,6 +17,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cors({
     origin: [
       process.env.FRONTEND_URL || 'http://localhost:5173', 
+      'https://power-wise-theta.vercel.app',
       'http://127.0.0.1:5173',
       'http://localhost:5174',
       'http://127.0.0.1:5174',
